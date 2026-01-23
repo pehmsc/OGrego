@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-label="O Grego - ómega">
+  <!-- © O Grego -->
+  <path fill="currentColor" d="M200 216
+           c32-28 46-60 46-96
+           c0-56-44-100-118-100
+           s-118 44-118 100
+           c0 36 14 68 46 96
+           h66
+           v-56
+           h-32
+           c-22-18-28-34-28-54
+           c0-36 28-64 66-64
+           s66 28 66 64
+           c0 20-6 36-28 54
+           h-32
+           v56
+           z"/>
+</svg>
