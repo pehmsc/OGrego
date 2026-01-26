@@ -1,4 +1,4 @@
 
 > ogrego@0.1.0 dev /Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego
-> next dev
+> next dev --turbopack
 
