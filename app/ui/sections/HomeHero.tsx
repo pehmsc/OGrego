@@ -20,7 +20,7 @@ export default function HomeHero() {
             <div className="grid gap-5">
               <h1 className="mx-auto max-w-xl text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] sm:text-4xl lg:mx-0 lg:text-5xl">
                 Grécia à mesa.<span className="hidden sm:inline"> </span>
-                <br className="hidden sm:block" />
+                <br />
                 Sem sair do lugar.
               </h1>
 
