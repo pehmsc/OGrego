@@ -1,3 +1,9 @@
 import postgres from "postgres";
 
-export const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
+const url = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+
+if (!url) {
+  throw new Error("Missing POSTGRES_URL / DATABASE_URL");
+}
+
+export const sql = postgres(url, { ssl: "require" });

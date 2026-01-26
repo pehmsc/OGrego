@@ -7,5 +7,5 @@ export async function getGalleryImages() {
     ORDER BY id ASC
   `;
 
-  return rows.map((r) => `/galeria/${r.image}`);
+  return rows.map((r) => `/galeria/${String(r.image).trim()}`);
 }
