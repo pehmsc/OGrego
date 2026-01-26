@@ -75,7 +75,7 @@ export default function WelcomePage() {
                     </h2>
                     <p className="mt-3 leading-7 text-zinc-600/90 dark:text-zinc-400/90">
                         A experiência é melhor quando é partilhada. Pratos
-                        pensados para mesa, para pedir mais uma coisa… e mais
+                        pensados para dividir, para pedir mais uma coisa… e mais
                         uma.
                     </p>
                 </div>

@@ -26,9 +26,7 @@ export default function ContactosPage() {
                             <div className="text-sm font-semibold text-[#1E3A8A]/80">
                                 Morada
                             </div>
-                            <div>
-                                O Grego, Rua de Atenas, n.º5, 1200-542 Lisboa
-                            </div>
+                            <div>Rua de Atenas, n.º5, 1200-542 Lisboa</div>
                         </div>
 
                         <div>
@@ -75,9 +73,9 @@ export default function ContactosPage() {
                     </h2>
 
                     <p className="mt-3 leading-7 text-zinc-600/90 dark:text-zinc-400/90">
-                        Preenche com o dia e a hora. Se houver alguma
-                        preferência (mesa, alergias, carrinho de bebé…), diz
-                        aqui — ajuda imenso.
+                        Preencha com o dia e a hora. Se houver alguma
+                        preferência (mesa, alergias, carrinho de bebé…),
+                        refira-a aqui — ajuda imenso.
                     </p>
 
                     <div className="mt-6">
