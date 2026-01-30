@@ -1,6 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="O Grego - favicon branco">
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="O Grego - favicon">
   <!-- © O Grego -->
+  <defs>
+    <style>
+      /* Light (default) - branco */
+      .blue { fill:#FFFFFF; }
+
+      /* Dark mode - azul */
+      @media (prefers-color-scheme: dark) {
+        .blue { fill:#1E3A8A; }
+      }
+    </style>
+  </defs>
 
   <path d="M200 216
            c32-28 46-60 46-96
@@ -16,5 +26,5 @@
            c0 20-6 36-28 54
            h-32
            v56
-           z" fill="#FFFFFF"></path>
+           z" class="blue"></path>
 </svg>

@@ -11,7 +11,7 @@ const links = [
 
 export default function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#1E3A8A]/10 bg-[var(--background)]/80 backdrop-blur">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#1E3A8A]/10 bg-[var(--background)]/80 backdrop-blur dark:border-white/10">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         <Link href="/welcome" className="flex items-center gap-3">
           <Image
@@ -38,7 +38,7 @@ export default function Header() {
 
         <Link
           href="/contactos"
-          className="hidden h-10 items-center justify-center rounded-full bg-[#1E3A8A] px-4 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#162F73] hover:-translate-y-[1px] md:flex"
+          className="hidden h-10 items-center justify-center rounded-full bg-[#1E3A8A] px-4 text-sm font-medium text-white shadow-xl transition-all hover:bg-[#162F73] hover:-translate-y-[1px] md:flex dark:border dark:border-white/30"
         >
           Reservar
         </Link>
