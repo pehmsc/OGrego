@@ -40,8 +40,8 @@ export default function HomeHero() {
                 className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1E3A8A] px-5 text-white shadow-sm transition-all duration-200 ease-out hover:bg-[#162F73] hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]/30 focus-visible:ring-offset-2 sm:w-[158px] dark:bg-white dark:text-[#1E3A8A] dark:hover:bg-[#F4F7FB] dark:focus-visible:ring-[#F4F7FB]/30"
               >
                 <Image
-                  className="transition-transform duration-200 ease-out group-hover:scale-105"
-                  src="/omegawhite.svg"
+                  className="transition-transform duration-200 ease-out group-hover:scale-105 text-[var(--foreground)]"
+                  src="/omegadark.svg"
                   alt="O Grego logomark"
                   width={16}
                   height={16}

@@ -15,7 +15,8 @@ export default function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         <Link href="/welcome" className="flex items-center gap-3">
           <Image
-            src="/logo.svg"
+            className="text-[var(--foreground)]"
+            src="/logodark.svg"
             alt="O Grego"
             width={200}
             height={60}
@@ -28,7 +29,7 @@ export default function Header() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-[#1E3A8A]/80 transition-colors hover:text-[#1E3A8A]"
+              className="text-sm font-medium text-[#1E3A8A]/80 transition-colors hover:text-[#1E3A8A] text-[var(--foreground)]"
             >
               {l.label}
             </Link>
