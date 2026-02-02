@@ -123,6 +123,7 @@ export default function ReservationForm() {
                         type="date"
                         value={form.date}
                         onChange={(e) => onChange("date", e.target.value)}
+                        placeholder="dd-mm-yyyy"
                         className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
                     />
                 </label>
