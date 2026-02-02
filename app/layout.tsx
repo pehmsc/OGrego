@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./ui/globals.css";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Providers } from "./providers";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -24,9 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-PT">
+    <html lang="pt-PT" suppressHydrationWarning>
       <body className={`${inter.variable} ${cormorant.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

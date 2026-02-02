@@ -9,7 +9,7 @@ export default function HomeHero() {
           <div className="grid gap-8 text-center lg:text-left">
             <div className="flex justify-center lg:justify-start">
               <Image
-                src="/logo.svg"
+                src="/logodark.svg"
                 alt="O Grego"
                 width={200}
                 height={60}
