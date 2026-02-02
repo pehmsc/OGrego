@@ -9,17 +9,17 @@ export default function HomeHero() {
           <div className="grid gap-8 text-center lg:text-left">
             <div className="flex justify-center lg:justify-start">
               <Image
-                className="text-[var(--foreground)]"
-                src="/logodark.svg"
+                src="/logo.svg"
                 alt="O Grego"
                 width={200}
                 height={60}
                 priority
               />
             </div>
+
             <div className="grid gap-5">
               <h1 className="mx-auto max-w-xl text-3xl font-semibold leading-tight tracking-tight text-[var(--foreground)] sm:text-4xl lg:mx-0 lg:text-5xl">
-                Grécia à mesa.<span className="hidden sm:inline"> </span>
+                Grécia à mesa.
                 <br />
                 Sem sair do lugar.
               </h1>
@@ -34,13 +34,14 @@ export default function HomeHero() {
                 Aqui, come-se devagar, conversa-se mais e volta-se sempre.
               </p>
             </div>
+
             <div className="flex w-full flex-col gap-3 text-base font-medium sm:flex-row sm:justify-center lg:justify-start">
               <Link
                 href="/welcome"
                 className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1E3A8A] px-5 text-white shadow-sm transition-all duration-200 ease-out hover:bg-[#162F73] hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]/30 focus-visible:ring-offset-2 sm:w-[158px] dark:bg-white dark:text-[#1E3A8A] dark:hover:bg-[#F4F7FB] dark:focus-visible:ring-[#F4F7FB]/30"
               >
                 <Image
-                  className="text-[var(--foreground)] transition-transform duration-200 ease-out group-hover:scale-105"
+                  className="transition-transform duration-200 ease-out group-hover:scale-105"
                   src="/omegawhite.svg"
                   alt="O Grego logomark"
                   width={20}
@@ -50,22 +51,24 @@ export default function HomeHero() {
               </Link>
 
               <Link
-                href="/sobre"
-                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#F4F7FB] px-5 text-[#1E3A8A] border border-[#1E3A8A]/20 shadow-sm transition-all duration-200 ease-out hover:bg-white hover:border-[#1E3A8A]/40 hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]/30 focus-visible:ring-offset-2 sm:w-[158px]
+                href="/auth/entrar"
+                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#F4F7FB] px-5 text-[#1E3A8A] border border-[#1E3A8A]/20 shadow-sm transition-all duration-200 ease-out hover:bg-white hover:border-[#1E3A8A]/40 hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]/30 focus-visible:ring-offset-2 sm:w-[190px]
                   dark:bg-[#F4F7FB] dark:text-[#1E3A8A] dark:border-white/20 dark:hover:border-white/35 dark:focus-visible:ring-white/30"
               >
-                Sobre
+                Entrar / Criar conta
               </Link>
             </div>
           </div>
+
           <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-[#F4F7FB] shadow-sm">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-3xl bg-[#F4F7FB] shadow-sm sm:aspect-[4/5]">
               <Image
                 src="/homehero.png"
                 alt="Ambiente do restaurante O Grego"
                 fill
                 className="object-cover"
                 priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
               />
             </div>
           </div>
