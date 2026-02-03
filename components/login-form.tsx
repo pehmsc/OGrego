@@ -1,3 +1,9 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSignIn } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +22,76 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
+function getClerkError(err: any) {
+  return (
+    err?.errors?.[0]?.longMessage ||
+    err?.errors?.[0]?.message ||
+    "Não foi possível entrar. Confirma os dados e tenta novamente."
+  );
+}
+
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+  const { isLoaded, signIn, setActive } = useSignIn();
+
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!isLoaded) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (res.status === "complete") {
+        await setActive({ session: res.createdSessionId });
+        router.push("/welcome");
+        router.refresh();
+        return;
+      }
+
+      // Se aparecer algum fluxo extra (2FA, etc.), avisamos de forma decente.
+      setError(
+        "A tua conta precisa de um passo extra para entrar (ex.: verificação/2FA). Ativa esse método no Clerk ou ajustamos o fluxo.",
+      );
+    } catch (err: any) {
+      setError(getClerkError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function signInWithProvider(provider: "oauth_google" | "oauth_apple") {
+    if (!isLoaded) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Abre o fluxo de OAuth e volta para o callback do Clerk.
+      await signIn.authenticateWithRedirect({
+        strategy: provider,
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/welcome",
+      });
+    } catch (err: any) {
+      setError(getClerkError(err));
+      setLoading(false);
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -31,13 +103,15 @@ export function LoginForm({
         </CardHeader>
 
         <CardContent>
-          <form>
+          <form onSubmit={onSubmit}>
             <FieldGroup>
               <Field>
                 <Button
                   className="rounded-full"
                   variant="outline"
                   type="button"
+                  disabled={loading}
+                  onClick={() => signInWithProvider("oauth_apple")}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -52,6 +126,8 @@ export function LoginForm({
                   className="rounded-full"
                   variant="outline"
                   type="button"
+                  disabled={loading}
+                  onClick={() => signInWithProvider("oauth_google")}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -75,36 +151,54 @@ export function LoginForm({
                   type="email"
                   placeholder="exemplo@email.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
                 />
               </Field>
 
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
+                  <Link
+                    href="/entrar" // depois trocamos isto por “recuperar password” quando criares a rota
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
                     Esqueceste-te da password?
-                  </a>
+                  </Link>
                 </div>
                 <Input
                   className="rounded-full"
                   id="password"
                   type="password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                 />
               </Field>
+
+              {error ? (
+                <Field>
+                  <FieldDescription className="text-center text-red-500">
+                    {error}
+                  </FieldDescription>
+                </Field>
+              ) : null}
 
               <Field>
                 <Button
                   className="group inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#1E3A8A] px-5 text-white shadow-sm transition-all duration-200 ease-out hover:bg-[#162F73] hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]/30 focus-visible:ring-offset-2 sm:w-[158px] dark:bg-white dark:text-[#1E3A8A] dark:hover:bg-[#F4F7FB] dark:focus-visible:ring-[#F4F7FB]/30"
                   type="submit"
+                  disabled={loading}
                 >
-                  Entrar
+                  {loading ? "A entrar..." : "Entrar"}
                 </Button>
                 <FieldDescription className="text-center">
-                  Ainda não tens conta? <a href="./criar-conta">Criar conta</a>
+                  Ainda não tens conta?{" "}
+                  <Link href="/criar-conta" className="underline">
+                    Criar conta
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -113,8 +207,15 @@ export function LoginForm({
       </Card>
 
       <FieldDescription className="px-6 text-center">
-        Ao continuar, concordas com os <a href="../terms">Termos de Serviço</a>{" "}
-        e a <a href="../privacy">Política de Privacidade</a>.
+        Ao continuar, concordas com os{" "}
+        <Link href="/terms" className="underline">
+          Termos de Serviço
+        </Link>{" "}
+        e a{" "}
+        <Link href="/privacy" className="underline">
+          Política de Privacidade
+        </Link>
+        .
       </FieldDescription>
     </div>
   );

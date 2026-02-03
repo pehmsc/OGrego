@@ -48,12 +48,6 @@ export default function MenuViewer({ ptSrc, enSrc }: Props) {
         >
           EN
         </button>
-
-        {lang === "en" && (
-          <span className="text-sm text-zinc-600/90">
-            (quando adicionares o PDF em EN)
-          </span>
-        )}
       </div>
 
       <div className="relative overflow-hidden rounded-3xl border border-[#1E3A8A]/10 bg-white/60 shadow-sm">
