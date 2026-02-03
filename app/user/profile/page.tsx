@@ -49,7 +49,7 @@ export default async function ProfilePage() {
                         {/* Badge de Fidelização */}
                         <div className="mt-3 flex items-center gap-3">
                             <span className="flex h-8 items-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 text-sm font-medium text-white shadow-sm">
-                                🏆 Ouro
+                                Ouro
                             </span>
                             <span className="text-sm font-medium text-zinc-600">
                                 {user.loyalty_points} pontos
@@ -62,13 +62,13 @@ export default async function ProfilePage() {
             {/* Tabs */}
             <div className="flex gap-3 border-b border-[#1E3A8A]/10">
                 <button className="border-b-2 border-[#1E3A8A] px-6 py-3 text-sm font-medium text-[#1E3A8A]">
-                    📋 Perfil
+                    Perfil
                 </button>
                 <button className="px-6 py-3 text-sm font-medium text-zinc-600/70 transition-colors hover:text-[#1E3A8A]">
-                    🛍️ Encomendas
+                    Encomendas
                 </button>
                 <button className="px-6 py-3 text-sm font-medium text-zinc-600/70 transition-colors hover:text-[#1E3A8A]">
-                    💬 Feedback
+                    Feedback
                 </button>
             </div>
 
@@ -211,7 +211,7 @@ export default async function ProfilePage() {
                                     1€ gasto = 1 ponto
                                 </p>
                             </div>
-                            <div className="text-4xl">🏆</div>
+                            <div className="text-4xl"></div>
                         </div>
 
                         <div className="mb-6">

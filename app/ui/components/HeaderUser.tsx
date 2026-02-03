@@ -9,7 +9,7 @@ const links = [
 ];
 
 export default function Header() {
-    const isLoggedIn = false; // TODO: NextAuth
+    const isLoggedIn = true; // TODO: NextAuth
     const cartItemCount = 3; // TODO: Vir da BD/estado
 
     return (
