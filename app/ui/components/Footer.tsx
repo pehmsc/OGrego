@@ -1,16 +1,28 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export default function Footer() {
+type FooterProps = {
+  className?: string;
+};
+
+export default function Footer({ className }: FooterProps) {
   return (
-    <footer className="border-t border-[#1E3A8A]/10 dark:border-white/10 bg-[var(--background)]">
+    <footer
+      className={cn(
+        "border-t border-[#1E3A8A]/10 bg-[var(--background)] dark:border-white/10",
+        className,
+      )}
+    >
       <div className="mx-auto max-w-7xl px-6 py-8 text-sm text-[#1E3A8A]/70">
         <div className="grid gap-4 text-center sm:grid-cols-3 sm:items-center sm:text-left dark:text-white/70">
           <p>
             © {new Date().getFullYear()} O Grego. Todos os direitos reservados.
           </p>
+
           <p className="text-[#1E3A8A]/60 sm:text-center dark:text-white/70">
             Grécia à mesa. Sem sair do lugar.
           </p>
+
           <div className="flex items-center justify-center gap-4 sm:justify-end">
             <Link
               href="https://www.facebook.com"
@@ -47,6 +59,7 @@ export default function Footer() {
     </footer>
   );
 }
+
 function FacebookIcon() {
   return (
     <svg

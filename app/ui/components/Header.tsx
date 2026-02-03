@@ -37,9 +37,9 @@ export default function Header() {
         </nav>
 
         <Link
-          href="/auth/entrar"
+          href="/entrar"
           className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] px-5 text-white border border-[#1E3A8A]/20 shadow-sm transition-all duration-200 ease-out hover:bg-white hover:text-[#1E3A8A] hover:border-[#1E3A8A]/40 hover:shadow-md hover:-translate-y-[1px] active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]/30 focus-visible:ring-offset-2 sm:w-[190px]
-                  dark:bg-[#F4F7FB] dark:text-[#F4F7FB] dark:border-white/20 dark:hover:border-white/35 dark:focus-visible:ring-white/30"
+                  dark:bg-[#F4F7FB] dark:text-[#1e3a8a] dark:border-white/20 dark:hover:border-white/35 dark:focus-visible:ring-white/30"
         >
           Entrar / Criar conta
         </Link>
