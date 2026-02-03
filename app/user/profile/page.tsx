@@ -1,19 +1,24 @@
 // import { getServerSession } from "next-auth";
 import Image from "next/image";
+import { getCurrentUserDb } from "@/app/lib/current-user";
+import { updateProfile } from "@/app/lib/profile-actions";
 
 export default async function ProfilePage() {
-    // const session = await getServerSession();
+    const userDb = await getCurrentUserDb();
 
-    // Mock data - por enquanto hardcoded
+    const name =
+        [userDb.first_name, userDb.last_name].filter(Boolean).join(" ") ||
+        "Utilizador";
+
     const user = {
-        name: "João Silva", // session?.user?.name || "Utilizador",
-        email: "joao@example.com", // session?.user?.email || "",
-        photo: "", // session?.user?.image || "",
-        phone: "+351 912 345 678",
-        nif: "123456789",
-        address: "Rua Exemplo, 123, 1200-000 Lisboa",
-        favorite_restaurant: "O Grego Lisboa",
-        loyalty_points: 45,
+        name,
+        email: userDb.email ?? "",
+        photo: userDb.image_url ?? "",
+        phone: userDb.phone ?? "",
+        nif: userDb.nif ?? "",
+        address: userDb.address ?? "",
+        favorite_restaurant: userDb.favorite_restaurant ?? "",
+        loyalty_points: userDb.points ?? 0,
     };
 
     return (
@@ -37,24 +42,14 @@ export default async function ProfilePage() {
                         )}
                     </div>
 
-                    {/* Info */}
-                    <div className="flex-1">
-                        <h1 className="text-3xl font-semibold tracking-tight text-[#1E3A8A] sm:text-4xl">
-                            {user.name}
-                        </h1>
-                        <p className="mt-1 text-lg text-zinc-600/90">
-                            {user.email}
-                        </p>
-
-                        {/* Badge de Fidelização */}
-                        <div className="mt-3 flex items-center gap-3">
-                            <span className="flex h-8 items-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 text-sm font-medium text-white shadow-sm">
-                                Ouro
-                            </span>
-                            <span className="text-sm font-medium text-zinc-600">
-                                {user.loyalty_points} pontos
-                            </span>
-                        </div>
+                    {/* Badge de Fidelização */}
+                    <div className="mt-3 flex items-center gap-3">
+                        <span className="flex h-8 items-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 text-sm font-medium text-white shadow-sm">
+                            Ouro
+                        </span>
+                        <span className="text-sm font-medium text-zinc-600">
+                            {user.loyalty_points} pontos
+                        </span>
                     </div>
                 </div>
             </div>
@@ -81,7 +76,7 @@ export default async function ProfilePage() {
                             Informações Pessoais
                         </h2>
 
-                        <form className="grid gap-6">
+                        <form action={updateProfile} className="grid gap-6">
                             {/* Fotografia */}
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-[#1E3A8A]">
@@ -104,6 +99,7 @@ export default async function ProfilePage() {
                                     Nome Completo
                                 </label>
                                 <input
+                                    name="name"
                                     type="text"
                                     defaultValue={user.name}
                                     className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
@@ -132,6 +128,7 @@ export default async function ProfilePage() {
                                     Telefone
                                 </label>
                                 <input
+                                    name="phone"
                                     type="tel"
                                     defaultValue={user.phone}
                                     placeholder="+351 912 345 678"
@@ -145,6 +142,7 @@ export default async function ProfilePage() {
                                     NIF
                                 </label>
                                 <input
+                                    name="nif"
                                     type="text"
                                     defaultValue={user.nif}
                                     placeholder="123456789"
@@ -159,6 +157,7 @@ export default async function ProfilePage() {
                                     Morada
                                 </label>
                                 <input
+                                    name="address"
                                     type="text"
                                     defaultValue={user.address}
                                     placeholder="Rua Exemplo, 123, 1200-000 Lisboa"
@@ -172,6 +171,7 @@ export default async function ProfilePage() {
                                     Restaurante Favorito
                                 </label>
                                 <select
+                                    name="favorite_restaurant"
                                     defaultValue={user.favorite_restaurant}
                                     className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
                                 >
@@ -264,6 +264,51 @@ export default async function ProfilePage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="mb-6">
+                <p className="text-sm font-medium text-yellow-100">
+                    Saldo Atual
+                </p>
+                <p className="text-4xl font-bold">{user.loyalty_points}</p>
+                <p className="text-sm text-yellow-100">pontos</p>
+            </div>
+
+            {/* Barra de Progresso */}
+            <div>
+                <div className="mb-2 flex justify-between text-xs font-medium">
+                    <span>Nível: Ouro</span>
+                    <span>{50 - user.loyalty_points} pts até Platina</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-yellow-300/50">
+                    <div
+                        className="h-full rounded-full bg-white transition-all"
+                        style={{
+                            width: `${(user.loyalty_points / 50) * 100}%`,
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Benefícios */}
+            <div className="mt-6 space-y-2 border-t border-yellow-500/30 pt-6">
+                <p className="text-xs font-semibold uppercase tracking-wide text-yellow-100">
+                    Benefícios Ouro
+                </p>
+                <ul className="space-y-1 text-sm">
+                    <li className="flex items-center gap-2">
+                        <span>✓</span>
+                        <span>10% desconto</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                        <span>✓</span>
+                        <span>Sobremesa grátis</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                        <span>✓</span>
+                        <span>Reserva prioritária</span>
+                    </li>
+                </ul>
             </div>
         </section>
     );

@@ -21,6 +21,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { AFTER_AUTH_REDIRECT } from "@/lib/route";
 
 function getClerkError(err: any) {
   return (
@@ -101,7 +102,7 @@ export function SignupForm({
 
       if (res.status === "complete") {
         await setActive({ session: res.createdSessionId });
-        router.push("/user/profile");
+        router.push(AFTER_AUTH_REDIRECT);
         router.refresh();
         return;
       }
