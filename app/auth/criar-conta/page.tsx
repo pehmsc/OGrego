@@ -63,7 +63,7 @@ export default function CriarContaPage() {
                     <p className="text-sm text-zinc-600/90">
                         Já tem conta?{" "}
                         <Link
-                            href="/auth/entrar"
+                            href="/(auth)/entrar"
                             className="font-semibold text-[#1E3A8A] underline-offset-4 hover:underline"
                         >
                             Entrar

@@ -11,7 +11,7 @@ export default async function UserLayout({
 
     // Comentado por enquanto - adicionar quando tivermos NextAuth
     // if (!session) {
-    //   redirect("/auth/entrar");
+    //   redirect("/(auth)/entrar");
     // }
 
     return (

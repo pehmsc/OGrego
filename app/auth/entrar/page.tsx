@@ -59,7 +59,7 @@ export default function EntrarPage() {
                         <p>
                             Ainda não tem conta?{" "}
                             <Link
-                                href="/auth/criar-conta"
+                                href="/(auth)/criar-conta"
                                 className="font-semibold text-[#1E3A8A] underline-offset-4 hover:underline"
                             >
                                 Criar conta

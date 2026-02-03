@@ -78,7 +78,7 @@ export default function Header() {
                     ) : (
                         /* Botão Entrar */
                         <Link
-                            href="/auth/entrar"
+                            href="/(auth)/entrar"
                             className="flex h-12 items-center justify-center rounded-full bg-[#1E3A8A] px-6 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#162F73] hover:-translate-y-[1px]"
                         >
                             Entrar / Criar conta
