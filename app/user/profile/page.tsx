@@ -265,51 +265,6 @@ export default async function ProfilePage() {
                     </div>
                 </div>
             </div>
-
-            <div className="mb-6">
-                <p className="text-sm font-medium text-yellow-100">
-                    Saldo Atual
-                </p>
-                <p className="text-4xl font-bold">{user.loyalty_points}</p>
-                <p className="text-sm text-yellow-100">pontos</p>
-            </div>
-
-            {/* Barra de Progresso */}
-            <div>
-                <div className="mb-2 flex justify-between text-xs font-medium">
-                    <span>Nível: Ouro</span>
-                    <span>{50 - user.loyalty_points} pts até Platina</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-yellow-300/50">
-                    <div
-                        className="h-full rounded-full bg-white transition-all"
-                        style={{
-                            width: `${(user.loyalty_points / 50) * 100}%`,
-                        }}
-                    />
-                </div>
-            </div>
-
-            {/* Benefícios */}
-            <div className="mt-6 space-y-2 border-t border-yellow-500/30 pt-6">
-                <p className="text-xs font-semibold uppercase tracking-wide text-yellow-100">
-                    Benefícios Ouro
-                </p>
-                <ul className="space-y-1 text-sm">
-                    <li className="flex items-center gap-2">
-                        <span>✓</span>
-                        <span>10% desconto</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                        <span>✓</span>
-                        <span>Sobremesa grátis</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                        <span>✓</span>
-                        <span>Reserva prioritária</span>
-                    </li>
-                </ul>
-            </div>
         </section>
     );
 }
