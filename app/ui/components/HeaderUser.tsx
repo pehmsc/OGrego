@@ -11,7 +11,7 @@ const links = [
   { href: "/contactos", label: "Contactos" },
 ];
 
-export default function Header() {
+export default function HeaderUser() {
   const cartItemCount = 3; // TODO: vir da BD/estado global
 
   return (

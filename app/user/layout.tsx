@@ -1,6 +1,6 @@
 // import { getServerSession } from "next-auth";
 // import { redirect } from "next/navigation";
-import Header from "@/app/ui/components/HeaderUser";
+import HeaderUser from "@/app/ui/components/HeaderUser";
 
 export default async function UserLayout({
   children,
@@ -17,7 +17,7 @@ export default async function UserLayout({
   return (
     <>
       {/* Header fixo no topo */}
-      <Header />
+      <HeaderUser />
 
       <div className="min-h-screen bg-[#F4F7FB]">
         {/* Navegação secundária - mt-20 para ficar abaixo do header fixo */}
