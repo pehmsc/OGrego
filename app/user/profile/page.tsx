@@ -37,19 +37,26 @@ export default async function ProfilePage() {
                             />
                         ) : (
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#1E3A8A] text-3xl font-bold text-white">
-                                {user.name[0]}
+                                {user.name.charAt(0)}
                             </div>
                         )}
                     </div>
 
-                    {/* Badge de Fidelização */}
-                    <div className="mt-3 flex items-center gap-3">
-                        <span className="flex h-8 items-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 text-sm font-medium text-white shadow-sm">
-                            Ouro
-                        </span>
-                        <span className="text-sm font-medium text-zinc-600">
-                            {user.loyalty_points} pontos
-                        </span>
+                    {/* Nome + Badge + Pontos */}
+                    <div className="flex flex-col justify-center gap-2">
+                        <h1 className="text-2xl font-semibold text-[#1E3A8A]">
+                            {user.name}
+                        </h1>
+
+                        <div className="flex items-center gap-3">
+                            <span className="flex h-8 items-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 text-sm font-medium text-white shadow-sm">
+                                Ouro
+                            </span>
+
+                            <span className="text-sm font-medium text-zinc-600">
+                                {user.loyalty_points} pontos
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,7 +67,7 @@ export default async function ProfilePage() {
                     Perfil
                 </button>
                 <button className="px-6 py-3 text-sm font-medium text-zinc-600/70 transition-colors hover:text-[#1E3A8A]">
-                    Encomendas
+                    Histórico de Encomendas
                 </button>
                 <button className="px-6 py-3 text-sm font-medium text-zinc-600/70 transition-colors hover:text-[#1E3A8A]">
                     Feedback
