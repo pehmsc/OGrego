@@ -1,8 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
 import { LoginForm } from "@/components/login-form";
-export default function LoginPage() {
+
+export default async function LoginPage() {
+  const authData = await auth();
+
+  if (authData.userId) {
+    redirect("/user/profile");
+  }
+
   return (
     <div className="bg-[var(--background)] flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -17,6 +26,7 @@ export default function LoginPage() {
             />
           </div>
         </Link>
+
         <LoginForm />
       </div>
     </div>
