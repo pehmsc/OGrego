@@ -8,9 +8,12 @@ importers:
 
   .:
     dependencies:
+<<<<<<< HEAD
+=======
       '@clerk/nextjs':
         specifier: ^6.37.1
         version: 6.37.1(next@16.1.4(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.1(react@19.2.3))
@@ -44,9 +47,12 @@ importers:
       react-hook-form:
         specifier: ^7.71.1
         version: 7.71.1(react@19.2.3)
+<<<<<<< HEAD
+=======
       svix:
         specifier: ^1.84.1
         version: 1.84.1
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
@@ -1202,9 +1208,12 @@ packages:
     resolution: {integrity: sha512-0dtu/5ApsOZ24qgaZwtif8jVwqol7a4m1x5AxPuM1k5wxhqU7t/qEfBGtaSki1R8VlbTQfCj5PAlO45NKCa7Gg==}
     hasBin: true
 
+<<<<<<< HEAD
+=======
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
 
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
@@ -2785,12 +2794,15 @@ packages:
   stable-hash@0.0.5:
     resolution: {integrity: sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==}
 
+<<<<<<< HEAD
+=======
   standardwebhooks@1.0.0:
     resolution: {integrity: sha512-BbHGOQK9olHPMvQNHWul6MYlrRTAOKn03rOe4A8O3CLWhNf4YHBqq2HJKKC+sfqpxiBY52pNeesD6jIiLDz8jg==}
 
   std-env@3.10.0:
     resolution: {integrity: sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg==}
 
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
   stdin-discarder@0.1.0:
     resolution: {integrity: sha512-xhV7w8S+bUwlPTb4bAOUQhv8/cSS5offJuX8GQGq32ONF0ZtDWKfkdomM3HMRA+LhX6um/FZ0COqlwsjD53LeQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -2991,10 +3003,13 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+<<<<<<< HEAD
+=======
   uuid@10.0.0:
     resolution: {integrity: sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==}
     hasBin: true
 
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
@@ -4220,8 +4235,11 @@ snapshots:
       prompts: 2.4.2
       zod: 3.25.76
 
+<<<<<<< HEAD
+=======
   '@stablelib/base64@1.0.1': {}
 
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
   '@standard-schema/utils@0.3.0': {}
 
   '@swc/helpers@0.5.15':
@@ -6013,6 +6031,8 @@ snapshots:
 
   stable-hash@0.0.5: {}
 
+<<<<<<< HEAD
+=======
   standardwebhooks@1.0.0:
     dependencies:
       '@stablelib/base64': 1.0.1
@@ -6020,6 +6040,7 @@ snapshots:
 
   std-env@3.10.0: {}
 
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
   stdin-discarder@0.1.0:
     dependencies:
       bl: 5.1.0
@@ -6267,8 +6288,11 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
+<<<<<<< HEAD
+=======
   uuid@10.0.0: {}
 
+>>>>>>> cfaa79c6df52b5599199121a1d903adc1ec5626b
   wcwidth@1.0.1:
     dependencies:
       defaults: 1.0.4
