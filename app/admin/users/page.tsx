@@ -1,13 +1,4 @@
-const users = [
-  {
-    nome: "Maria Lopes",
-    morada: "Rua das Oliveiras, Lisboa",
-    telefone: "912 345 678",
-    nif: "245678912",
-  },
-];
-
-export default function Utilizadores() {
+export default function Page() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Utilizadores</h2>
@@ -31,3 +22,12 @@ export default function Utilizadores() {
     </div>
   );
 }
+
+const users = [
+  {
+    nome: "Maria Lopes",
+    morada: "Rua das Oliveiras, Lisboa",
+    telefone: "912 345 678",
+    nif: "245678912",
+  },
+];
