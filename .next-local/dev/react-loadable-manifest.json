@@ -1,8 +1,0 @@
-{
-  "node_modules/.pnpm/@clerk+nextjs@6.37.1_next@16.1.4_@babel+core@7.28.6_react-dom@19.2.3_react@19.2.3__reac_d85bb1e1046fb3a9dad22e974cb950cb/node_modules/@clerk/nextjs/dist/esm/app-router/client/ClerkProvider.js -> ./keyless-creator-reader.js": {
-    "id": "node_modules/.pnpm/@clerk+nextjs@6.37.1_next@16.1.4_@babel+core@7.28.6_react-dom@19.2.3_react@19.2.3__reac_d85bb1e1046fb3a9dad22e974cb950cb/node_modules/@clerk/nextjs/dist/esm/app-router/client/ClerkProvider.js -> ./keyless-creator-reader.js",
-    "files": [
-      "static/chunks/_app-pages-browser_node_modules_pnpm_clerk_nextjs_6_37_1_next_16_1_4__babel_core_7_28_6_react-279059.js"
-    ]
-  }
-}

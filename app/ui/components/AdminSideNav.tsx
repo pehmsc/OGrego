@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import NavLinks from "@/app/admin/dashboard/nav-links";
+import NavLinks from "@/app/admin/nav-links";
 import Image from "next/image";
 
 export default function AdminSideNav() {

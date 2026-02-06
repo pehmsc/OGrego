@@ -1,23 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // IMPORTANTÍSSIMO: evita o .next dentro do CloudDocs (que falha em writes/renames)
-  distDir: ".next-local",
-
   images: {
     remotePatterns: [
       {
         protocol: "https",
         hostname: "pub-1d125fe406c2413c836fec3139f85cbd.r2.dev",
       },
-      {
-        protocol: "https",
-        hostname: "img.clerk.com",
-      },
-      {
-        protocol: "https",
-        hostname: "images.clerk.dev",
-      },
+      { protocol: "https", hostname: "img.clerk.com" },
+      { protocol: "https", hostname: "images.clerk.dev" },
     ],
   },
 };
