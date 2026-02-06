@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // IMPORTANTÍSSIMO: evita o .next dentro do CloudDocs (que falha em writes/renames)
+  distDir: ".next-local",
+
   images: {
     remotePatterns: [
       {
@@ -19,4 +22,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

@@ -1,4 +1,3 @@
-// import { getServerSession } from "next-auth";
 // import { redirect } from "next/navigation";
 import HeaderUser from "@/app/ui/components/HeaderUser";
 
