@@ -1,9 +1,9 @@
 import { sql } from "./db";
 
-export async function getGalleryImages(): Promise<string[]> {
+export async function getMenuImages(): Promise<string[]> {
     const rows = await sql<{ id: number; image: string }[]>`
     SELECT id, image
-    FROM gallery
+    FROM menuImages
     ORDER BY id ASC
   `;
 

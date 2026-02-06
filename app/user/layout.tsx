@@ -1,31 +1,62 @@
-// import { getServerSession } from "next-auth";
-// import { redirect } from "next/navigation";
-import HeaderUser from "@/app/ui/components/HeaderUser";
+import Header from "@/app/ui/components/Header";
+import UserHeader from "@/app/ui/components/user/UserHeader";
+import UserNav from "@/app/ui/components/user/UserNav";
+import { getCurrentUserDb } from "@/app/lib/current-user";
 
 export default async function UserLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  // const session = await getServerSession();
+    // const session = await getServerSession();
 
-  // Comentado por enquanto - adicionar quando tivermos NextAuth
-  // if (!session) {
-  //   redirect("/(auth)/entrar");
-  // }
+    // Comentado por enquanto - adicionar quando tivermos NextAuth
+    // if (!session) {
+    //   redirect("/auth/entrar");
+    // }
 
-  return (
-    <>
-      {/* Header fixo no topo */}
-      <HeaderUser />
+    // Buscar dados reais do user
+    const userDb = await getCurrentUserDb();
 
-      <div className="min-h-screen bg-[#F4F7FB]">
-        {/* Navegação secundária - mt-20 para ficar abaixo do header fixo */}
-        <div className="mt-20 border-b border-[#1E3A8A]/10 bg-white/80"></div>
+    const name =
+        [userDb.first_name, userDb.last_name].filter(Boolean).join(" ") ||
+        "Utilizador";
 
-        {/* Conteúdo da página */}
-        <div className="container mx-auto px-4 py-8">{children}</div>
-      </div>
-    </>
-  );
+    const user = {
+        name,
+        email: userDb.email ?? "",
+        photo: userDb.image_url ?? "",
+        loyalty_points: userDb.points ?? 0,
+    };
+
+    return (
+        <>
+            {/* Header fixo no topo (comum a todo o site) */}
+            <Header />
+
+            <div id="user_navegacao" className="min-h-screen bg-[#F4F7FB]">
+                {/* Navegação secundária - mt-20 para ficar abaixo do header fixo */}
+
+                {/* Conteúdo da página */}
+                <div
+                    id="user_header"
+                    className="mx-auto max-w-7xl flex-1 px-6 pt-28 pb-10"
+                >
+                    {/* Header interno com avatar e pontos (comum a todas as páginas user) */}
+                    <div className="mb-8">
+                        <UserHeader
+                            name={user.name}
+                            email={user.email}
+                            photo={user.photo}
+                            loyaltyPoints={user.loyalty_points}
+                        />
+                        <UserNav />
+                    </div>
+
+                    {/* Conteúdo dinâmico de cada página */}
+                    {children}
+                </div>
+            </div>
+        </>
+    );
 }
