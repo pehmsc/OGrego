@@ -1,6 +1,8 @@
+// app/user/encomendas/page.tsx
 import { getCurrentUserDb } from "@/app/lib/current-user";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import OrderSummaryCard from "@/app/ui/components/user/OrderSummaryCard";
+import Link from "next/link";
 
 // TODO: Descomentar quando criares as tabelas no Neon
 // import { getUserOrders, getUserOrderStats } from "@/app/lib/orders";
@@ -27,7 +29,6 @@ export default async function EncomendasPage() {
             total: 23.5,
             points: 23,
             status: "Entregue",
-            items: "Moussaka, Tzatziki",
         },
         {
             id: 2,
@@ -35,7 +36,6 @@ export default async function EncomendasPage() {
             total: 45.0,
             points: 45,
             status: "Entregue",
-            items: "Souvlaki de Frango, Baklava",
         },
         {
             id: 3,
@@ -43,7 +43,6 @@ export default async function EncomendasPage() {
             total: 32.0,
             points: 32,
             status: "Entregue",
-            items: "Giouvetsi, Spanakopita",
         },
         {
             id: 4,
@@ -51,7 +50,6 @@ export default async function EncomendasPage() {
             total: 28.5,
             points: 28,
             status: "Cancelado",
-            items: "Kleftiko",
         },
         {
             id: 5,
@@ -59,7 +57,6 @@ export default async function EncomendasPage() {
             total: 16.5,
             points: 16,
             status: "Entregue",
-            items: "Hummus, Dolmades",
         },
     ];
     // ========== FIM MOCK DATA ==========
@@ -93,9 +90,6 @@ export default async function EncomendasPage() {
                                             Data
                                         </th>
                                         <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
-                                            Itens
-                                        </th>
-                                        <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
                                             Total
                                         </th>
                                         <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
@@ -104,6 +98,7 @@ export default async function EncomendasPage() {
                                         <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
                                             Estado
                                         </th>
+                                        <th className="pb-3 text-left text-sm font-medium text-zinc-600/70"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -117,9 +112,6 @@ export default async function EncomendasPage() {
                                             </td>
                                             <td className="py-4 text-sm text-zinc-600">
                                                 {order.date}
-                                            </td>
-                                            <td className="py-4 text-sm text-zinc-600 max-w-xs truncate">
-                                                {order.items}
                                             </td>
                                             <td className="py-4 text-sm font-medium text-[#1E3A8A]">
                                                 {order.total.toFixed(2)} EUR
@@ -146,6 +138,14 @@ export default async function EncomendasPage() {
                                                     {order.status}
                                                 </span>
                                             </td>
+                                            <td className="py-4">
+                                                <Link
+                                                    href={`/user/encomendas/${order.id}`}
+                                                    className="inline-flex items-center gap-1 rounded-full bg-[#1E3A8A] px-4 py-2 text-xs font-medium text-white transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                                                >
+                                                    Ver Fatura
+                                                </Link>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -159,7 +159,7 @@ export default async function EncomendasPage() {
                                     key={order.id}
                                     className="rounded-2xl border border-[#1E3A8A]/10 bg-white p-4"
                                 >
-                                    <div className="mb-2 flex items-center justify-between">
+                                    <div className="mb-3 flex items-center justify-between">
                                         <span className="text-sm font-medium text-[#1E3A8A]">
                                             #{order.id}
                                         </span>
@@ -179,13 +179,12 @@ export default async function EncomendasPage() {
                                             {order.status}
                                         </span>
                                     </div>
-                                    <p className="mb-1 text-xs text-zinc-600/70">
+
+                                    <p className="mb-2 text-xs text-zinc-600/70">
                                         {order.date}
                                     </p>
-                                    <p className="mb-2 text-sm text-zinc-600">
-                                        {order.items}
-                                    </p>
-                                    <div className="flex items-center justify-between">
+
+                                    <div className="mb-3 flex items-center justify-between">
                                         <span className="text-sm font-medium text-[#1E3A8A]">
                                             {order.total.toFixed(2)} EUR
                                         </span>
@@ -193,6 +192,13 @@ export default async function EncomendasPage() {
                                             +{order.points} pts
                                         </span>
                                     </div>
+
+                                    <Link
+                                        href={`/user/encomendas/${order.id}`}
+                                        className="flex h-10 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-xs font-medium text-white transition-all hover:bg-[#162F73]"
+                                    >
+                                        Ver Fatura
+                                    </Link>
                                 </div>
                             ))}
                         </div>

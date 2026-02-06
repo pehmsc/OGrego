@@ -15,7 +15,6 @@ export default async function UserLayout({
     //   redirect("/auth/entrar");
     // }
 
-<<<<<<< HEAD
     // Buscar dados reais do user
     const userDb = await getCurrentUserDb();
 
@@ -60,16 +59,4 @@ export default async function UserLayout({
             </div>
         </>
     );
-=======
-  return (
-    <>
-      {/* Header fixo no topo */}
-      <HeaderUser />
-      {/* Conteúdo da página */}
-      <div className="mx-auto max-w-7xl flex-1 px-6 pt-28 pb-10">
-        {children}
-      </div>
-    </>
-  );
->>>>>>> 8e361a2d69a05f241eabb6c17b0f2a2ec3e526de
 }
