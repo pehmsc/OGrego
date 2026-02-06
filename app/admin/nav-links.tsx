@@ -12,32 +12,32 @@ import {
 const links = [
   {
     name: "Dashboard",
-    href: "/dashboard",
+    href: "/admin/dashboard",
     icon: HomeIcon,
   },
   {
     name: "Utilizadores",
-    href: "/utilizadores",
+    href: "/admin/utilizadores",
     icon: UserGroupIcon,
   },
   {
     name: "Pedidos Pendentes",
-    href: "/pedidos",
+    href: "/admin/pedidos",
     icon: DocumentDuplicateIcon,
   },
   {
     name: "Recibos",
-    href: "/recibos",
+    href: "/admin/recibos",
     icon: DocumentDuplicateIcon,
   },
   {
     name: "Gestão de Pedidos",
-    href: "/orders",
+    href: "/admin/pedidos",
     icon: UserGroupIcon,
   },
   {
     name: "Gestão de Reservas",
-    href: "/reservations",
+    href: "/admin/reservas",
     icon: DocumentDuplicateIcon,
   },
 ];
