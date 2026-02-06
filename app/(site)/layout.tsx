@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { auth } from "@clerk/nextjs/server";
 
 import Header from "../ui/components/Header";
-import HeaderUser from "@/app/ui/components/HeaderUser";
 import Footer from "../ui/components/Footer";
 import { getCurrentUserDb } from "@/app/lib/current-user";
 
@@ -18,7 +17,7 @@ export default async function SiteLayout({
     return (
       <div className="flex min-h-screen flex-col bg-[var(--background)]">
         <Header />
-        <main className="mx-auto max-w-7xl flex-1 px-6 pt-28 pb-10">
+        <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-28 pb-10">
           {children}
         </main>
         <Footer />
@@ -33,9 +32,9 @@ export default async function SiteLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
-      {showUserHeader ? <HeaderUser /> : null}
+      {showUserHeader ? <Header /> : null}
 
-      <main className="mx-auto max-w-7xl flex-1 px-6 pt-28 pb-10">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-28 pb-10">
         {children}
       </main>
 

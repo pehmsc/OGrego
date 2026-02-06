@@ -1,5 +1,5 @@
 // import { redirect } from "next/navigation";
-import HeaderUser from "@/app/ui/components/HeaderUser";
+import HeaderUser from "@/app/ui/components/Header";
 
 export default async function UserLayout({
   children,
