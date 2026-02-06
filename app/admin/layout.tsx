@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // app/admin/layout.tsx
 import React from "react";
 import { redirect } from "next/navigation";
@@ -45,4 +46,23 @@ export default async function AdminLayout({
             <main className="flex-1 p-6">{children}</main>
         </div>
     );
+=======
+import AdminSideNav from "@/app/ui/components/AdminSideNav";
+import AdminHeader from "@/app/ui/components/AdminHeader";
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSideNav />
+      <div className="flex flex-1 flex-col">
+        <AdminHeader />
+        <main className="p-6">{children}</main>
+      </div>
+    </div>
+  );
+>>>>>>> f36d06d2e5593239c192c00a669b69a5f5241286
 }

@@ -79,7 +79,7 @@ export default function HeaderUser() {
 
               {/* Sair */}
               <SignOutButton redirectUrl="/">
-                <button className="flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-4 text-sm font-medium text-[#1E3A8A] transition-all hover:bg-[#F4F7FB] hover:border-[#1E3A8A]/40 hover:-translate-y-[1px] hover:shadow-sm">
+                <button className="cursor-pointer flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-4 text-sm font-medium text-[#1E3A8A] transition-all hover:bg-[#F4F7FB] hover:border-[#1E3A8A]/40 hover:-translate-y-[1px] hover:shadow-sm">
                   Sair
                 </button>
               </SignOutButton>

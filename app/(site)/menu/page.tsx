@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 
-const BASE_URL = "https://pub-1d125fe406c2413c836fec3139f85cbd.r2.dev";
+const BASE_URL =
+    "https://pub-1d125fe406c2413c836fec3139f85cbd.r2.dev/public/menu";
 
 type Lang = "pt" | "en";
 
@@ -108,7 +109,7 @@ const categorias: CategoriaMenu[] = [
                     en: "Baked pasta with minced meat and béchamel topping.",
                 },
                 preco: "15,50 €",
-                imagem: `${BASE_URL}/principal-pastitsio.jpg`,
+                imagem: `${BASE_URL}/principal-pastitsio.jpeg`,
             },
         ],
     },

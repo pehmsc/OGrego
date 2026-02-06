@@ -4,22 +4,23 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import { Providers } from "./providers";
 
 const cormorant = Cormorant_Garamond({
-    subsets: ["latin"],
-    weight: ["400", "500", "600", "700"],
-    variable: "--font-title",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-title",
 });
 
 const inter = Inter({
-    subsets: ["latin"],
-    variable: "--font-body",
+  subsets: ["latin"],
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
-    title: "O Grego Restaurante",
-    description: "Aqui, come-se devagar, conversa-se mais e volta-se sempre.",
+  title: "O Grego Restaurante",
+  description: "Aqui, come-se devagar, conversa-se mais e volta-se sempre.",
 };
 
 export default function RootLayout({
+<<<<<<< HEAD
     children,
 }: {
     children: React.ReactNode;
@@ -33,4 +34,19 @@ export default function RootLayout({
             </body>
         </html>
     );
+=======
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="pt-PT" suppressHydrationWarning>
+      <body className={`${inter.variable} ${cormorant.variable} antialiased`}>
+        <Providers>
+          <main className="flex-1 p-6">{children}</main>
+        </Providers>
+      </body>
+    </html>
+  );
+>>>>>>> f36d06d2e5593239c192c00a669b69a5f5241286
 }
