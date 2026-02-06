@@ -1,8 +1,12 @@
+// app/admin/page.tsx
+import React from "react";
 import StatCard from "@/app/ui/components/StatCard";
 
 export default function AdminDashboard() {
     return (
         <div className="space-y-6">
+            <h1 className="text-2xl font-semibold">Área de Admin</h1>
+
             <h2 className="text-xl font-semibold">Visão Geral</h2>
 
             <section className="grid gap-4 md:grid-cols-3">
