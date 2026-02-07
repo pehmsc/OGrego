@@ -1,8 +1,8 @@
-// app/user/encomendas/page.tsx
 import { getCurrentUserDb } from "@/app/lib/current-user";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import OrderSummaryCard from "@/app/ui/components/user/OrderSummaryCard";
 import Link from "next/link";
+import { DocumentTextIcon } from "@heroicons/react/24/outline";
 
 // TODO: Descomentar quando criares as tabelas no Neon
 // import { getUserOrders, getUserOrderStats } from "@/app/lib/orders";
@@ -141,8 +141,9 @@ export default async function EncomendasPage() {
                                             <td className="py-4">
                                                 <Link
                                                     href={`/user/encomendas/${order.id}`}
-                                                    className="inline-flex items-center gap-1 rounded-full bg-[#1E3A8A] px-4 py-2 text-xs font-medium text-white transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1E3A8A] px-4 py-2 text-xs font-medium text-white transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                                                 >
+                                                    <DocumentTextIcon className="h-4 w-4" />
                                                     Ver Fatura
                                                 </Link>
                                             </td>
