@@ -270,13 +270,13 @@ export default function MenuPage() {
             </nav>
 
             {/* Lista de itens da categoria ativa */}
-            <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <section className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
                 {categoria.itens.map((item) => (
                     <article
                         key={item.id}
                         className="border rounded-lg overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow"
                     >
-                        <div className="relative h-80 w-full bg-gray-200 overflow-hidden">
+                        <div className="relative h-65 w-full">
                             <Image
                                 src={item.imagem}
                                 alt={item.nome[lang]}
@@ -285,7 +285,7 @@ export default function MenuPage() {
                             />
                         </div>
 
-                        <div className="p-4 space-y-2">
+                        <div className="p-6 space-y-3">
                             <div className="flex items-center justify-between gap-2">
                                 <h2 className="text-base font-semibold">
                                     {item.nome[lang]}
