@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useCart } from "@/app/contexts/CartContext";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 
 const BASE_URL =
     "https://pub-1d125fe406c2413c836fec3139f85cbd.r2.dev/public/menu";
@@ -203,6 +205,25 @@ export default function MenuPage() {
     const [lang, setLang] = useState<Lang>("pt");
     const [categoriaAtiva, setCategoriaAtiva] = useState<string>("entradas");
 
+    const { addItem } = useCart();
+
+    const handleAddToCart = (item: ItemMenu) => {
+        // Converter preço de "5,50 €" para 5.50
+        const precoNumerico = parseFloat(
+            item.preco.replace(",", ".").replace(" €", "").trim(),
+        );
+
+        addItem({
+            id: item.id,
+            nome: item.nome[lang],
+            descricao: item.descricao?.[lang] || "",
+            preco: precoNumerico,
+            imagem: item.imagem,
+        });
+
+        alert(`${item.nome[lang]} adicionado ao carrinho!`);
+    };
+
     const categoria =
         categorias.find((c) => c.id === categoriaAtiva) ?? categorias[0];
 
@@ -285,7 +306,7 @@ export default function MenuPage() {
                             />
                         </div>
 
-                        <div className="p-6 space-y-3">
+                        <div className="flex flex-col p-6 space-y-3">
                             <div className="flex items-center justify-between gap-2">
                                 <h2 className="text-base font-semibold">
                                     {item.nome[lang]}
@@ -300,6 +321,23 @@ export default function MenuPage() {
                                     {item.descricao[lang]}
                                 </p>
                             )}
+
+                            <button
+                                onClick={() => handleAddToCart(item)}
+                                aria-label={
+                                    lang === "pt"
+                                        ? "Adicionar ao carrinho"
+                                        : "Add to cart"
+                                }
+                                title={
+                                    lang === "pt"
+                                        ? "Adicionar ao carrinho"
+                                        : "Add to cart"
+                                }
+                                className="ml-auto p-2 text-[#1E3A8A] transition hover:text-[#162F73]"
+                            >
+                                <ShoppingCartIcon className="h-6 w-6" />
+                            </button>
                         </div>
                     </article>
                 ))}
