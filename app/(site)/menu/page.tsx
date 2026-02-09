@@ -295,8 +295,9 @@ export default function MenuPage() {
                 {categoria.itens.map((item) => (
                     <article
                         key={item.id}
-                        className="border rounded-lg overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow"
+                        className="flex flex-col border rounded-lg overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow"
                     >
+                        {/* Imagem */}
                         <div className="relative h-65 w-full">
                             <Image
                                 src={item.imagem}
@@ -306,38 +307,45 @@ export default function MenuPage() {
                             />
                         </div>
 
-                        <div className="flex flex-col p-6 space-y-3">
-                            <div className="flex items-center justify-between gap-2">
-                                <h2 className="text-base font-semibold">
-                                    {item.nome[lang]}
-                                </h2>
-                                <span className="text-emerald-700 font-semibold whitespace-nowrap">
-                                    {item.preco}
-                                </span>
+                        {/* Conteúdo */}
+                        <div className="flex flex-col flex-1 p-6 space-y-3">
+                            {/* Topo: Nome, Preço, Descrição (cresce para empurrar botão) */}
+                            <div className="flex-1 space-y-3">
+                                <div className="flex items-center justify-between gap-2">
+                                    <h2 className="text-base font-semibold">
+                                        {item.nome[lang]}
+                                    </h2>
+                                    <span className="text-emerald-700 font-semibold whitespace-nowrap">
+                                        {item.preco}
+                                    </span>
+                                </div>
+
+                                {item.descricao && (
+                                    <p className="text-sm text-gray-600">
+                                        {item.descricao[lang]}
+                                    </p>
+                                )}
                             </div>
 
-                            {item.descricao && (
-                                <p className="text-sm text-gray-600">
-                                    {item.descricao[lang]}
-                                </p>
-                            )}
-
-                            <button
-                                onClick={() => handleAddToCart(item)}
-                                aria-label={
-                                    lang === "pt"
-                                        ? "Adicionar ao carrinho"
-                                        : "Add to cart"
-                                }
-                                title={
-                                    lang === "pt"
-                                        ? "Adicionar ao carrinho"
-                                        : "Add to cart"
-                                }
-                                className="ml-auto p-2 text-[#1E3A8A] transition hover:text-[#162F73]"
-                            >
-                                <ShoppingCartIcon className="h-6 w-6" />
-                            </button>
+                            {/* Fundo: Botão do Carrinho (sempre alinhado) */}
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={() => handleAddToCart(item)}
+                                    aria-label={
+                                        lang === "pt"
+                                            ? "Adicionar ao carrinho"
+                                            : "Add to cart"
+                                    }
+                                    title={
+                                        lang === "pt"
+                                            ? "Adicionar ao carrinho"
+                                            : "Add to cart"
+                                    }
+                                    className="group p-2 text-[#1E3A8A] transition-all duration-200 hover:text-white hover:bg-[#1E3A8A] hover:scale-110 rounded-full cursor-pointer"
+                                >
+                                    <ShoppingCartIcon className="h-6 w-6 transition-transform group-hover:scale-110" />
+                                </button>
+                            </div>
                         </div>
                     </article>
                 ))}
