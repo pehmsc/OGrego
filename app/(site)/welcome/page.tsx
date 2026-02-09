@@ -25,10 +25,10 @@ export default function WelcomePage() {
             </Link>
 
             <Link
-              href="/contactos"
+              href="/menu"
               className="flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 text-sm font-medium text-[#1E3A8A] shadow-sm transition-all hover:border-[#1E3A8A]/40 hover:-translate-y-[1px]"
             >
-              Reservas & Contactos
+              Encomendar
             </Link>
           </div>
         </div>
@@ -49,32 +49,44 @@ export default function WelcomePage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold text-[#1E3A8A]">
-            Ambiente mediterrânico
-          </h2>
-          <p className="mt-3 leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
-            Um espaço luminoso, calmo e confortável — ideal para jantares
-            longos, encontros a dois e mesas cheias de conversa.
+          <Image
+            src="/grego10.png"
+            alt="10% desconto"
+            width={400}
+            height={300}
+            className="rounded-2xl"
+          />
+          <p className="text-center mt-3 leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
+            Um convite ao sabor. <br />
+            10% de vantagem na sua próxima encomenda.
           </p>
         </div>
 
         <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold text-[#1E3A8A]">
-            Ingredientes frescos
-          </h2>
-          <p className="mt-3 leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
-            Sabores limpos, simples e bem executados. O que chega à mesa tem
-            intenção: qualidade, equilíbrio e carácter.
+          <Image
+            src="/bemvindo.png"
+            alt="15% desconto"
+            width={400}
+            height={300}
+            className="rounded-2xl"
+          />
+          <p className="text-center mt-3 leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
+            Seja bem-vindo. <br />
+            Um início especial, pensado para si.
           </p>
         </div>
 
         <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold text-[#1E3A8A]">
-            Para partilhar
-          </h2>
-          <p className="mt-3 leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
-            A experiência é melhor quando é partilhada. Pratos pensados para
-            dividir, para pedir mais uma coisa… e mais uma.
+          <Image
+            src="/promo20.png"
+            alt="20% desconto"
+            width={400}
+            height={300}
+            className="rounded-2xl"
+          />
+          <p className="text-center mt-3 leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
+            Mais para quem escolhe mais. <br />
+            20% de vantagem em compras selecionadas.
           </p>
         </div>
       </div>
@@ -89,18 +101,12 @@ export default function WelcomePage() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 justify-center">
           <Link
             href="/contactos"
             className="flex h-12 items-center justify-center rounded-full bg-[#1E3A8A] px-6 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#162F73] hover:-translate-y-[1px]"
           >
             Como chegar
-          </Link>
-          <Link
-            href="/galeria"
-            className="flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white/60 px-6 text-sm font-medium text-[#1E3A8A] shadow-sm transition-all hover:border-[#1E3A8A]/40 hover:-translate-y-[1px]"
-          >
-            Ver ambiente
           </Link>
         </div>
       </div>
