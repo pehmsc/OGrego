@@ -1,4 +1,3 @@
-// app/lib/current-user.ts
 import "server-only";
 import { auth, currentUser as clerkCurrentUser } from "@clerk/nextjs/server";
 import { sql } from "@/app/lib/db";
