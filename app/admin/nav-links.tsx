@@ -19,28 +19,28 @@ const links = [
         icon: PresentationChartBarIcon,
     },
     {
-        name: "Utilizadores",
-        href: "/admin/utilizadores",
+        name: "Users",
+        href: "/admin/users",
         icon: UsersIcon,
     },
     {
-        name: "Recibos",
-        href: "/admin/recibos",
+        name: "Receipts & Invoices",
+        href: "/admin/invoices-and-receipts",
         icon: DocumentDuplicateIcon,
     },
     {
         name: "Gestão de Pedidos",
-        href: "/admin/pedidos",
+        href: "/admin/ordens",
         icon: PencilSquareIcon,
     },
     {
         name: "Gestão de Reservas",
-        href: "/admin/reservas",
+        href: "/admin/reservations",
         icon: UserGroupIcon,
     },
     {
         name: "Gestão de Vendas",
-        href: "/admin/vendas",
+        href: "/admin/sales",
         icon: CurrencyEuroIcon,
     },
 ];
