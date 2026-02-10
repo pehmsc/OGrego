@@ -1,20 +1,11 @@
-import { redirect } from "next/navigation";
 import AdminSideNav from "@/app/ui/components/AdminSideNav";
 import AdminHeader from "@/app/ui/components/AdminHeader";
-import { getCurrentUserDb } from "@/app/lib/current-user";
-import { AFTER_AUTH_REDIRECT } from "@/lib/route";
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUserDb();
-
-  if (user.role !== "admin") {
-    redirect(AFTER_AUTH_REDIRECT); // ou "/user/profile"
-  }
-
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSideNav />

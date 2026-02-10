@@ -5,23 +5,25 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import {
     UserGroupIcon,
+    HomeIcon,
     DocumentDuplicateIcon,
-    CurrencyEuroIcon,
-    PresentationChartBarIcon,
-    UsersIcon,
-    PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 
 const links = [
     {
         name: "Dashboard",
         href: "/admin/dashboard",
-        icon: PresentationChartBarIcon,
+        icon: HomeIcon,
     },
     {
         name: "Utilizadores",
         href: "/admin/utilizadores",
-        icon: UsersIcon,
+        icon: UserGroupIcon,
+    },
+    {
+        name: "Pedidos Pendentes",
+        href: "/admin/pedidos",
+        icon: DocumentDuplicateIcon,
     },
     {
         name: "Recibos",
@@ -30,18 +32,13 @@ const links = [
     },
     {
         name: "Gestão de Pedidos",
-        href: "/admin/pedidos",
-        icon: PencilSquareIcon,
-    },
-    {
-        name: "Gestão de Reservas",
-        href: "/admin/reservas",
+        href: "/admin/orders",
         icon: UserGroupIcon,
     },
     {
-        name: "Gestão de Vendas",
-        href: "/admin/vendas",
-        icon: CurrencyEuroIcon,
+        name: "Gestão de Reservas",
+        href: "/admin/reservations",
+        icon: DocumentDuplicateIcon,
     },
 ];
 
