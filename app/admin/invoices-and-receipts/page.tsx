@@ -1,4 +1,4 @@
-export default function Recibos() {
+export default function ReceiptsAndInvoices() {
     return (
         <div className="space-y-4">
             <h2 className="text-xl font-semibold">Recibos Pagos</h2>

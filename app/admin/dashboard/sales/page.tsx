@@ -1,4 +1,4 @@
-export default function VendasPage() {
+export default function SalesPage() {
     const vendas = [
         {
             id: 1,
