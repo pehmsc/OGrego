@@ -1,65 +1,16 @@
 import { getCurrentUserDb } from "@/app/lib/current-user";
+import { getUserOrders, getUserOrderStats } from "@/app/lib/orders";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import OrderSummaryCard from "@/app/ui/components/user/OrderSummaryCard";
 import Link from "next/link";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 
-// TODO: Descomentar quando criares as tabelas no Neon
-// import { getUserOrders, getUserOrderStats } from "@/app/lib/orders";
-
 export default async function EncomendasPage() {
     const userDb = await getCurrentUserDb();
 
-    // ========== TODO: DESCOMENTAR QUANDO TIVERES TABELAS ==========
-    // const orders = await getUserOrders(userDb.id);
-    // const stats = await getUserOrderStats(userDb.id);
-    // ===============================================================
-
-    // ========== MOCK DATA - APAGAR DEPOIS ==========
-    const stats = {
-        totalOrders: 12,
-        totalSpent: 145.5,
-        lastOrder: "5 de Fev, 2026",
-    };
-
-    const orders = [
-        {
-            id: 1,
-            date: "5 Fev 2026",
-            total: 23.5,
-            points: 23,
-            status: "Entregue",
-        },
-        {
-            id: 2,
-            date: "28 Jan 2026",
-            total: 45.0,
-            points: 45,
-            status: "Entregue",
-        },
-        {
-            id: 3,
-            date: "15 Jan 2026",
-            total: 32.0,
-            points: 32,
-            status: "Entregue",
-        },
-        {
-            id: 4,
-            date: "3 Jan 2026",
-            total: 28.5,
-            points: 28,
-            status: "Cancelado",
-        },
-        {
-            id: 5,
-            date: "20 Dez 2025",
-            total: 16.5,
-            points: 16,
-            status: "Entregue",
-        },
-    ];
-    // ========== FIM MOCK DATA ==========
+    // ✅ Dados reais da BD
+    const orders = await getUserOrders(userDb.id);
+    const stats = await getUserOrderStats(userDb.id);
 
     return (
         <UserPageLayout
@@ -67,7 +18,7 @@ export default async function EncomendasPage() {
                 <OrderSummaryCard
                     totalOrders={stats.totalOrders}
                     totalSpent={stats.totalSpent}
-                    lastOrder={stats.lastOrder}
+                    lastOrder={stats.lastOrder ?? "Sem encomendas"}
                 />
             }
         >
@@ -123,28 +74,36 @@ export default async function EncomendasPage() {
                                                 <span
                                                     className={`rounded-full px-3 py-1 text-xs font-medium ${
                                                         order.status ===
-                                                            "Entregue" ||
+                                                            "delivered" ||
                                                         order.status ===
-                                                            "delivered"
+                                                            "Entregue"
                                                             ? "bg-green-100 text-green-700"
                                                             : order.status ===
-                                                                    "Cancelado" ||
+                                                                    "cancelled" ||
                                                                 order.status ===
-                                                                    "cancelled"
+                                                                    "Cancelado"
                                                               ? "bg-red-100 text-red-700"
                                                               : "bg-yellow-100 text-yellow-700"
                                                     }`}
                                                 >
-                                                    {order.status}
+                                                    {order.status === "pending"
+                                                        ? "Pendente"
+                                                        : order.status ===
+                                                            "delivered"
+                                                          ? "Entregue"
+                                                          : order.status ===
+                                                              "cancelled"
+                                                            ? "Cancelado"
+                                                            : order.status}
                                                 </span>
                                             </td>
                                             <td className="py-4">
                                                 <Link
-                                                    href={`/user/encomendas/${order.id}`}
+                                                    href={`/user/encomendas/${order.id}/recibo`}
                                                     className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1E3A8A] px-4 py-2 text-xs font-medium text-white transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                                                 >
                                                     <DocumentTextIcon className="h-4 w-4" />
-                                                    Ver Fatura
+                                                    Ver Recibo
                                                 </Link>
                                             </td>
                                         </tr>
@@ -166,18 +125,24 @@ export default async function EncomendasPage() {
                                         </span>
                                         <span
                                             className={`rounded-full px-3 py-1 text-xs font-medium ${
-                                                order.status === "Entregue" ||
-                                                order.status === "delivered"
+                                                order.status === "delivered" ||
+                                                order.status === "Entregue"
                                                     ? "bg-green-100 text-green-700"
                                                     : order.status ===
-                                                            "Cancelado" ||
+                                                            "cancelled" ||
                                                         order.status ===
-                                                            "cancelled"
+                                                            "Cancelado"
                                                       ? "bg-red-100 text-red-700"
                                                       : "bg-yellow-100 text-yellow-700"
                                             }`}
                                         >
-                                            {order.status}
+                                            {order.status === "pending"
+                                                ? "Pendente"
+                                                : order.status === "delivered"
+                                                  ? "Entregue"
+                                                  : order.status === "cancelled"
+                                                    ? "Cancelado"
+                                                    : order.status}
                                         </span>
                                     </div>
 
@@ -195,10 +160,10 @@ export default async function EncomendasPage() {
                                     </div>
 
                                     <Link
-                                        href={`/user/encomendas/${order.id}`}
+                                        href={`/user/encomendas/${order.id}/recibo`}
                                         className="flex h-10 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-xs font-medium text-white transition-all hover:bg-[#162F73]"
                                     >
-                                        Ver Fatura
+                                        Ver Recibo
                                     </Link>
                                 </div>
                             ))}

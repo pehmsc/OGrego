@@ -10,8 +10,10 @@ import {
     TicketIcon,
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/app/contexts/CartContext";
+import { useUser } from "@clerk/nextjs";
 
 export default function CartPage() {
+    const { user } = useUser();
     const {
         items,
         removeItem,
@@ -378,17 +380,37 @@ export default function CartPage() {
 
                     {/* Botões */}
                     <div className="mt-6 space-y-3">
-                        <button
-                            onClick={() => {
-                                // TODO: Implementar checkout
-                                alert(
-                                    `Checkout de €${total.toFixed(2)} - Ganhar ${pontosAGanhar} pontos`,
-                                );
-                            }}
-                            className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
-                        >
-                            Finalizar Compra
-                        </button>
+                        {user ? (
+                            // User autenticado - pode finalizar compra
+                            <Link
+                                href="/checkout"
+                                className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                            >
+                                Finalizar Compra
+                            </Link>
+                        ) : (
+                            // User NÃO autenticado - precisa login
+                            <div className="space-y-2">
+                                <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-center">
+                                    <p className="text-xs text-amber-800">
+                                        🔒 Necessário iniciar sessão para
+                                        finalizar compra
+                                    </p>
+                                </div>
+                                <Link
+                                    href="/sign-in?redirect_url=/checkout"
+                                    className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                                >
+                                    Iniciar Sessão
+                                </Link>
+                                <Link
+                                    href="/sign-up?redirect_url=/checkout"
+                                    className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
+                                >
+                                    Criar Conta
+                                </Link>
+                            </div>
+                        )}
 
                         <Link
                             href="/menu"
