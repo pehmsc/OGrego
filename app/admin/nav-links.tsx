@@ -19,12 +19,12 @@ const links = [
         icon: PresentationChartBarIcon,
     },
     {
-        name: "Users",
+        name: "Utilizadores",
         href: "/admin/users",
         icon: UsersIcon,
     },
     {
-        name: "Receipts & Invoices",
+        name: "Recibos e Faturas",
         href: "/admin/invoices-and-receipts",
         icon: DocumentDuplicateIcon,
     },
