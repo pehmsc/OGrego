@@ -1,44 +1,19 @@
 import { getCurrentUserDb } from "@/app/lib/current-user";
+import {
+    getUserFeedbacks,
+    getUserFeedbackStats,
+} from "@/app/lib/feedback-actions";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import FeedbackStatsCard from "@/app/ui/components/user/FeedbackStatsCard";
 import FeedbackForm from "@/app/ui/components/FeedbackForm";
 import Image from "next/image";
 
-// TODO: Descomentar quando criares a tabela feedback
-// import { getUserFeedbacks, getUserFeedbackStats } from "@/app/lib/feedback-actions";
-
 export default async function FeedbackPage() {
     const userDb = await getCurrentUserDb();
 
-    // ========== TODO: DESCOMENTAR QUANDO TIVERES TABELA ==========
-    // const stats = await getUserFeedbackStats(userDb.id);
-    // const feedbacks = await getUserFeedbacks(userDb.id);
-    // ==============================================================
-
-    // ========== MOCK DATA - APAGAR DEPOIS ==========
-    const stats = {
-        totalFeedbacks: 8,
-        averageRating: 4.5,
-        lastFeedback: "Há 3 dias",
-    };
-
-    const feedbacks = [
-        {
-            id: 1,
-            rating: 5,
-            comment: "Comida deliciosa! O Moussaka estava perfeito.",
-            image_url: null,
-            date: "3 de Fev de 2026",
-        },
-        {
-            id: 2,
-            rating: 4,
-            comment: "Muito bom! Apenas o tempo de espera foi um pouco longo.",
-            image_url: null,
-            date: "15 de Jan de 2026",
-        },
-    ];
-    // ========== FIM MOCK DATA ==========
+    // ✅ Dados reais da BD
+    const stats = await getUserFeedbackStats(userDb.id);
+    const feedbacks = await getUserFeedbacks(userDb.id);
 
     return (
         <UserPageLayout

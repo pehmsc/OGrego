@@ -110,7 +110,7 @@ export async function getUserFeedbacks(userId: string) {
       LIMIT 20
     `;
 
-        return result; // ✅ SEM .rows
+        return result;
     } catch (error) {
         console.error("Erro ao buscar feedbacks:", error);
         return [];
@@ -128,7 +128,7 @@ export async function getUserFeedbackStats(userId: string) {
       WHERE user_id = ${userId}
     `;
 
-        const row = result[0]; // ✅ SEM .rows
+        const row = result[0];
 
         let lastFeedback = "Nenhum feedback";
         if (row.hours_diff) {
