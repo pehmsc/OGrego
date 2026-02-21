@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UsersIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 
 type User = {
     nome: string;
@@ -12,7 +13,7 @@ type User = {
     pontos: number;
 };
 
-const users: User[] = [
+const usersData: User[] = [
     {
         nome: "David Martins",
         morada: "Morada da Baixa 3, Faro",
@@ -42,24 +43,24 @@ const users: User[] = [
     },
 ];
 
+const emptyUser: User = {
+    nome: "",
+    morada: "",
+    telefone: "",
+    email: "",
+    nif: "",
+    restauranteFavorito: "Lisboa",
+    pontos: 0,
+};
+
 export default function UsersPage() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState<User>({
-        nome: "",
-        morada: "",
-        telefone: "",
-        email: "",
-        nif: "",
-        restauranteFavorito: "",
-        pontos: 0,
-    });
-
-    // NOVO: Estados para pesquisa
+    const [isNewUser, setIsNewUser] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [formData, setFormData] = useState<User>(emptyUser);
 
-    // NOVO: Função para filtrar utilizadores
-    const filteredUsers = users.filter(
+    const filteredUsers = usersData.filter(
         (user) =>
             user.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
             user.nif.includes(searchQuery) ||
@@ -74,12 +75,22 @@ export default function UsersPage() {
     const openEditModal = (user: User) => {
         setSelectedUser(user);
         setFormData(user);
+        setIsNewUser(false);
+        setIsModalOpen(true);
+    };
+
+    const openNewUserModal = () => {
+        setSelectedUser(null);
+        setFormData(emptyUser);
+        setIsNewUser(true);
         setIsModalOpen(true);
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedUser(null);
+        setIsNewUser(false);
+        setFormData(emptyUser);
     };
 
     const handleInputChange = (
@@ -93,74 +104,84 @@ export default function UsersPage() {
     };
 
     const handleSave = () => {
-        if (selectedUser) {
-            // Aqui podias fazer fetch para API real
-            console.log("Guardar:", formData);
+        if (isNewUser) {
+            console.log("Criar novo cliente:", formData);
+            alert("Cliente criado! (Simulação - implementa API real)");
+        } else if (selectedUser) {
+            console.log("Guardar cliente:", formData);
             alert("Cliente atualizado! (Simulação - implementa API real)");
         }
         closeModal();
     };
 
+    const isFormValid = formData.nome && formData.email && formData.nif;
+
     return (
         <>
             <main className="p-6 space-y-6">
-                <header className="space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                        Utilizadores
-                    </h1>
-                    <p className="text-xl text-gray-600">
-                        Lista de clientes registados na plataforma.
-                    </p>
+                <header className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow">
+                        <UsersIcon className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold">Utilizadores</h1>
+                        <p className="text-sm text-gray-600">
+                            Lista de clientes registados na plataforma
+                        </p>
+                    </div>
                 </header>
 
-                {/* NOVO: Barra de pesquisa */}
-                <section className="space-y-4">
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                                className="h-4 w-4 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                />
-                            </svg>
-                        </div>
+                <section className="flex items-center gap-4">
+                    <div className="relative flex-1 max-w-md">
+                        <svg
+                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
                         <input
                             type="text"
-                            placeholder="Procurar por nome, NIF, email, morada..."
+                            placeholder="Pesquisar por nome, NIF, email..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full max-w-md pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                            className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-purple-400"
                         />
                     </div>
+                    <button
+                        onClick={openNewUserModal}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                        <UserPlusIcon className="h-4 w-4" />
+                        <span className="text-sm font-medium">
+                            Novo Cliente
+                        </span>
+                    </button>
                 </section>
 
                 <section className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg">
-                            {filteredUsers.length} clientes
-                        </span>
+                    <div className="inline-flex items-center gap-2 rounded-full bg-purple-100 text-purple-800 px-4 py-2 text-sm font-medium">
+                        {filteredUsers.length} clientes
                     </div>
 
-                    {/* MUDANÇA: usar filteredUsers em vez de users */}
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {filteredUsers.map((u) => (
                             <div
                                 key={u.nif}
-                                className="group overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 cursor-pointer"
                                 onClick={() => openEditModal(u)}
+                                className="group cursor-pointer border border-gray-200 rounded-2xl p-4 bg-white hover:shadow-lg hover:-translate-y-1 transition-all"
                             >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-2 shadow-lg">
+                                <div className="flex items-start justify-between gap-2 mb-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow">
                                             <svg
-                                                className="h-8 w-8 text-white"
+                                                className="h-6 w-6 text-white"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
@@ -173,49 +194,41 @@ export default function UsersPage() {
                                                 />
                                             </svg>
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-xl text-gray-900 group-hover:text-blue-600">
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-gray-900 truncate group-hover:text-purple-600">
                                                 {u.nome}
                                             </h3>
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-xs text-gray-500">
                                                 {u.nif}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-800">
+                                    <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800 flex-shrink-0">
                                         {u.pontos} pts
-                                    </div>
+                                    </span>
                                 </div>
 
-                                <div className="mt-4 space-y-2 border-t border-gray-100 pt-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-gray-500">
+                                <div className="space-y-2 border-t border-gray-100 pt-3">
+                                    <div className="flex items-center justify-between text-xs">
+                                        <span className="text-gray-500">
                                             Restaurante Favorito
                                         </span>
-                                        <span className="inline-flex rounded-full bg-gradient-to-r from-orange-400 to-yellow-500 px-3 py-1 text-xs font-bold text-white shadow-md">
+                                        <span className="inline-flex rounded-full bg-orange-100 px-2 py-1 text-xs font-semibold text-orange-800">
                                             {u.restauranteFavorito}
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                                        <div>
-                                            <span className="font-medium">
-                                                📍
-                                            </span>{" "}
-                                            {u.morada}
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">
-                                                📱
-                                            </span>{" "}
-                                            {u.telefone}
-                                        </div>
-                                        <div className="col-span-2 pt-1">
-                                            <span className="font-medium">
-                                                ✉️
-                                            </span>{" "}
-                                            {u.email}
-                                        </div>
-                                    </div>
+                                    <p className="text-xs text-gray-600 truncate">
+                                        <span className="mr-1">📍</span>
+                                        {u.morada}
+                                    </p>
+                                    <p className="text-xs text-gray-600 truncate">
+                                        <span className="mr-1">📱</span>
+                                        {u.telefone}
+                                    </p>
+                                    <p className="text-xs text-gray-600 truncate">
+                                        <span className="mr-1">✉️</span>
+                                        {u.email}
+                                    </p>
                                 </div>
                             </div>
                         ))}
@@ -223,20 +236,21 @@ export default function UsersPage() {
                 </section>
             </main>
 
-            {/* Modal de Edição - SEM MUDANÇAS */}
             {isModalOpen && (
                 <div
-                    className="fixed inset-0 z-50 overflow-y-auto bg-black/50"
+                    className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
                     onClick={closeModal}
                 >
                     <div
-                        className="mx-auto mt-10 w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all sm:mt-20"
+                        className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="mb-6 flex items-center justify-between">
-                            <h3 className="text-2xl font-bold text-gray-900">
-                                Editar {selectedUser?.nome}
-                            </h3>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold">
+                                {isNewUser
+                                    ? "Novo Cliente"
+                                    : `Editar ${selectedUser?.nome}`}
+                            </h2>
                             <button
                                 onClick={closeModal}
                                 className="text-gray-400 hover:text-gray-600"
@@ -244,8 +258,8 @@ export default function UsersPage() {
                                 <svg
                                     className="h-6 w-6"
                                     fill="none"
-                                    viewBox="0 0 24 24"
                                     stroke="currentColor"
+                                    viewBox="0 0 24 24"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -257,22 +271,23 @@ export default function UsersPage() {
                             </button>
                         </div>
 
-                        <form className="space-y-4">
+                        <form className="space-y-3">
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Nome
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Nome <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     name="nome"
                                     value={formData.nome}
                                     onChange={handleInputChange}
-                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="Nome completo"
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
                                     Morada
                                 </label>
                                 <input
@@ -280,13 +295,14 @@ export default function UsersPage() {
                                     name="morada"
                                     value={formData.morada}
                                     onChange={handleInputChange}
-                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="Endereço completo"
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">
                                         Telefone
                                     </label>
                                     <input
@@ -294,39 +310,44 @@ export default function UsersPage() {
                                         name="telefone"
                                         value={formData.telefone}
                                         onChange={handleInputChange}
-                                        className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="911 111 111"
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        NIF
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                                        NIF{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         name="nif"
                                         value={formData.nif}
                                         onChange={handleInputChange}
-                                        className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="123456789"
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Email
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Email{" "}
+                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="email@example.com"
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">
                                         Pontos
                                     </label>
                                     <input
@@ -334,18 +355,20 @@ export default function UsersPage() {
                                         name="pontos"
                                         value={formData.pontos}
                                         onChange={handleInputChange}
-                                        className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="0"
+                                        min="0"
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">
                                         Restaurante Favorito
                                     </label>
                                     <select
                                         name="restauranteFavorito"
                                         value={formData.restauranteFavorito}
                                         onChange={handleInputChange}
-                                        className="w-full rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400"
                                     >
                                         <option value="Lisboa">Lisboa</option>
                                         <option value="Porto">Porto</option>
@@ -354,18 +377,19 @@ export default function UsersPage() {
                                 </div>
                             </div>
 
-                            <div className="flex gap-3 pt-6">
+                            <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={handleSave}
-                                    className="flex-1 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                                    disabled={!isFormValid}
+                                    className="flex-1 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                                 >
-                                    Guardar Alterações
+                                    {isNewUser ? "Criar Cliente" : "Guardar"}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={closeModal}
-                                    className="flex-1 rounded-xl border border-gray-300 px-6 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200"
+                                    className="flex-1 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50"
                                 >
                                     Cancelar
                                 </button>
