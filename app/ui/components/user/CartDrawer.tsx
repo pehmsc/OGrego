@@ -142,12 +142,13 @@ export function CartDrawer({ open, onClose }: Props) {
               Ir para Checkout
             </Link>
 
-            <button
+            <Link
+              href="/menu"
               onClick={onClose}
               className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
             >
               Continuar a comprar
-            </button>
+            </Link>
           </div>
         </div>
       </aside>
