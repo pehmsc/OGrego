@@ -1,44 +1,27 @@
 import { getCurrentUserDb } from "@/app/lib/current-user";
+import {
+    getUserFeedbacks,
+    getUserFeedbackStats,
+} from "@/app/lib/feedback-actions";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import FeedbackStatsCard from "@/app/ui/components/user/FeedbackStatsCard";
 import FeedbackForm from "@/app/ui/components/FeedbackForm";
 import Image from "next/image";
 
-// TODO: Descomentar quando criares a tabela feedback
-// import { getUserFeedbacks, getUserFeedbackStats } from "@/app/lib/feedback-actions";
+export default async function FeedbackPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ encomenda?: string; rating?: string }>;
+}) {
+    const params = await searchParams;
+    const initialOrderId = params.encomenda ? parseInt(params.encomenda) : undefined;
+    const initialRating = params.rating ? parseInt(params.rating) : undefined;
 
-export default async function FeedbackPage() {
     const userDb = await getCurrentUserDb();
 
-    // ========== TODO: DESCOMENTAR QUANDO TIVERES TABELA ==========
-    // const stats = await getUserFeedbackStats(userDb.id);
-    // const feedbacks = await getUserFeedbacks(userDb.id);
-    // ==============================================================
-
-    // ========== MOCK DATA - APAGAR DEPOIS ==========
-    const stats = {
-        totalFeedbacks: 8,
-        averageRating: 4.5,
-        lastFeedback: "Há 3 dias",
-    };
-
-    const feedbacks = [
-        {
-            id: 1,
-            rating: 5,
-            comment: "Comida deliciosa! O Moussaka estava perfeito.",
-            image_url: null,
-            date: "3 de Fev de 2026",
-        },
-        {
-            id: 2,
-            rating: 4,
-            comment: "Muito bom! Apenas o tempo de espera foi um pouco longo.",
-            image_url: null,
-            date: "15 de Jan de 2026",
-        },
-    ];
-    // ========== FIM MOCK DATA ==========
+    // ✅ Dados reais da BD
+    const stats = await getUserFeedbackStats(userDb.id);
+    const feedbacks = await getUserFeedbacks(userDb.id);
 
     return (
         <UserPageLayout
@@ -55,9 +38,14 @@ export default async function FeedbackPage() {
                 <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
                     <h2 className="mb-6 text-2xl font-semibold text-[#1E3A8A]">
                         Deixe o seu Feedback
+                        {initialOrderId && (
+                            <span className="ml-3 text-base font-normal text-zinc-500">
+                                — Encomenda #{initialOrderId}
+                            </span>
+                        )}
                     </h2>
 
-                    <FeedbackForm />
+                    <FeedbackForm initialOrderId={initialOrderId} initialRating={initialRating} />
                 </div>
 
                 {/* Histórico */}

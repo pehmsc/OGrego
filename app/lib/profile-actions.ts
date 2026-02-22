@@ -1,8 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { sql } from "@/app/lib/db";
 import { uploadImageToR2 } from "@/app/lib/upload";
 
@@ -133,4 +134,29 @@ export async function updateProfile(formData: FormData) {
             error: "Erro ao atualizar perfil",
         };
     }
+}
+
+export async function deleteAccount() {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    // Anonimizar dados pessoais — manter NIF por obrigação fiscal
+    await sql`
+        UPDATE users SET
+            email              = NULL,
+            first_name         = 'Conta',
+            last_name          = 'Eliminada',
+            image_url          = NULL,
+            phone              = NULL,
+            address            = NULL,
+            favorite_restaurant = NULL,
+            updated_at         = now()
+        WHERE clerk_user_id = ${userId}
+    `;
+
+    // Eliminar conta do Clerk
+    const client = await clerkClient();
+    await client.users.deleteUser(userId);
+
+    redirect("/");
 }

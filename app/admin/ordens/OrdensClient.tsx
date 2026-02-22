@@ -1,0 +1,505 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import {
+    ShoppingBagIcon,
+    ArrowTrendingUpIcon,
+    ClockIcon,
+    CheckCircleIcon,
+} from "@heroicons/react/24/outline";
+import { updateOrderAdmin } from "@/app/lib/admin-actions";
+
+type DbOrder = {
+    id: number;
+    customer_name: string | null;
+    customer_phone: string | null;
+    order_type: string;
+    status: string;
+    total_cents: number;
+    notes: string | null;
+    created_at: string;
+};
+
+type Order = {
+    id: number;
+    numero: string;
+    cliente: string;
+    tipo: "Entrega" | "Take-away" | "Balcão";
+    estado: "Em preparação" | "Pronto" | "Entregue" | "Cancelado";
+    total: number;
+    data: string;
+    hora: string;
+    telefone: string;
+    notas: string;
+};
+
+function dbToOrder(o: DbOrder): Order {
+    const date = new Date(o.created_at);
+    return {
+        id: o.id,
+        numero: `#${o.id}`,
+        cliente: o.customer_name || "—",
+        tipo:
+            o.order_type === "delivery"
+                ? "Entrega"
+                : o.order_type === "takeaway"
+                  ? "Take-away"
+                  : "Balcão",
+        estado:
+            o.status === "pending"
+                ? "Em preparação"
+                : o.status === "ready"
+                  ? "Pronto"
+                  : o.status === "delivered"
+                    ? "Entregue"
+                    : "Cancelado",
+        total: o.total_cents / 100,
+        data: date.toLocaleDateString("pt-PT"),
+        hora: date.toLocaleTimeString("pt-PT", {
+            hour: "2-digit",
+            minute: "2-digit",
+        }),
+        telefone: o.customer_phone || "—",
+        notas: o.notes || "",
+    };
+}
+
+function uiStatusToDb(estado: string): string {
+    switch (estado) {
+        case "Em preparação": return "pending";
+        case "Pronto":        return "ready";
+        case "Entregue":      return "delivered";
+        case "Cancelado":     return "cancelled";
+        default:              return "pending";
+    }
+}
+
+const getStatusColor = (estado: Order["estado"]) => {
+    switch (estado) {
+        case "Em preparação": return "bg-yellow-100 text-yellow-800";
+        case "Pronto":        return "bg-blue-100 text-blue-800";
+        case "Entregue":      return "bg-emerald-100 text-emerald-800";
+        case "Cancelado":     return "bg-red-100 text-red-800";
+        default:              return "bg-gray-100 text-gray-800";
+    }
+};
+
+const getTipoColor = (tipo: Order["tipo"]) => {
+    switch (tipo) {
+        case "Entrega":   return "bg-indigo-100 text-indigo-800";
+        case "Take-away": return "bg-orange-100 text-orange-800";
+        case "Balcão":    return "bg-green-100 text-green-800";
+        default:          return "bg-gray-100 text-gray-800";
+    }
+};
+
+export default function OrdensClient({ orders: dbOrders }: { orders: DbOrder[] }) {
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filterTipo, setFilterTipo] = useState<"" | "Entrega" | "Take-away" | "Balcão">("");
+    const [selectedPedido, setSelectedPedido] = useState<Order | null>(null);
+
+    const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
+
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [editForm, setEditForm] = useState<Partial<Order>>({});
+
+    const orders = dbOrders.map(dbToOrder);
+
+    const filteredPedidos = orders.filter((p) => {
+        const matchSearch =
+            p.cliente.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.numero.includes(searchQuery) ||
+            p.data.includes(searchQuery);
+        const matchTipo = filterTipo === "" || p.tipo === filterTipo;
+        return matchSearch && matchTipo;
+    });
+
+    const pedidosAtivos = orders.filter(
+        (p) => p.estado !== "Entregue" && p.estado !== "Cancelado",
+    ).length;
+    const pedidosEntregues = orders.filter((p) => p.estado === "Entregue").length;
+    const totalPedidos = orders.reduce((sum, p) => sum + p.total, 0);
+
+    const openEditModal = (pedido: Order) => {
+        setEditForm(pedido);
+        setIsEditOpen(true);
+    };
+    const closeEditModal = () => setIsEditOpen(false);
+
+    const handleEditChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    ) => {
+        const { name, value } = e.target;
+        setEditForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditSave = () => {
+        if (editForm.id == null) return;
+        startTransition(async () => {
+            await updateOrderAdmin(editForm.id as number, {
+                status: uiStatusToDb(editForm.estado as string),
+                notes: editForm.notas as string || "",
+            });
+            setIsEditOpen(false);
+            setSelectedPedido(null);
+            router.refresh();
+        });
+    };
+
+    return (
+        <main className="p-6 space-y-6">
+            <header className="flex items-center gap-4">
+                <div className="p-3 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow">
+                    <ShoppingBagIcon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold">Gestão de Pedidos</h1>
+                    <p className="text-sm text-gray-600">
+                        Acompanhamento de todas as encomendas e pedidos
+                    </p>
+                </div>
+            </header>
+
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 p-4 text-white">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs uppercase">Pedidos Ativos</p>
+                            <p className="text-2xl font-bold">{pedidosAtivos}</p>
+                        </div>
+                        <ClockIcon className="h-8 w-8 opacity-80" />
+                    </div>
+                </div>
+                <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-4 text-white">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs uppercase">Entregues</p>
+                            <p className="text-2xl font-bold">{pedidosEntregues}</p>
+                        </div>
+                        <CheckCircleIcon className="h-8 w-8 opacity-80" />
+                    </div>
+                </div>
+                <div className="rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 p-4 text-white">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-xs uppercase">Total (€)</p>
+                            <p className="text-2xl font-bold">€{totalPedidos.toFixed(2)}</p>
+                        </div>
+                        <ArrowTrendingUpIcon className="h-8 w-8 opacity-80" />
+                    </div>
+                </div>
+            </section>
+
+            <section className="flex items-center gap-6">
+                <div className="relative">
+                    <svg
+                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder="Pesquisar..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-56 pl-10 pr-3 py-1 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-orange-400"
+                    />
+                </div>
+                <button
+                    onClick={() => setIsCreateOrderOpen(true)}
+                    className="ml-2 inline-flex items-center gap-2 px-4 py-1 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-colors"
+                >
+                    Criar Pedido
+                </button>
+            </section>
+
+            <section className="flex gap-2 flex-wrap mt-2">
+                {(["", "Entrega", "Take-away", "Balcão"] as const).map((tipo) => (
+                    <button
+                        key={tipo || "todos"}
+                        onClick={() => setFilterTipo(tipo)}
+                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                            filterTipo === tipo
+                                ? tipo === "Entrega"
+                                    ? "bg-indigo-500 text-white"
+                                    : tipo === "Take-away"
+                                      ? "bg-orange-500 text-white"
+                                      : tipo === "Balcão"
+                                        ? "bg-green-500 text-white"
+                                        : "bg-orange-500 text-white"
+                                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                        }`}
+                    >
+                        {tipo || "Todos"}
+                    </button>
+                ))}
+            </section>
+
+            <section className="bg-white rounded-2xl shadow border overflow-x-auto">
+                <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-4 py-3 text-left">Número</th>
+                            <th className="px-4 py-3 text-left">Cliente</th>
+                            <th className="px-4 py-3 text-left">Tipo</th>
+                            <th className="px-4 py-3 text-left">Estado</th>
+                            <th className="px-4 py-3 text-left">Total</th>
+                            <th className="px-4 py-3 text-left">Data</th>
+                            <th className="px-4 py-3 text-left">Hora</th>
+                            <th className="px-4 py-3 text-left">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredPedidos.map((pedido) => (
+                            <tr key={pedido.id} className="border-t hover:bg-gray-50">
+                                <td className="px-4 py-3">{pedido.numero}</td>
+                                <td className="px-4 py-3">{pedido.cliente}</td>
+                                <td className="px-4 py-3">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getTipoColor(pedido.tipo)}`}>
+                                        {pedido.tipo}
+                                    </span>
+                                </td>
+                                <td className="px-4 py-3">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(pedido.estado)}`}>
+                                        {pedido.estado}
+                                    </span>
+                                </td>
+                                <td className="px-4 py-3 font-semibold text-orange-600">
+                                    €{pedido.total.toFixed(2)}
+                                </td>
+                                <td className="px-4 py-3">{pedido.data}</td>
+                                <td className="px-4 py-3">{pedido.hora}</td>
+                                <td className="px-4 py-3">
+                                    <button
+                                        className="text-orange-600"
+                                        onClick={() => setSelectedPedido(pedido)}
+                                    >
+                                        Ver
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </section>
+
+            {/* MODAL VER PEDIDO */}
+            {selectedPedido && (
+                <div
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    onClick={() => setSelectedPedido(null)}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex justify-between items-start">
+                            <h2 className="text-xl font-bold">{selectedPedido.numero}</h2>
+                            <button onClick={() => setSelectedPedido(null)} className="text-gray-600">
+                                Fechar
+                            </button>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                            <div>
+                                <p className="text-xs text-gray-500">Cliente</p>
+                                <p className="font-medium">{selectedPedido.cliente}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Total</p>
+                                <p className="font-medium">€{selectedPedido.total.toFixed(2)}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Tipo</p>
+                                <p className="font-medium">{selectedPedido.tipo}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Estado</p>
+                                <p className="font-medium">{selectedPedido.estado}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Data</p>
+                                <p className="font-medium">{selectedPedido.data}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Hora</p>
+                                <p className="font-medium">{selectedPedido.hora}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Telefone</p>
+                                <p className="font-medium">{selectedPedido.telefone}</p>
+                            </div>
+                        </div>
+                        {selectedPedido.notas && (
+                            <div className="mt-4 p-3 bg-orange-50 rounded">
+                                <p className="text-sm text-gray-700">{selectedPedido.notas}</p>
+                            </div>
+                        )}
+                        <div className="mt-6 flex gap-3">
+                            <button
+                                onClick={() => setSelectedPedido(null)}
+                                className="flex-1 py-2 rounded-lg border"
+                            >
+                                Fechar
+                            </button>
+                            <button
+                                className="flex-1 py-2 rounded-lg bg-orange-600 text-white"
+                                onClick={() => openEditModal(selectedPedido)}
+                            >
+                                Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL CRIAR PEDIDO */}
+            {isCreateOrderOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    onClick={() => setIsCreateOrderOpen(false)}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold">Criar Pedido</h2>
+                            <button onClick={() => setIsCreateOrderOpen(false)} className="text-gray-500">
+                                Fechar
+                            </button>
+                        </div>
+                        <p className="text-sm text-gray-500 py-6 text-center">
+                            Funcionalidade em desenvolvimento.
+                        </p>
+                        <button
+                            onClick={() => setIsCreateOrderOpen(false)}
+                            className="w-full py-2 border rounded-lg text-sm"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL EDITAR PEDIDO */}
+            {isEditOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    onClick={closeEditModal}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold">Editar Pedido</h2>
+                            <button onClick={closeEditModal} className="text-gray-500">
+                                Fechar
+                            </button>
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-xs text-gray-600 block mb-1">Número</label>
+                                    <input
+                                        value={editForm.numero ?? ""}
+                                        disabled
+                                        className="w-full border px-3 py-2 rounded bg-gray-50 text-gray-400 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-600 block mb-1">Tipo</label>
+                                    <input
+                                        value={editForm.tipo ?? ""}
+                                        disabled
+                                        className="w-full border px-3 py-2 rounded bg-gray-50 text-gray-400 text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs text-gray-600 block mb-1">Cliente</label>
+                                <input
+                                    value={editForm.cliente ?? ""}
+                                    disabled
+                                    className="w-full border px-3 py-2 rounded bg-gray-50 text-gray-400 text-sm"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-xs text-gray-600 block mb-1">Data</label>
+                                    <input
+                                        value={editForm.data ?? ""}
+                                        disabled
+                                        className="w-full border px-3 py-2 rounded bg-gray-50 text-gray-400 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-600 block mb-1">Hora</label>
+                                    <input
+                                        value={editForm.hora ?? ""}
+                                        disabled
+                                        className="w-full border px-3 py-2 rounded bg-gray-50 text-gray-400 text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs text-gray-600 block mb-1">
+                                    Estado <span className="text-orange-500">*</span>
+                                </label>
+                                <select
+                                    name="estado"
+                                    value={editForm.estado ?? "Em preparação"}
+                                    onChange={handleEditChange}
+                                    className="w-full border px-3 py-2 rounded text-sm focus:ring-2 focus:ring-orange-400"
+                                >
+                                    <option value="Em preparação">Em preparação</option>
+                                    <option value="Pronto">Pronto</option>
+                                    <option value="Entregue">Entregue</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-xs text-gray-600 block mb-1">Notas</label>
+                                <textarea
+                                    name="notas"
+                                    value={editForm.notas ?? ""}
+                                    onChange={handleEditChange}
+                                    rows={3}
+                                    className="w-full border px-3 py-2 rounded text-sm focus:ring-2 focus:ring-orange-400"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    onClick={handleEditSave}
+                                    disabled={isPending}
+                                    className="flex-1 py-2 bg-orange-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isPending ? "A guardar..." : "Guardar"}
+                                </button>
+                                <button
+                                    onClick={closeEditModal}
+                                    disabled={isPending}
+                                    className="flex-1 py-2 border rounded-lg disabled:cursor-not-allowed"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </main>
+    );
+}

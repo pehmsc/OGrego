@@ -3,6 +3,7 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { DocumentTextIcon } from "@heroicons/react/24/outline";
 
 // Extensão do tipo jsPDF para incluir lastAutoTable
 interface jsPDFWithAutoTable extends jsPDF {
@@ -89,16 +90,24 @@ const getStatusText = (status: Receipt["status"]) => {
     }
 };
 
-export default function ReceiptsAndInvoices() {
+export default function InvoicesAndReceiptsPage() {
     const [activeTab, setActiveTab] = useState<"todos" | "pagos" | "pendentes">(
         "todos",
     );
-
     const [searchQuery, setSearchQuery] = useState("");
-
     const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(
         null,
     );
+
+    // Create modal state + form
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [createForm, setCreateForm] = useState<Omit<Receipt, "id">>({
+        date: new Date().toISOString().slice(0, 10),
+        amount: 0,
+        status: "pago",
+        restaurant: "",
+        invoiceNumber: "",
+    });
 
     const filteredReceipts = receipts
         .filter((receipt) => {
@@ -127,7 +136,6 @@ export default function ReceiptsAndInvoices() {
         .filter((r) => r.status === "pendente")
         .reduce((sum, r) => sum + r.amount, 0);
 
-    // Função para exportar PDF
     const exportToPDF = (receipt: Receipt) => {
         const doc = new jsPDF() as jsPDFWithAutoTable;
 
@@ -214,51 +222,70 @@ export default function ReceiptsAndInvoices() {
         doc.save(`${receipt.invoiceNumber}.pdf`);
     };
 
+    // Create modal handlers
+    const openCreateModal = () => {
+        setCreateForm({
+            date: new Date().toISOString().slice(0, 10),
+            amount: 0,
+            status: "pago",
+            restaurant: "",
+            invoiceNumber: "",
+        });
+        setIsCreateOpen(true);
+    };
+
+    const closeCreateModal = () => {
+        setIsCreateOpen(false);
+    };
+
+    const handleCreateChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    ) => {
+        const { name, value } = e.target;
+        setCreateForm((prev) => ({
+            ...prev,
+            [name]: name === "amount" ? parseFloat(value || "0") : value,
+        }));
+    };
+
+    const handleCreateSave = () => {
+        // Simulation: show created data (replace with API call or state update)
+        const newDoc: Receipt = {
+            id: String(Date.now()),
+            ...createForm,
+        };
+        console.log("Criar documento:", newDoc);
+        alert("Documento criado (simulação). Ver console para dados.");
+        closeCreateModal();
+    };
+
     return (
         <main className="p-6 space-y-6">
             {/* Header */}
-            <header className="space-y-2">
-                <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
-                        <svg
-                            className="h-8 w-8 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                            Documentos
-                        </h1>
-                        <p className="text-xl text-gray-600">
-                            Recibos e faturas organizados
-                        </p>
-                    </div>
+            <header className="flex items-center gap-4">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow">
+                    <DocumentTextIcon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold">Recibos e Faturas</h1>
+                    <p className="text-sm text-gray-600">
+                        Gestão de documentos fiscais
+                    </p>
                 </div>
             </header>
 
             {/* Estatísticas */}
-            <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-8 text-white shadow-xl">
+            <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-4 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-emerald-100 text-sm font-medium uppercase tracking-wider">
-                                Total Pago
-                            </p>
-                            <p className="mt-1 text-3xl font-bold">
+                            <p className="text-xs uppercase">Total Pago</p>
+                            <p className="text-2xl font-bold">
                                 €{totalPaid.toFixed(2)}
                             </p>
                         </div>
                         <svg
-                            className="h-12 w-12 opacity-75"
+                            className="h-8 w-8 opacity-80"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                         >
@@ -271,18 +298,16 @@ export default function ReceiptsAndInvoices() {
                     </div>
                 </div>
 
-                <div className="rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 p-8 text-white shadow-xl">
+                <div className="rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 p-4 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-amber-100 text-sm font-medium uppercase tracking-wider">
-                                Pendente
-                            </p>
-                            <p className="mt-1 text-3xl font-bold">
+                            <p className="text-xs uppercase">Pendente</p>
+                            <p className="text-2xl font-bold">
                                 €{totalPending.toFixed(2)}
                             </p>
                         </div>
                         <svg
-                            className="h-12 w-12 opacity-75"
+                            className="h-8 w-8 opacity-80"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                         >
@@ -295,36 +320,34 @@ export default function ReceiptsAndInvoices() {
                     </div>
                 </div>
 
-                <div className="rounded-2xl bg-gradient-to-br from-gray-500 to-gray-600 p-8 text-white shadow-xl lg:col-span-1">
+                <div className="rounded-2xl bg-gradient-to-br from-slate-500 to-slate-600 p-4 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-gray-100 text-sm font-medium uppercase tracking-wider">
+                            <p className="text-xs uppercase">
                                 Total Documentos
                             </p>
-                            <p className="mt-1 text-3xl font-bold">
+                            <p className="text-2xl font-bold">
                                 {receipts.length}
                             </p>
                         </div>
-                        <div className="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center">
-                            <svg
-                                className="h-6 w-6"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        </div>
+                        <svg
+                            className="h-8 w-8 opacity-80"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
                     </div>
                 </div>
             </section>
 
-            {/* Barra de Pesquisa */}
-            <section className="bg-white/50 backdrop-blur-sm rounded-2xl p-3 border border-gray-200/50">
-                <div className="relative">
+            {/* Search Bar */}
+            <section className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
                         fill="none"
@@ -343,12 +366,12 @@ export default function ReceiptsAndInvoices() {
                         placeholder="Pesquisar..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-xl bg-white/80 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base placeholder-gray-500"
+                        className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-blue-400"
                     />
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-200"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                             <svg
                                 className="h-4 w-4"
@@ -366,36 +389,57 @@ export default function ReceiptsAndInvoices() {
                         </button>
                     )}
                 </div>
+
+                {/* Button to create invoice/receipt */}
+                <button
+                    onClick={openCreateModal}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
+                    <span className="text-sm font-medium">Criar Documento</span>
+                </button>
             </section>
 
             {/* Tabs */}
-            <section className="flex flex-wrap gap-3 bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+            <section className="flex flex-wrap gap-2">
                 <button
                     onClick={() => setActiveTab("todos")}
-                    className={`px-6 py-2.5 rounded-xl font-medium transition-all ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         activeTab === "todos"
-                            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
-                            : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                            ? "bg-blue-600 text-white"
+                            : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
                     }`}
                 >
                     Todos ({receipts.length})
                 </button>
                 <button
                     onClick={() => setActiveTab("pagos")}
-                    className={`px-6 py-2.5 rounded-xl font-medium transition-all ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         activeTab === "pagos"
-                            ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg"
-                            : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                            ? "bg-emerald-600 text-white"
+                            : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
                     }`}
                 >
                     Pagos ({receipts.filter((r) => r.status === "pago").length})
                 </button>
                 <button
                     onClick={() => setActiveTab("pendentes")}
-                    className={`px-6 py-2.5 rounded-xl font-medium transition-all ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         activeTab === "pendentes"
-                            ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg"
-                            : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                            ? "bg-amber-600 text-white"
+                            : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
                     }`}
                 >
                     Pendentes (
@@ -405,24 +449,8 @@ export default function ReceiptsAndInvoices() {
 
             {/* Lista de Recibos */}
             <section className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        {activeTab === "todos"
-                            ? "Todos os Documentos"
-                            : activeTab === "pagos"
-                              ? "Documentos Pagos"
-                              : "Documentos Pendentes"}
-                    </h2>
-                    <span className="text-sm text-gray-500">
-                        {filteredReceipts.length}{" "}
-                        {filteredReceipts.length === 1
-                            ? "documento"
-                            : "documentos"}
-                    </span>
-                </div>
-
                 {filteredReceipts.length === 0 ? (
-                    <div className="text-center py-12">
+                    <div className="text-center py-12 rounded-2xl border border-gray-200 bg-gray-50">
                         <svg
                             className="mx-auto h-12 w-12 text-gray-400 mb-4"
                             fill="none"
@@ -437,7 +465,7 @@ export default function ReceiptsAndInvoices() {
                             />
                         </svg>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            {searchQuery ? "Sem resultados" : "Sem documentos"}
+                            Sem resultados
                         </h3>
                         <p className="text-gray-500">
                             {searchQuery
@@ -451,47 +479,45 @@ export default function ReceiptsAndInvoices() {
                             <div
                                 key={receipt.id}
                                 onClick={() => setSelectedReceipt(receipt)}
-                                className="group hover:shadow-xl transition-all duration-300 border border-gray-200 rounded-2xl p-6 bg-white hover:-translate-y-1 cursor-pointer"
+                                className="group cursor-pointer border border-gray-200 rounded-2xl p-4 bg-white hover:shadow-lg hover:-translate-y-1 transition-all"
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <div className="flex-shrink-0">
-                                                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                                                    <svg
-                                                        className="h-6 w-6 text-white"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                    >
-                                                        <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth={2}
-                                                            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                                                        />
-                                                    </svg>
-                                                </div>
+                                            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow">
+                                                <svg
+                                                    className="h-5 w-5 text-white"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                                    />
+                                                </svg>
                                             </div>
-                                            <div>
-                                                <h3 className="font-bold text-xl text-gray-900 truncate">
+                                            <div className="min-w-0">
+                                                <h3 className="font-bold text-gray-900 truncate group-hover:text-blue-600">
                                                     {receipt.invoiceNumber}
                                                 </h3>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="text-xs text-gray-500">
                                                     {receipt.restaurant}
                                                 </p>
                                             </div>
                                         </div>
-                                        <p className="text-sm text-gray-500 mb-3">
+                                        <p className="text-xs text-gray-500">
                                             {receipt.date}
                                         </p>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
-                                        <span className="text-2xl font-bold text-gray-900">
+                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                        <span className="text-xl font-bold text-gray-900">
                                             €{receipt.amount.toFixed(2)}
                                         </span>
                                         <span
-                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(receipt.status)}`}
+                                            className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(receipt.status)}`}
                                         >
                                             {getStatusText(receipt.status)}
                                         </span>
@@ -506,43 +532,206 @@ export default function ReceiptsAndInvoices() {
             {/* Modal do Documento */}
             {selectedReceipt && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
                     onClick={() => setSelectedReceipt(null)}
                 >
                     <div
-                        className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header do Modal */}
-                        <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-t-3xl flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-white/20 rounded-2xl">
-                                    <svg
-                                        className="h-6 w-6"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                        />
-                                    </svg>
+                        <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-white/20 rounded-xl">
+                                    <DocumentTextIcon className="h-5 w-5 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-bold">
+                                    <h2 className="text-xl font-bold">
                                         Documento Fiscal
                                     </h2>
-                                    <p className="text-blue-100 text-sm">
+                                    <p className="text-blue-100 text-xs">
                                         {selectedReceipt.invoiceNumber}
                                     </p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setSelectedReceipt(null)}
-                                className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+                                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                            >
+                                <svg
+                                    className="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Conteúdo do Documento */}
+                        <div className="p-6 space-y-4">
+                            {/* Informações do Restaurante */}
+                            <div className="border-b pb-4">
+                                <h3 className="font-semibold text-gray-900 mb-3">
+                                    Fornecedor
+                                </h3>
+                                <div className="bg-gray-50 rounded-lg p-3">
+                                    <p className="font-bold text-gray-900">
+                                        {selectedReceipt.restaurant}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        NIF: 123 456 789
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                        Morada: Rua Exemplo, 123, Lisboa
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Detalhes do Documento */}
+                            <div className="border-b pb-4">
+                                <h3 className="font-semibold text-gray-900 mb-3">
+                                    Detalhes
+                                </h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-blue-50 rounded-lg p-3">
+                                        <p className="text-xs text-blue-600 font-medium">
+                                            Número
+                                        </p>
+                                        <p className="font-bold text-blue-900 text-sm">
+                                            {selectedReceipt.invoiceNumber}
+                                        </p>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-3">
+                                        <p className="text-xs text-blue-600 font-medium">
+                                            Data
+                                        </p>
+                                        <p className="font-bold text-blue-900 text-sm">
+                                            {selectedReceipt.date}
+                                        </p>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-3">
+                                        <p className="text-xs text-blue-600 font-medium">
+                                            Estado
+                                        </p>
+                                        <span
+                                            className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedReceipt.status)}`}
+                                        >
+                                            {getStatusText(
+                                                selectedReceipt.status,
+                                            )}
+                                        </span>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-3">
+                                        <p className="text-xs text-blue-600 font-medium">
+                                            Valor Total
+                                        </p>
+                                        <p className="font-bold text-blue-900 text-sm">
+                                            €{selectedReceipt.amount.toFixed(2)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Itens */}
+                            <div className="border-b pb-4">
+                                <h3 className="font-semibold text-gray-900 mb-3">
+                                    Itens
+                                </h3>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg text-sm">
+                                        <span className="text-gray-700">
+                                            Serviço de Alimentação
+                                        </span>
+                                        <span className="font-bold text-gray-900">
+                                            €
+                                            {(
+                                                selectedReceipt.amount * 0.85
+                                            ).toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg text-sm">
+                                        <span className="text-gray-700">
+                                            IVA (23%)
+                                        </span>
+                                        <span className="font-bold text-gray-900">
+                                            €
+                                            {(
+                                                selectedReceipt.amount * 0.15
+                                            ).toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Totais */}
+                            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-semibold text-emerald-900">
+                                        Total a Pagar
+                                    </span>
+                                    <span className="text-2xl font-bold text-emerald-900">
+                                        €{selectedReceipt.amount.toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer com Botões */}
+                        <div className="sticky bottom-0 bg-gray-50 p-4 border-t flex gap-3">
+                            <button
+                                onClick={() => setSelectedReceipt(null)}
+                                className="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-all text-sm"
+                            >
+                                Fechar
+                            </button>
+                            <button
+                                onClick={() => exportToPDF(selectedReceipt)}
+                                className="flex-1 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm"
+                            >
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
+                                </svg>
+                                Exportar PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* CREATE Modal */}
+            {isCreateOpen && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+                    onClick={closeCreateModal}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold">
+                                Criar Documento
+                            </h2>
+                            <button
+                                onClick={closeCreateModal}
+                                className="text-gray-400 hover:text-gray-600"
                             >
                                 <svg
                                     className="h-6 w-6"
@@ -560,143 +749,95 @@ export default function ReceiptsAndInvoices() {
                             </button>
                         </div>
 
-                        {/* Conteúdo do Documento */}
-                        <div className="p-8 space-y-6">
-                            {/* Informações do Restaurante */}
-                            <div className="border-b border-gray-200 pb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                    Fornecedor
-                                </h3>
-                                <div className="bg-gray-50 rounded-2xl p-4">
-                                    <p className="font-bold text-xl text-gray-900">
-                                        {selectedReceipt.restaurant}
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        NIF: 123 456 789
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        Morada: Rua Exemplo, 123, Lisboa
-                                    </p>
-                                </div>
+                        <form className="space-y-3">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Número (ex: #RF-0001)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="invoiceNumber"
+                                    value={createForm.invoiceNumber}
+                                    onChange={handleCreateChange}
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                                />
                             </div>
 
-                            {/* Detalhes do Documento */}
-                            <div className="border-b border-gray-200 pb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                    Detalhes
-                                </h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-blue-50 rounded-2xl p-4">
-                                        <p className="text-sm text-blue-600 font-medium">
-                                            Número
-                                        </p>
-                                        <p className="text-lg font-bold text-blue-900">
-                                            {selectedReceipt.invoiceNumber}
-                                        </p>
-                                    </div>
-                                    <div className="bg-blue-50 rounded-2xl p-4">
-                                        <p className="text-sm text-blue-600 font-medium">
-                                            Data
-                                        </p>
-                                        <p className="text-lg font-bold text-blue-900">
-                                            {selectedReceipt.date}
-                                        </p>
-                                    </div>
-                                    <div className="bg-blue-50 rounded-2xl p-4">
-                                        <p className="text-sm text-blue-600 font-medium">
-                                            Estado
-                                        </p>
-                                        <span
-                                            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedReceipt.status)}`}
-                                        >
-                                            {getStatusText(
-                                                selectedReceipt.status,
-                                            )}
-                                        </span>
-                                    </div>
-                                    <div className="bg-blue-50 rounded-2xl p-4">
-                                        <p className="text-sm text-blue-600 font-medium">
-                                            Valor Total
-                                        </p>
-                                        <p className="text-2xl font-bold text-blue-900">
-                                            €{selectedReceipt.amount.toFixed(2)}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Itens */}
-                            <div className="border-b border-gray-200 pb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                    Itens
-                                </h3>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                                        <span className="text-gray-700">
-                                            Serviço de Alimentação
-                                        </span>
-                                        <span className="font-bold text-gray-900">
-                                            €
-                                            {(
-                                                selectedReceipt.amount * 0.85
-                                            ).toFixed(2)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                                        <span className="text-gray-700">
-                                            IVA (23%)
-                                        </span>
-                                        <span className="font-bold text-gray-900">
-                                            €
-                                            {(
-                                                selectedReceipt.amount * 0.15
-                                            ).toFixed(2)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Totais */}
-                            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-xl font-semibold text-emerald-900">
-                                        Total a Pagar
-                                    </span>
-                                    <span className="text-3xl font-bold text-emerald-900">
-                                        €{selectedReceipt.amount.toFixed(2)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Footer com Botões */}
-                        <div className="sticky bottom-0 bg-gray-50 p-6 rounded-b-3xl flex gap-3">
-                            <button
-                                onClick={() => setSelectedReceipt(null)}
-                                className="flex-1 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-2xl hover:bg-gray-100 transition-all"
-                            >
-                                Fechar
-                            </button>
-                            <button
-                                onClick={() => exportToPDF(selectedReceipt)}
-                                className="flex-1 px-6 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-semibold rounded-2xl hover:from-rose-600 hover:to-rose-700 transition-all shadow-lg flex items-center justify-center gap-2"
-                            >
-                                <svg
-                                    className="h-5 w-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                                        Data
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="date"
+                                        value={createForm.date}
+                                        onChange={handleCreateChange}
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
                                     />
-                                </svg>
-                                Exportar PDF
-                            </button>
-                        </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                                        Valor (€)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        name="amount"
+                                        value={createForm.amount}
+                                        onChange={handleCreateChange}
+                                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Restaurante / Fornecedor
+                                </label>
+                                <input
+                                    type="text"
+                                    name="restaurant"
+                                    value={createForm.restaurant}
+                                    onChange={handleCreateChange}
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Estado
+                                </label>
+                                <select
+                                    name="status"
+                                    value={createForm.status}
+                                    onChange={handleCreateChange}
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <option value="pago">Pago</option>
+                                    <option value="pendente">Pendente</option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={handleCreateSave}
+                                    className="flex-1 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Criar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={closeCreateModal}
+                                    className="flex-1 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

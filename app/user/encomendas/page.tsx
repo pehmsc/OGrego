@@ -2,6 +2,7 @@ import { getCurrentUserDb } from "@/app/lib/current-user";
 import { getUserOrders, getUserOrderStats } from "@/app/lib/orders";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import OrderSummaryCard from "@/app/ui/components/user/OrderSummaryCard";
+import OrderFeedbackStars from "@/app/ui/components/user/OrderFeedbackStars";
 import Link from "next/link";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 
@@ -49,7 +50,12 @@ export default async function EncomendasPage() {
                                         <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
                                             Estado
                                         </th>
-                                        <th className="pb-3 text-left text-sm font-medium text-zinc-600/70"></th>
+                                        <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
+                                            Recibo
+                                        </th>
+                                        <th className="pb-3 text-left text-sm font-medium text-zinc-600/70">
+                                            Avaliação
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -100,11 +106,14 @@ export default async function EncomendasPage() {
                                             <td className="py-4">
                                                 <Link
                                                     href={`/user/encomendas/${order.id}/recibo`}
-                                                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1E3A8A] px-4 py-2 text-xs font-medium text-white transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                                                    className="inline-flex items-center justify-center rounded-full bg-[#1E3A8A] p-2 text-white transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                                                    title="Ver Recibo"
                                                 >
                                                     <DocumentTextIcon className="h-4 w-4" />
-                                                    Ver Recibo
                                                 </Link>
+                                            </td>
+                                            <td className="py-4">
+                                                <OrderFeedbackStars orderId={order.id} />
                                             </td>
                                         </tr>
                                     ))}
@@ -159,12 +168,17 @@ export default async function EncomendasPage() {
                                         </span>
                                     </div>
 
-                                    <Link
-                                        href={`/user/encomendas/${order.id}/recibo`}
-                                        className="flex h-10 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-xs font-medium text-white transition-all hover:bg-[#162F73]"
-                                    >
-                                        Ver Recibo
-                                    </Link>
+                                    <div className="flex flex-col gap-2">
+                                        <Link
+                                            href={`/user/encomendas/${order.id}/recibo`}
+                                            className="flex h-10 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-xs font-medium text-white transition-all hover:bg-[#162F73]"
+                                        >
+                                            Ver Recibo
+                                        </Link>
+                                        <div className="flex h-10 w-full items-center justify-center gap-1">
+                                            <OrderFeedbackStars orderId={order.id} />
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>

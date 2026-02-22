@@ -1,57 +1,64 @@
 "use client";
 
 import { useState } from "react";
+import { createFeedback } from "@/app/lib/feedback-actions";
 
-// TODO: Descomentar quando criares a tabela feedback e configurares R2
-// import { createFeedback } from "@/app/lib/feedback-actions";
-
-/* =======================
-   Tipos
-======================= */
-type FeedbackResult = { success: true } | { success: false; error: string };
-
-export default function FeedbackForm() {
-    const [rating, setRating] = useState(0);
+export default function FeedbackForm({
+    initialOrderId,
+    initialRating,
+}: {
+    initialOrderId?: number;
+    initialRating?: number;
+}) {
+    const [rating, setRating] = useState(initialRating ?? 0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [result, setResult] = useState<{ success: boolean; error?: string } | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (rating === 0) {
-            alert("Por favor, selecione uma avaliação");
+            setResult({ success: false, error: "Por favor, selecione uma avaliação" });
             return;
         }
 
         setIsSubmitting(true);
+        setResult(null);
 
-        // ========== TODO: DESCOMENTAR QUANDO TIVERES BD ==========
-        // const formData = new FormData(e.currentTarget);
-        // formData.append("rating", rating.toString());
-        // const result: FeedbackResult = await createFeedback(formData);
-        // ========================================================
+        const formData = new FormData(e.currentTarget);
+        formData.append("rating", rating.toString());
 
-        // ========== MOCK - APAGAR DEPOIS ==========
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const result = { success: true } as FeedbackResult;
-        // ========================================
+        const res = await createFeedback(formData);
 
         setIsSubmitting(false);
 
-        if (result.success) {
-            alert("Feedback enviado com sucesso!");
-            e.currentTarget.reset();
+        if (res.success) {
+            setResult({ success: true });
+            (e.target as HTMLFormElement).reset();
             setRating(0);
-
-            // TODO: Descomentar quando tiveres BD para recarregar feedbacks
-            // window.location.reload();
         } else {
-            alert(result.error);
+            setResult({ success: false, error: res.error });
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nº de Encomenda */}
+            <div>
+                <label className="mb-2 block text-sm font-medium text-[#1E3A8A]">
+                    Nº de Encomenda{" "}
+                    <span className="font-normal text-zinc-500">(opcional)</span>
+                </label>
+                <input
+                    name="order_id"
+                    type="number"
+                    defaultValue={initialOrderId ?? ""}
+                    placeholder="ex: 42"
+                    className="w-full max-w-xs rounded-2xl border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                />
+            </div>
+
             {/* Rating com estrelas */}
             <div>
                 <label className="mb-2 block text-sm font-medium text-[#1E3A8A]">
@@ -77,7 +84,6 @@ export default function FeedbackForm() {
                         </button>
                     ))}
                 </div>
-
                 {rating > 0 && (
                     <p className="mt-2 text-sm text-zinc-600">
                         {rating === 1 && "Muito insatisfeito"}
@@ -123,6 +129,21 @@ export default function FeedbackForm() {
                     Máximo 5MB (JPG, PNG, WEBP)
                 </p>
             </div>
+
+            {/* Resultado */}
+            {result && (
+                <p
+                    className={`rounded-2xl px-4 py-3 text-sm font-medium ${
+                        result.success
+                            ? "bg-green-50 text-green-700"
+                            : "bg-red-50 text-red-600"
+                    }`}
+                >
+                    {result.success
+                        ? "Feedback enviado com sucesso!"
+                        : result.error}
+                </p>
+            )}
 
             {/* Botão Enviar */}
             <button
