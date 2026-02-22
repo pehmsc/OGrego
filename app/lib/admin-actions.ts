@@ -50,5 +50,5 @@ export async function updateOrderAdmin(
         WHERE id = ${orderId}
     `;
 
-    revalidatePath("/admin/ordens");
+    revalidatePath("/admin/orders");
 }

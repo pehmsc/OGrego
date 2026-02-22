@@ -1,9 +1,9 @@
 import { requireAdmin } from "@/app/lib/admin";
 import { redirect } from "next/navigation";
 import { sql } from "@/app/lib/db";
-import OrdensClient from "./OrdensClient";
+import OrdersClient from "./OrdersClient";
 
-export default async function OrdensPage() {
+export default async function OrdersPage() {
     const adminCheck = await requireAdmin();
     if (!adminCheck.ok) redirect("/");
 
@@ -22,5 +22,5 @@ export default async function OrdensPage() {
         LIMIT 200
     `;
 
-    return <OrdensClient orders={orders} />;
+    return <OrdersClient orders={orders} />;
 }

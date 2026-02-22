@@ -30,7 +30,7 @@ const links = [
     },
     {
         name: "Gestão de Pedidos",
-        href: "/admin/ordens",
+        href: "/admin/orders",
         icon: PencilSquareIcon,
     },
     {

@@ -94,7 +94,7 @@ const getTipoColor = (tipo: Order["tipo"]) => {
     }
 };
 
-export default function OrdensClient({ orders: dbOrders }: { orders: DbOrder[] }) {
+export default function OrdersClient({ orders: dbOrders }: { orders: DbOrder[] }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
