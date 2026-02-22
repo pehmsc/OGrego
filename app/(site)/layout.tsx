@@ -28,7 +28,7 @@ export default async function SiteLayout({
   // Autenticado -> role vem da BD
   const dbUser = await getCurrentUserDb();
 
-  const showUserHeader = dbUser.role === "user"; // admin -> não mostra
+  const showUserHeader = dbUser.role !== "admin"; // mostra para qualquer role não-admin
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--background)]">

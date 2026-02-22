@@ -59,14 +59,15 @@ export async function POST(req: Request) {
 
     try {
       await sql`
-        insert into users (clerk_user_id, email, first_name, last_name, image_url, updated_at)
-        values (${clerkUserId}, ${email}, ${firstName}, ${lastName}, ${imageUrl}, now())
+        insert into users (clerk_user_id, email, first_name, last_name, image_url, role, updated_at)
+        values (${clerkUserId}, ${email}, ${firstName}, ${lastName}, ${imageUrl}, 'user', now())
         on conflict (clerk_user_id)
         do update set
           email = excluded.email,
           first_name = excluded.first_name,
           last_name = excluded.last_name,
           image_url = excluded.image_url,
+          role = coalesce(users.role, excluded.role),
           updated_at = now()
       `;
       console.log("✅ DB upsert OK:", clerkUserId);
