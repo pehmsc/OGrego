@@ -125,9 +125,13 @@ export default function CheckoutPage() {
         }
     };
 
+    const isAdmin =
+        userData?.role === "admin" || user?.publicMetadata?.role === "admin";
+    const adminDiscount = isAdmin ? subtotal * 0.5 : 0;
+    const subtotalAfterDiscount = subtotal - adminDiscount;
     const deliveryFee =
-        formData.orderType === "delivery" && subtotal < 30 ? 2.5 : 0;
-    const total = subtotal + deliveryFee;
+        formData.orderType === "delivery" && subtotalAfterDiscount < 30 ? 2.5 : 0;
+    const total = subtotalAfterDiscount + deliveryFee;
 
     // ========================================
     // LOADING
@@ -542,6 +546,15 @@ export default function CheckoutPage() {
                                         €{subtotal.toFixed(2)}
                                     </span>
                                 </div>
+
+                                {isAdmin && (
+                                    <div className="flex justify-between text-sm text-emerald-700">
+                                        <span>Desconto Admin (50%)</span>
+                                        <span className="font-medium">
+                                            -€{adminDiscount.toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
 
                                 {deliveryFee > 0 && (
                                     <div className="flex justify-between text-sm">
