@@ -22,6 +22,8 @@ export async function createFeedback(formData: FormData) {
         const rating = parseInt(formData.get("rating") as string);
         const comment = formData.get("comment") as string;
         const imageFile = formData.get("image") as File | null;
+        const orderIdRaw = formData.get("order_id") as string | null;
+        const orderId = orderIdRaw ? parseInt(orderIdRaw) : null;
 
         // Validação
         if (!rating || rating < 1 || rating > 5) {
@@ -81,9 +83,9 @@ export async function createFeedback(formData: FormData) {
 
         // Inserir feedback na BD
         await sql`
-      INSERT INTO feedback (user_id, rating, comment, image_url)
-      VALUES (${userDb.id}, ${rating}, ${comment}, ${imageUrl})
-    `;
+            INSERT INTO feedback (user_id, order_id, rating, comment, image_url)
+            VALUES (${userDb.id}, ${orderId}, ${rating}, ${comment}, ${imageUrl})
+        `;
 
         revalidatePath("/user/feedback");
 

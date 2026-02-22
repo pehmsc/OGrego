@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { updateProfile } from "@/app/lib/profile-actions";
 import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import LoyaltyCard from "@/app/ui/components/user/LoyaltyCard";
+import DeleteAccountButton from "@/app/ui/components/user/DeleteAccountButton";
 import Image from "next/image";
 
 export default function PerfilPage() {
@@ -215,6 +216,15 @@ export default function PerfilPage() {
                         {isSubmitting ? "A guardar..." : "Guardar Alterações"}
                     </button>
                 </form>
+
+                {/* Zona perigosa */}
+                <div className="mt-10 border-t border-red-100 pt-8">
+                    <p className="mb-4 text-sm text-zinc-500">
+                        Ao eliminar a sua conta, os seus dados pessoais serão
+                        apagados permanentemente.
+                    </p>
+                    <DeleteAccountButton />
+                </div>
             </div>
         </UserPageLayout>
     );
