@@ -53,8 +53,8 @@ export async function getCurrentUserDb(): Promise<DbUser> {
     const imageUrl = cu?.imageUrl ?? null;
 
     const inserted = await sql<DbUser[]>`
-    INSERT INTO users (clerk_user_id, email, first_name, last_name, image_url)
-    VALUES (${userId}, ${email}, ${firstName}, ${lastName}, ${imageUrl})
+    INSERT INTO users (clerk_user_id, email, first_name, last_name, image_url, role)
+    VALUES (${userId}, ${email}, ${firstName}, ${lastName}, ${imageUrl}, 'user')
     RETURNING *
   `;
 
