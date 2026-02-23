@@ -65,10 +65,19 @@ export async function getMenuItemsByIds(ids: string[]): Promise<CatalogMenuItem[
         WHERE m.id IN ${sql(numericIds)}
     `;
 
+    const returnedIds = new Set(rows.map((row) => String(row.id)));
+    const missingItemIds = normalizedIds.filter((id) => !returnedIds.has(id));
+    if (missingItemIds.length > 0) {
+        throw new Error(`Item não encontrado: ${missingItemIds.join(", ")}`);
+    }
+
     return rows.map((row) => {
         const itemName = String(row.item_name ?? "").trim();
+        const safeItemName = itemName || `Item ${row.id}`;
         if (!itemName) {
-            throw new Error(`Nome inválido no catálogo para item ${row.id}.`);
+            console.warn("[catalog:getMenuItemsByIds] item sem nome, a usar fallback", {
+                itemId: String(row.id),
+            });
         }
 
         const parsedPrice = Number(row.item_price_raw ?? "");
@@ -78,7 +87,7 @@ export async function getMenuItemsByIds(ids: string[]): Promise<CatalogMenuItem[
 
         return {
             id: String(row.id),
-            name: itemName,
+            name: safeItemName,
             price_cents: toPriceCents(parsedPrice, row.is_price_already_cents),
         };
     });

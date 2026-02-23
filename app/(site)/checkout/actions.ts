@@ -142,9 +142,21 @@ async function calculateServerCheckoutPricing(params: {
     role: UserRole;
     promoCode?: string;
 }) {
+    const normalizedCartItems = mapCheckoutItemsToPricingItems(params.items);
+
+    console.log("[checkout:pricing:input]", {
+        role: params.role,
+        orderType: params.orderType,
+        cartItems: normalizedCartItems.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+        })),
+        promoCode: params.promoCode ? "provided" : "none",
+    });
+
     return calculateCheckoutPricing(
         {
-            items: mapCheckoutItemsToPricingItems(params.items),
+            items: normalizedCartItems,
             orderType: params.orderType,
             role: params.role,
             promoCode: params.promoCode,
@@ -152,6 +164,16 @@ async function calculateServerCheckoutPricing(params: {
         {
             fetchPricedItems: async (ids) => {
                 const menuItems = await getMenuItemsByIds(ids);
+
+                console.log("[checkout:pricing:catalog]", {
+                    requestedIds: ids,
+                    returnedItems: menuItems.map((item) => ({
+                        id: item.id,
+                        hasName: item.name.trim().length > 0,
+                        priceCents: item.price_cents,
+                    })),
+                });
+
                 return menuItems.map((item) => ({
                     id: item.id,
                     name: item.name,
@@ -404,7 +426,7 @@ export async function createOrder(data: CheckoutData): Promise<CreateOrderResult
             `;
         }
 
-        await sendOrderConfirmation({
+        const emailResult = await sendOrderConfirmation({
             to: data.customerEmail,
             customerName: data.customerName,
             orderId,
@@ -425,6 +447,20 @@ export async function createOrder(data: CheckoutData): Promise<CreateOrderResult
             paymentMethod: data.paymentMethod,
             notes: data.notes,
         });
+
+        if (!emailResult.success) {
+            console.warn("[checkout:createOrder:email]", {
+                orderId,
+                customerEmail: data.customerEmail,
+                reason: emailResult.error,
+            });
+        } else {
+            console.log("[checkout:createOrder:email]", {
+                orderId,
+                customerEmail: data.customerEmail,
+                status: "sent",
+            });
+        }
 
         return {
             success: true,
