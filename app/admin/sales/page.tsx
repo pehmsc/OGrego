@@ -51,22 +51,54 @@ const vendasSeed: Sale[] = [
     },
 ];
 
+const metodoColor = (m: Sale["metodo"]) => {
+    switch (m) {
+        case "Cartão":
+            return "bg-blue-100 text-blue-800";
+        case "Dinheiro":
+            return "bg-green-100 text-green-800";
+        case "Multibanco":
+            return "bg-yellow-100 text-yellow-800";
+        case "MB Way":
+            return "bg-pink-100 text-pink-800";
+        default:
+            return "bg-gray-100 text-gray-800";
+    }
+};
+
 export default function SalesPage() {
     const [q, setQ] = useState("");
     const [selected, setSelected] = useState<Sale | null>(null);
     const [editing, setEditing] = useState<Sale | null>(null);
     const [showCreate, setShowCreate] = useState(false);
 
-    const filtered = vendasSeed.filter(
-        (v) =>
-            v.cliente.toLowerCase().includes(q.toLowerCase()) ||
-            v.numero.includes(q) ||
-            v.data.includes(q),
-    );
+    const [vendas, setVendas] = useState<Sale[]>(vendasSeed);
 
-    const totalVendas = vendasSeed.reduce((s, v) => s + v.total, 0);
-    const totalItens = vendasSeed.reduce((s, v) => s + v.itens, 0);
-    const media = (totalVendas / vendasSeed.length).toFixed(2);
+    const filtered = vendas.filter((v) => {
+        const query = q.toLowerCase();
+        return (
+            v.cliente.toLowerCase().includes(query) ||
+            v.numero.toLowerCase().includes(query) ||
+            v.data.toLowerCase().includes(query) ||
+            v.hora.toLowerCase().includes(query) ||
+            v.metodo.toLowerCase().includes(query) ||
+            v.total.toString().includes(query) ||
+            v.itens.toString().includes(query)
+        );
+    });
+
+    const totalVendas = vendas.reduce((s, v) => s + v.total, 0);
+    const totalItens = vendas.reduce((s, v) => s + v.itens, 0);
+    const media =
+        vendas.length > 0 ? (totalVendas / vendas.length).toFixed(2) : "0.00";
+
+    const handleMetodoChange = (id: number, novoMetodo: Sale["metodo"]) => {
+        setVendas((prev) =>
+            prev.map((item) =>
+                item.id === id ? { ...item, metodo: novoMetodo } : item,
+            ),
+        );
+    };
 
     return (
         <main className="p-6 space-y-6">
@@ -174,9 +206,26 @@ export default function SalesPage() {
                                 <td className="px-4 py-3">{v.itens}</td>
                                 <td className="px-4 py-3">{v.data}</td>
                                 <td className="px-4 py-3">
-                                    <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-800 text-xs">
-                                        {v.metodo}
-                                    </span>
+                                    <select
+                                        value={v.metodo}
+                                        onChange={(e) =>
+                                            handleMetodoChange(
+                                                v.id,
+                                                e.target
+                                                    .value as Sale["metodo"],
+                                            )
+                                        }
+                                        className={`px-2 py-1 rounded-full text-xs font-semibold ${metodoColor(v.metodo)}`}
+                                    >
+                                        <option value="Cartão">Cartão</option>
+                                        <option value="Dinheiro">
+                                            Dinheiro
+                                        </option>
+                                        <option value="Multibanco">
+                                            Multibanco
+                                        </option>
+                                        <option value="MB Way">MB Way</option>
+                                    </select>
                                 </td>
                                 <td className="px-4 py-3">
                                     <button

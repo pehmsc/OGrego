@@ -17,7 +17,7 @@ export default function DashboardPage() {
         pedidos: "7",
     };
 
-    const recentes = [
+    const [recentes, setRecentes] = useState([
         {
             id: 1,
             mesa: "#12",
@@ -31,7 +31,7 @@ export default function DashboardPage() {
             mesa: "#5",
             cliente: "Maria Costa",
             total: "€32,10",
-            estado: "Concluído",
+            estado: "Pronto",
             hora: "19:30",
         },
         {
@@ -42,19 +42,32 @@ export default function DashboardPage() {
             estado: "Cancelado",
             hora: "19:20",
         },
-    ];
+    ]);
 
     const getStatusColor = (estado: string) => {
         switch (estado) {
             case "Em preparação":
                 return "bg-yellow-100 text-yellow-800";
-            case "Concluído":
-                return "bg-emerald-100 text-emerald-800";
+            case "Pronto":
+                return "bg-blue-100 text-blue-800";
+            case "Entregue":
+                return "bg-green-100 text-green-800";
             case "Cancelado":
                 return "bg-red-100 text-red-800";
+            case "Concluído":
+                return "bg-emerald-100 text-emerald-800";
             default:
                 return "bg-gray-100 text-gray-800";
         }
+    };
+
+    const handleEstadoChange = (id: number, novoEstado: string) => {
+        setRecentes((prev) =>
+            prev.map((item) =>
+                item.id === id ? { ...item, estado: novoEstado } : item,
+            ),
+        );
+        // Aqui pode chamar uma API para atualizar no backend
     };
 
     return (
@@ -202,11 +215,29 @@ export default function DashboardPage() {
                                         {item.total}
                                     </td>
                                     <td className="px-6 py-3">
-                                        <span
+                                        <select
+                                            value={item.estado}
+                                            onChange={(e) =>
+                                                handleEstadoChange(
+                                                    item.id,
+                                                    e.target.value,
+                                                )
+                                            }
                                             className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.estado)}`}
                                         >
-                                            {item.estado}
-                                        </span>
+                                            <option value="Em preparação">
+                                                Em preparação
+                                            </option>
+                                            <option value="Pronto">
+                                                Pronto
+                                            </option>
+                                            <option value="Entregue">
+                                                Entregue
+                                            </option>
+                                            <option value="Cancelado">
+                                                Cancelado
+                                            </option>
+                                        </select>
                                     </td>
                                     <td className="px-6 py-3 text-gray-600">
                                         {item.hora}
