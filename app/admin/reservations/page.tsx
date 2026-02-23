@@ -10,11 +10,12 @@ import {
 
 type Reservation = {
     id: number;
+    numero?: string;
     cliente: string;
     data: string;
     hora: string;
     pessoas: number;
-    estado: "Confirmada" | "Pendente" | "Cancelada";
+    estado: "Confirmada" | "Pendente";
     telefone?: string;
     notas?: string;
 };
@@ -22,6 +23,7 @@ type Reservation = {
 const reservasSeed: Reservation[] = [
     {
         id: 1,
+        numero: "#RSV-001",
         cliente: "João Silva",
         data: "2026-02-15",
         hora: "19:30",
@@ -32,6 +34,7 @@ const reservasSeed: Reservation[] = [
     },
     {
         id: 2,
+        numero: "#RSV-002",
         cliente: "Maria Santos",
         data: "2026-02-16",
         hora: "20:00",
@@ -41,6 +44,7 @@ const reservasSeed: Reservation[] = [
     },
     {
         id: 3,
+        numero: "#RSV-003",
         cliente: "Pedro Costa",
         data: "2026-02-17",
         hora: "19:00",
@@ -54,30 +58,45 @@ const reservasSeed: Reservation[] = [
 const statusColor = (s: Reservation["estado"]) =>
     s === "Confirmada"
         ? "bg-emerald-100 text-emerald-800"
-        : s === "Pendente"
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-red-100 text-red-800";
+        : "bg-yellow-100 text-yellow-800";
 
 export default function ReservationsPage() {
     const [query, setQuery] = useState("");
     const [selected, setSelected] = useState<Reservation | null>(null);
     const [editing, setEditing] = useState<Reservation | null>(null);
     const [showCreate, setShowCreate] = useState(false);
+    const [reservas, setReservas] = useState<Reservation[]>(reservasSeed);
 
-    const reservas = reservasSeed.filter(
-        (r) =>
-            r.cliente.toLowerCase().includes(query.toLowerCase()) ||
-            r.data.includes(query) ||
-            (r.telefone || "").includes(query),
-    );
+    const filtered = reservas.filter((r) => {
+        const q = query.toLowerCase();
+        return (
+            (r.numero || "").toLowerCase().includes(q) ||
+            r.cliente.toLowerCase().includes(q) ||
+            r.data.toLowerCase().includes(q) ||
+            r.hora.toLowerCase().includes(q) ||
+            (r.telefone || "").toLowerCase().includes(q) ||
+            (r.notas || "").toLowerCase().includes(q) ||
+            r.pessoas.toString().includes(q) ||
+            r.estado.toLowerCase().includes(q)
+        );
+    });
 
-    const confirmadas = reservasSeed.filter(
+    const confirmadas = reservas.filter(
         (r) => r.estado === "Confirmada",
     ).length;
-    const pendentes = reservasSeed.filter(
-        (r) => r.estado === "Pendente",
-    ).length;
-    const totalPessoas = reservasSeed.reduce((s, r) => s + r.pessoas, 0);
+    const pendentes = reservas.filter((r) => r.estado === "Pendente").length;
+    const totalPessoas = reservas.reduce((s, r) => s + r.pessoas, 0);
+
+    const handleEstadoChange = (
+        id: number,
+        novoEstado: Reservation["estado"],
+    ) => {
+        setReservas((prev) =>
+            prev.map((item) =>
+                item.id === id ? { ...item, estado: novoEstado } : item,
+            ),
+        );
+    };
 
     return (
         <main className="p-6 space-y-6">
@@ -160,6 +179,7 @@ export default function ReservationsPage() {
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50">
                         <tr>
+                            <th className="px-4 py-3 text-left">Número</th>
                             <th className="px-4 py-3 text-left">Nome</th>
                             <th className="px-4 py-3 text-left">Pessoas</th>
                             <th className="px-4 py-3 text-left">Data</th>
@@ -170,11 +190,12 @@ export default function ReservationsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {reservas.map((r) => (
+                        {filtered.map((r) => (
                             <tr
                                 key={r.id}
                                 className="border-t hover:bg-gray-50"
                             >
+                                <td className="px-4 py-3">{r.numero || "—"}</td>
                                 <td className="px-4 py-3">{r.cliente}</td>
                                 <td className="px-4 py-3">{r.pessoas}</td>
                                 <td className="px-4 py-3">{r.data}</td>
@@ -183,11 +204,24 @@ export default function ReservationsPage() {
                                     {r.telefone || "—"}
                                 </td>
                                 <td className="px-4 py-3">
-                                    <span
+                                    <select
+                                        value={r.estado}
+                                        onChange={(e) =>
+                                            handleEstadoChange(
+                                                r.id,
+                                                e.target
+                                                    .value as Reservation["estado"],
+                                            )
+                                        }
                                         className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(r.estado)}`}
                                     >
-                                        {r.estado}
-                                    </span>
+                                        <option value="Confirmada">
+                                            Confirmada
+                                        </option>
+                                        <option value="Pendente">
+                                            Pendente
+                                        </option>
+                                    </select>
                                 </td>
                                 <td className="px-4 py-3">
                                     <button
@@ -225,6 +259,12 @@ export default function ReservationsPage() {
                         </div>
 
                         <div className="mt-4 grid grid-cols-2 gap-3">
+                            <div>
+                                <p className="text-xs text-gray-500">Número</p>
+                                <p className="font-medium">
+                                    {selected.numero || "—"}
+                                </p>
+                            </div>
                             <div>
                                 <p className="text-xs text-gray-500">Data</p>
                                 <p className="font-medium">{selected.data}</p>
@@ -301,6 +341,16 @@ export default function ReservationsPage() {
                         >
                             <div>
                                 <label className="text-xs text-gray-500">
+                                    Número
+                                </label>
+                                <input
+                                    type="text"
+                                    defaultValue={editing.numero}
+                                    className="w-full border rounded-lg px-3 py-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs text-gray-500">
                                     Nome
                                 </label>
                                 <input
@@ -348,6 +398,20 @@ export default function ReservationsPage() {
                                     defaultValue={editing.telefone}
                                     className="w-full border rounded-lg px-3 py-2"
                                 />
+                            </div>
+                            <div>
+                                <label className="text-xs text-gray-500">
+                                    Estado
+                                </label>
+                                <select
+                                    defaultValue={editing.estado}
+                                    className="w-full border rounded-lg px-3 py-2"
+                                >
+                                    <option value="Confirmada">
+                                        Confirmada
+                                    </option>
+                                    <option value="Pendente">Pendente</option>
+                                </select>
                             </div>
                             <div>
                                 <label className="text-xs text-gray-500">
@@ -400,6 +464,15 @@ export default function ReservationsPage() {
                             }}
                             className="space-y-4"
                         >
+                            <div>
+                                <label className="text-xs text-gray-500">
+                                    Número
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded-lg px-3 py-2"
+                                />
+                            </div>
                             <div>
                                 <label className="text-xs text-gray-500">
                                     Nome
