@@ -282,6 +282,42 @@ export default function CheckoutPage() {
     }
 
     // ========================================
+    // NIF EM FALTA
+    // ========================================
+    if (user && userData && !userData.nif) {
+        return (
+            <main className="mx-auto max-w-4xl px-4 py-12">
+                <div className="rounded-3xl border border-amber-200 bg-amber-50 p-12 text-center shadow-sm">
+                    <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100">
+                        <span className="text-4xl">📋</span>
+                    </div>
+                    <h2 className="mb-2 text-2xl font-semibold text-amber-900">
+                        NIF necessário para continuar
+                    </h2>
+                    <p className="mb-6 text-amber-800">
+                        Para emitir recibo fiscal é necessário ter o NIF preenchido no perfil.
+                        Adicione o seu NIF e volte para finalizar a encomenda.
+                    </p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <Link
+                            href="/user/profile"
+                            className="inline-flex h-12 items-center justify-center rounded-full bg-[#1E3A8A] px-8 text-sm font-medium text-white hover:bg-[#162F73] transition-all shadow-lg"
+                        >
+                            Ir para o Perfil
+                        </Link>
+                        <Link
+                            href="/menu"
+                            className="inline-flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-8 text-sm font-medium text-[#1E3A8A] hover:border-[#1E3A8A]/40 transition-all"
+                        >
+                            ← Voltar ao Menu
+                        </Link>
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
+    // ========================================
     // CARRINHO VAZIO
     // ========================================
     if (items.length === 0) {
