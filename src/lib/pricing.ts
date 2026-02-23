@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { UserRole } from "@/src/lib/auth";
+import type { UserRole } from "@/src/lib/roles";
 
 const ADMIN_DISCOUNT_PERCENT = 50;
 const DELIVERY_FREE_THRESHOLD_CENTS = 3000;

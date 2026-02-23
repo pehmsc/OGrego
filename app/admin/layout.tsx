@@ -1,11 +1,18 @@
 import AdminSideNav from "@/app/ui/components/AdminSideNav";
 import AdminHeader from "@/app/ui/components/AdminHeader";
+import { requireAdmin } from "@/app/lib/admin";
+import { redirect } from "next/navigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) {
+    redirect("/");
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSideNav />

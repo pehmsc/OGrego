@@ -2,8 +2,14 @@ import "server-only";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { sql } from "@/app/lib/db";
+import {
+    getRoleFromClerkUserMetadata,
+    getRoleFromSessionClaims,
+    normalizeUserRole,
+    type UserRole,
+} from "@/src/lib/roles";
 
-export type UserRole = "user" | "admin";
+export type { UserRole } from "@/src/lib/roles";
 
 export type AuthenticatedUserContext = {
     clerkUserId: string;
@@ -16,30 +22,14 @@ type DbUserRoleRow = {
     role: string | null;
 };
 
-function normalizeRole(value: unknown): UserRole | null {
-    if (typeof value !== "string") return null;
-
-    const normalized = value.toLowerCase().trim();
-    if (normalized === "admin") return "admin";
-    if (normalized === "user") return "user";
-    return null;
-}
-
-function getRoleFromMetadata(metadata: unknown): UserRole | null {
-    if (!metadata || typeof metadata !== "object") return null;
-    const role = (metadata as Record<string, unknown>).role;
-    return normalizeRole(role);
-}
-
 export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserContext | null> {
-    const { userId } = await auth();
+    const { userId, sessionClaims } = await auth();
     if (!userId) return null;
 
     const clerkUser = await currentUser();
     const clerkRole =
-        getRoleFromMetadata(clerkUser?.publicMetadata) ??
-        getRoleFromMetadata(clerkUser?.privateMetadata) ??
-        getRoleFromMetadata(clerkUser?.unsafeMetadata);
+        getRoleFromSessionClaims(sessionClaims) ??
+        getRoleFromClerkUserMetadata(clerkUser);
 
     const dbRows = await sql<DbUserRoleRow[]>`
         SELECT id, role
@@ -91,7 +81,7 @@ export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserCo
     return {
         clerkUserId: userId,
         dbUserId: dbUser?.id ?? null,
-        role: clerkRole ?? normalizeRole(dbUser?.role) ?? "user",
+        role: clerkRole ?? normalizeUserRole(dbUser?.role) ?? "user",
     };
 }
 
