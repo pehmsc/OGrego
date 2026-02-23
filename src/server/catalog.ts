@@ -10,9 +10,15 @@ export type CatalogMenuItem = {
 
 type DbMenuItemRow = {
     id: string | number;
-    name: string;
-    price_cents: number;
+    item_name: string | null;
+    item_price_raw: string | null;
+    is_price_already_cents: boolean;
 };
+
+function toPriceCents(value: number, isPriceAlreadyCents: boolean) {
+    if (isPriceAlreadyCents) return Math.round(value);
+    return Math.round(value * 100);
+}
 
 export async function getMenuItemsByIds(ids: string[]): Promise<CatalogMenuItem[]> {
     if (!ids.length) return [];
@@ -32,14 +38,48 @@ export async function getMenuItemsByIds(ids: string[]): Promise<CatalogMenuItem[
     });
 
     const rows = await sql<DbMenuItemRow[]>`
-        SELECT id, name, price_cents
-        FROM menu_items
-        WHERE id IN ${sql(numericIds)}
+        SELECT
+            m.id,
+            COALESCE(
+                to_jsonb(m) ->> 'name',
+                to_jsonb(m) ->> 'nome',
+                to_jsonb(m) ->> 'title',
+                to_jsonb(m) ->> 'item_name'
+            ) AS item_name,
+            COALESCE(
+                to_jsonb(m) ->> 'price_cents',
+                to_jsonb(m) ->> 'preco_cents',
+                to_jsonb(m) ->> 'unit_price_cents',
+                to_jsonb(m) ->> 'price',
+                to_jsonb(m) ->> 'preco'
+            ) AS item_price_raw,
+            CASE
+                WHEN COALESCE(
+                    to_jsonb(m) ->> 'price_cents',
+                    to_jsonb(m) ->> 'preco_cents',
+                    to_jsonb(m) ->> 'unit_price_cents'
+                ) IS NOT NULL THEN true
+                ELSE false
+            END AS is_price_already_cents
+        FROM menu_items m
+        WHERE m.id IN ${sql(numericIds)}
     `;
 
-    return rows.map((row) => ({
-        id: String(row.id),
-        name: String(row.name),
-        price_cents: Math.round(Number(row.price_cents)),
-    }));
+    return rows.map((row) => {
+        const itemName = String(row.item_name ?? "").trim();
+        if (!itemName) {
+            throw new Error(`Nome inválido no catálogo para item ${row.id}.`);
+        }
+
+        const parsedPrice = Number(row.item_price_raw ?? "");
+        if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+            throw new Error(`Preço inválido no catálogo para item ${row.id}.`);
+        }
+
+        return {
+            id: String(row.id),
+            name: itemName,
+            price_cents: toPriceCents(parsedPrice, row.is_price_already_cents),
+        };
+    });
 }

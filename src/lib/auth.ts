@@ -89,3 +89,7 @@ export async function getAuthenticatedUserRole(): Promise<UserRole | null> {
     const userContext = await getAuthenticatedUserContext();
     return userContext?.role ?? null;
 }
+
+export async function getCurrentRole(): Promise<UserRole | null> {
+    return getAuthenticatedUserRole();
+}
