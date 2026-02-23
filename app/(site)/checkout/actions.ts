@@ -1,24 +1,14 @@
 "use server";
 
-import postgres from "postgres";
-import { currentUser } from "@clerk/nextjs/server";
+import { sql } from "@/app/lib/db";
 import { sendOrderConfirmation } from "@/app/lib/send-email";
+import { getAuthenticatedUserContext, type UserRole } from "@/src/lib/auth";
+import { calculateCheckoutPricing } from "@/src/lib/pricing";
+import { getMenuItemsByIds } from "@/src/server/catalog";
 
-if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL não está definida");
-}
-
-const sql = postgres(process.env.DATABASE_URL, {
-    ssl: "require",
-});
-
-type CartItem = {
-    id: number;
-    nome: string;
-    preco: number;
+type CheckoutItemInput = {
+    id: number | string;
     quantidade: number;
-    imagem: string;
-    descricao: string;
 };
 
 type CheckoutData = {
@@ -31,263 +21,475 @@ type CheckoutData = {
     deliveryCity?: string;
     paymentMethod: string;
     notes?: string;
-    items: CartItem[];
+    items: CheckoutItemInput[];
     promoCode?: string;
 };
 
-export async function createOrder(data: CheckoutData) {
+type CreateOrderResult =
+    | {
+          success: true;
+          orderId: number;
+          breakdown: {
+              subtotalCents: number;
+              discountCents: number;
+              deliveryFeeCents: number;
+              totalCents: number;
+          };
+      }
+    | {
+          success: false;
+          error: string;
+      };
+
+type CheckoutPricingBreakdown = {
+    subtotalCents: number;
+    discountCents: number;
+    discountKind: "none" | "promo" | "admin";
+    deliveryFeeCents: number;
+    totalCents: number;
+    appliedPromoCode: string | null;
+};
+
+type CheckoutPricingPreviewResult =
+    | {
+          success: true;
+          role: UserRole;
+          breakdown: CheckoutPricingBreakdown;
+      }
+    | {
+          success: false;
+          error: string;
+      };
+
+type PromoCodeRow = {
+    code: string;
+    discount_type: "percentage" | "fixed";
+    discount_value: number;
+    min_order_value_cents: number;
+    max_uses: number | null;
+    times_used: number;
+};
+
+type DbColumnExistsRow = {
+    exists: boolean;
+};
+
+let hasOrdersDiscountCentsColumnPromise: Promise<boolean> | null = null;
+
+async function hasOrdersDiscountCentsColumn(): Promise<boolean> {
+    if (hasOrdersDiscountCentsColumnPromise) {
+        return hasOrdersDiscountCentsColumnPromise;
+    }
+
+    hasOrdersDiscountCentsColumnPromise = (async () => {
+        const rows = await sql<DbColumnExistsRow[]>`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = 'orders'
+                  AND column_name = 'discount_cents'
+            ) AS exists
+        `;
+
+        return Boolean(rows[0]?.exists);
+    })().catch((error) => {
+        hasOrdersDiscountCentsColumnPromise = null;
+        throw error;
+    });
+
+    return hasOrdersDiscountCentsColumnPromise;
+}
+
+function getPostgresErrorCode(error: unknown): string | null {
+    if (!error || typeof error !== "object") return null;
+    const code = (error as { code?: unknown }).code;
+    return typeof code === "string" ? code : null;
+}
+
+function getPostgresErrorMetadata(error: unknown) {
+    if (!error || typeof error !== "object") return null;
+
+    const err = error as {
+        code?: unknown;
+        table?: unknown;
+        column?: unknown;
+        constraint?: unknown;
+        detail?: unknown;
+        hint?: unknown;
+    };
+
+    return {
+        code: typeof err.code === "string" ? err.code : null,
+        table: typeof err.table === "string" ? err.table : null,
+        column: typeof err.column === "string" ? err.column : null,
+        constraint: typeof err.constraint === "string" ? err.constraint : null,
+        detail: typeof err.detail === "string" ? err.detail : null,
+        hint: typeof err.hint === "string" ? err.hint : null,
+    };
+}
+
+function mapCheckoutItemsToPricingItems(items: CheckoutItemInput[]) {
+    return items.map((item) => ({
+        id: String(item.id),
+        quantity: item.quantidade,
+    }));
+}
+
+async function calculateServerCheckoutPricing(params: {
+    items: CheckoutItemInput[];
+    orderType: "delivery" | "takeaway";
+    role: UserRole;
+    promoCode?: string;
+}) {
+    const normalizedCartItems = mapCheckoutItemsToPricingItems(params.items);
+
+    console.log("[checkout:pricing:input]", {
+        role: params.role,
+        orderType: params.orderType,
+        cartItems: normalizedCartItems.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+        })),
+        promoCode: params.promoCode ? "provided" : "none",
+    });
+
+    return calculateCheckoutPricing(
+        {
+            items: normalizedCartItems,
+            orderType: params.orderType,
+            role: params.role,
+            promoCode: params.promoCode,
+        },
+        {
+            fetchPricedItems: async (ids) => {
+                const menuItems = await getMenuItemsByIds(ids);
+
+                console.log("[checkout:pricing:catalog]", {
+                    requestedIds: ids,
+                    returnedItems: menuItems.map((item) => ({
+                        id: item.id,
+                        hasName: item.name.trim().length > 0,
+                        priceCents: item.price_cents,
+                    })),
+                });
+
+                return menuItems.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                    unit_price_cents: item.price_cents,
+                }));
+            },
+            fetchPromoByCode: async (normalizedCode) => {
+                const rows = await sql<PromoCodeRow[]>`
+                    SELECT code, discount_type, discount_value, min_order_value_cents, max_uses, times_used
+                    FROM promo_codes
+                    WHERE code = ${normalizedCode}
+                      AND is_active = true
+                      AND (valid_from IS NULL OR valid_from <= NOW())
+                      AND (valid_until IS NULL OR valid_until >= NOW())
+                    LIMIT 1
+                `;
+                return rows[0] ?? null;
+            },
+        },
+    );
+}
+
+function toCheckoutBreakdown(
+    pricing: Awaited<ReturnType<typeof calculateServerCheckoutPricing>>,
+): CheckoutPricingBreakdown {
+    return {
+        subtotalCents: pricing.productSubtotalCents,
+        discountCents: pricing.discountCents,
+        discountKind: pricing.discountKind,
+        deliveryFeeCents: pricing.deliveryFeeCents,
+        totalCents: pricing.totalCents,
+        appliedPromoCode: pricing.appliedPromoCode,
+    };
+}
+
+export async function getCheckoutPricingPreview(input: {
+    items: CheckoutItemInput[];
+    orderType: "delivery" | "takeaway";
+    promoCode?: string;
+}): Promise<CheckoutPricingPreviewResult> {
     try {
-        console.log("=== INÍCIO CHECKOUT ===");
-
-        // ========================================
-        // 1. BUSCAR USER E CONVERTER PARA UUID
-        // ========================================
-        const user = await currentUser();
-        let userUuid = null;
-
-        if (user) {
-            console.log("User Clerk ID:", user.id);
-
-            // Buscar UUID da BD
-            const userResult = await sql`
-        SELECT id 
-        FROM users 
-        WHERE clerk_user_id = ${user.id}
-        LIMIT 1
-      `;
-
-            if (userResult.length > 0) {
-                userUuid = userResult[0].id;
-                console.log("User UUID da BD:", userUuid);
-            } else {
-                console.warn(
-                    "User não encontrado na BD! Criando encomenda sem user_id.",
-                );
-            }
-        } else {
-            console.log("User não autenticado (convidado)");
+        const authContext = await getAuthenticatedUserContext();
+        if (!authContext) {
+            return {
+                success: false,
+                error: "Necessário iniciar sessão para calcular o total.",
+            };
         }
 
-        // ========================================
-        // 2. CALCULAR VALORES
-        // ========================================
-        const subtotalCents = data.items.reduce(
-            (acc, item) => acc + Math.round(item.preco * 100) * item.quantidade,
-            0,
-        );
-
-        let discountCents = 0;
-
-        // Validar código promocional
-        if (data.promoCode) {
-            const promoResult = await sql`
-        SELECT discount_type, discount_value, min_order_value_cents, max_uses, times_used
-        FROM promo_codes
-        WHERE code = ${data.promoCode.toUpperCase()}
-          AND is_active = true
-          AND (valid_from IS NULL OR valid_from <= NOW())
-          AND (valid_until IS NULL OR valid_until >= NOW())
-        LIMIT 1
-      `;
-
-            if (promoResult.length > 0) {
-                const promo = promoResult[0];
-
-                // Verificar valor mínimo
-                if (subtotalCents >= promo.min_order_value_cents) {
-                    // Verificar limite de usos
-                    if (
-                        promo.max_uses === null ||
-                        promo.times_used < promo.max_uses
-                    ) {
-                        // Calcular desconto
-                        if (promo.discount_type === "percentage") {
-                            discountCents = Math.round(
-                                (subtotalCents * promo.discount_value) / 100,
-                            );
-                        } else if (promo.discount_type === "fixed") {
-                            discountCents = promo.discount_value;
-                        }
-                        console.log(
-                            `Código promocional aplicado: ${data.promoCode} (-€${(discountCents / 100).toFixed(2)})`,
-                        );
-                    }
-                }
-            }
-        }
-
-        const subtotalAfterDiscount = subtotalCents - discountCents;
-        const deliveryFeeCents =
-            data.orderType === "delivery" && subtotalAfterDiscount < 3000
-                ? 250
-                : 0;
-        const totalCents = subtotalAfterDiscount + deliveryFeeCents;
-
-        console.log("Cálculos:", {
-            subtotal: subtotalCents / 100,
-            desconto: discountCents / 100,
-            portes: deliveryFeeCents / 100,
-            total: totalCents / 100,
+        const pricing = await calculateServerCheckoutPricing({
+            items: input.items,
+            orderType: input.orderType,
+            role: authContext.role,
+            promoCode: input.promoCode,
         });
 
-        // ========================================
-        // 3. CRIAR ENCOMENDA
-        // ========================================
-        console.log("Criando encomenda...");
+        const breakdown = toCheckoutBreakdown(pricing);
 
-        const orderResult = await sql`
-      INSERT INTO orders (
-        user_id,
-        customer_name,
-        customer_email,
-        customer_phone,
-        order_type,
-        delivery_address,
-        delivery_postal_code,
-        delivery_city,
-        subtotal_cents,
-        delivery_fee_cents,
-        total_cents,
-        promo_code,
-        payment_method,
-        notes,
-        status,
-        created_at,
-        updated_at
-      ) VALUES (
-        ${userUuid},
-        ${data.customerName},
-        ${data.customerEmail},
-        ${data.customerPhone || null},
-        ${data.orderType},
-        ${data.deliveryAddress || null},
-        ${data.deliveryPostalCode || null},
-        ${data.deliveryCity || null},
-        ${subtotalCents},
-        ${deliveryFeeCents},
-        ${totalCents},
-        ${data.promoCode?.toUpperCase() || null},
-        ${data.paymentMethod},
-        ${data.notes || null},
-        'pending',
-        NOW(),
-        NOW()
-      )
-      RETURNING id
-    `;
+        console.log("[checkout:preview]", {
+            role: authContext.role,
+            subtotalCents: breakdown.subtotalCents,
+            discountCents: breakdown.discountCents,
+            totalCents: breakdown.totalCents,
+        });
+
+        return {
+            success: true,
+            role: authContext.role,
+            breakdown,
+        };
+    } catch (error) {
+        console.error("Erro ao calcular preview do checkout:", error);
+        return {
+            success: false,
+            error: "Erro ao calcular total do checkout.",
+        };
+    }
+}
+
+export async function createOrder(data: CheckoutData): Promise<CreateOrderResult> {
+    try {
+        const authContext = await getAuthenticatedUserContext();
+        if (!authContext) {
+            return {
+                success: false,
+                error: "Necessário iniciar sessão para finalizar a encomenda.",
+            };
+        }
+
+        const pricing = await calculateServerCheckoutPricing({
+            items: data.items,
+            orderType: data.orderType,
+            role: authContext.role,
+            promoCode: data.promoCode,
+        });
+
+        const breakdown = toCheckoutBreakdown(pricing);
+
+        console.log("[checkout:createOrder]", {
+            role: authContext.role,
+            subtotalCents: breakdown.subtotalCents,
+            discountCents: breakdown.discountCents,
+            totalCents: breakdown.totalCents,
+        });
+
+        const supportsDiscountCents = await hasOrdersDiscountCentsColumn();
+
+        console.log("[checkout:createOrder:operation]", {
+            operation: "insert_orders",
+            role: authContext.role,
+            orderType: data.orderType,
+            itemsCount: pricing.items.length,
+            paymentMethod: data.paymentMethod,
+            hasPromoCode: Boolean(data.promoCode),
+            supportsDiscountCents,
+        });
+
+        const orderResult = supportsDiscountCents
+            ? await sql<{ id: number }[]>`
+                  INSERT INTO orders (
+                      user_id,
+                      customer_name,
+                      customer_email,
+                      customer_phone,
+                      order_type,
+                      delivery_address,
+                      delivery_postal_code,
+                      delivery_city,
+                      subtotal_cents,
+                      discount_cents,
+                      delivery_fee_cents,
+                      total_cents,
+                      promo_code,
+                      payment_method,
+                      notes,
+                      status,
+                      created_at,
+                      updated_at
+                  ) VALUES (
+                      ${authContext.dbUserId},
+                      ${data.customerName},
+                      ${data.customerEmail},
+                      ${data.customerPhone || null},
+                      ${data.orderType},
+                      ${data.deliveryAddress || null},
+                      ${data.deliveryPostalCode || null},
+                      ${data.deliveryCity || null},
+                      ${pricing.productSubtotalCents},
+                      ${pricing.discountCents},
+                      ${pricing.deliveryFeeCents},
+                      ${pricing.totalCents},
+                      ${pricing.appliedPromoCode},
+                      ${data.paymentMethod},
+                      ${data.notes || null},
+                      'pending',
+                      NOW(),
+                      NOW()
+                  )
+                  RETURNING id
+              `
+            : await sql<{ id: number }[]>`
+                  INSERT INTO orders (
+                      user_id,
+                      customer_name,
+                      customer_email,
+                      customer_phone,
+                      order_type,
+                      delivery_address,
+                      delivery_postal_code,
+                      delivery_city,
+                      subtotal_cents,
+                      delivery_fee_cents,
+                      total_cents,
+                      promo_code,
+                      payment_method,
+                      notes,
+                      status,
+                      created_at,
+                      updated_at
+                  ) VALUES (
+                      ${authContext.dbUserId},
+                      ${data.customerName},
+                      ${data.customerEmail},
+                      ${data.customerPhone || null},
+                      ${data.orderType},
+                      ${data.deliveryAddress || null},
+                      ${data.deliveryPostalCode || null},
+                      ${data.deliveryCity || null},
+                      ${pricing.productSubtotalCents},
+                      ${pricing.deliveryFeeCents},
+                      ${pricing.totalCents},
+                      ${pricing.appliedPromoCode},
+                      ${data.paymentMethod},
+                      ${data.notes || null},
+                      'pending',
+                      NOW(),
+                      NOW()
+                  )
+                  RETURNING id
+              `;
 
         const orderId = orderResult[0].id;
-        console.log("Encomenda criada! ID:", orderId);
 
-        // ========================================
-        // 4. CRIAR ORDER ITEMS
-        // ========================================
-        console.log("Criando items da encomenda...");
+        console.log("[checkout:createOrder:operation]", {
+            operation: "insert_order_items",
+            orderId,
+            itemsCount: pricing.items.length,
+        });
 
-        for (const item of data.items) {
-            const itemPriceCents = Math.round(item.preco * 100);
-            const subtotalItemCents = itemPriceCents * item.quantidade;
-
+        for (const item of pricing.items) {
             await sql`
-        INSERT INTO order_items (
-          order_id,
-          menu_item_id,
-          item_name,
-          item_price_cents,
-          quantity,
-          subtotal_cents,
-          created_at
-        ) VALUES (
-          ${orderId},
-          ${item.id},
-          ${item.nome},
-          ${itemPriceCents},
-          ${item.quantidade},
-          ${subtotalItemCents},
-          NOW()
-        )
-      `;
-            console.log(
-                `  - Item adicionado: ${item.nome} x${item.quantidade}`,
-            );
+                INSERT INTO order_items (
+                    order_id,
+                    menu_item_id,
+                    item_name,
+                    item_price_cents,
+                    quantity,
+                    subtotal_cents,
+                    created_at
+                ) VALUES (
+                    ${orderId},
+                    ${item.menuItemId},
+                    ${item.name},
+                    ${item.unitPriceCents},
+                    ${item.quantity},
+                    ${item.subtotalCents},
+                    NOW()
+                )
+            `;
         }
 
-        // ========================================
-        // 5. ATUALIZAR CÓDIGO PROMOCIONAL
-        // ========================================
-        if (data.promoCode && discountCents > 0) {
+        if (pricing.shouldIncrementPromoUsage && pricing.appliedPromoCode) {
             await sql`
-        UPDATE promo_codes
-        SET times_used = times_used + 1
-        WHERE code = ${data.promoCode.toUpperCase()}
-      `;
-            console.log("Código promocional atualizado");
+                UPDATE promo_codes
+                SET times_used = times_used + 1
+                WHERE code = ${pricing.appliedPromoCode}
+            `;
         }
 
-        // ========================================
-        // 6. ATUALIZAR PONTOS DO USER (se autenticado)
-        // ========================================
-        if (userUuid) {
-            const pointsToAdd = Math.floor(totalCents / 100);
+        if (authContext.dbUserId) {
+            const pointsToAdd = Math.floor(pricing.totalCents / 100);
 
             await sql`
-        UPDATE users
-        SET 
-          points = points + ${pointsToAdd},
-          total_spent_cents = total_spent_cents + ${totalCents},
-          updated_at = NOW()
-        WHERE id = ${userUuid}
-      `;
-            console.log(`User atualizado: +${pointsToAdd} pontos`);
+                UPDATE users
+                SET
+                    points = points + ${pointsToAdd},
+                    total_spent_cents = total_spent_cents + ${pricing.totalCents},
+                    updated_at = NOW()
+                WHERE id = ${authContext.dbUserId}
+            `;
         }
-
-        console.log("=== CHECKOUT CONCLUÍDO COM SUCESSO ===");
-
-        // ========================================
-        // 7. ENVIAR EMAIL DE CONFIRMAÇÃO
-        // ========================================
-        console.log("Enviando email de confirmação...");
 
         const emailResult = await sendOrderConfirmation({
             to: data.customerEmail,
             customerName: data.customerName,
-            orderId: orderId,
+            orderId,
             orderType: data.orderType,
             deliveryAddress:
                 data.orderType === "delivery"
                     ? `${data.deliveryAddress}, ${data.deliveryPostalCode} ${data.deliveryCity}`
                     : undefined,
-            items: data.items.map((item) => ({
-                name: item.nome,
-                quantity: item.quantidade,
-                price: item.preco,
-                subtotal: item.preco * item.quantidade,
+            items: pricing.items.map((item) => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.unitPriceCents / 100,
+                subtotal: item.subtotalCents / 100,
             })),
-            subtotal: subtotalCents / 100,
-            deliveryFee: deliveryFeeCents / 100,
-            total: totalCents / 100,
+            subtotal: pricing.productSubtotalCents / 100,
+            deliveryFee: pricing.deliveryFeeCents / 100,
+            total: pricing.totalCents / 100,
             paymentMethod: data.paymentMethod,
             notes: data.notes,
         });
 
-        if (emailResult.success) {
-            console.log("Email enviado com sucesso");
+        if (!emailResult.success) {
+            console.warn("[checkout:createOrder:email]", {
+                orderId,
+                customerEmail: data.customerEmail,
+                reason: emailResult.error,
+            });
         } else {
-            console.warn("Erro ao enviar email (encomenda criada na mesma)");
+            console.log("[checkout:createOrder:email]", {
+                orderId,
+                customerEmail: data.customerEmail,
+                status: "sent",
+            });
         }
 
         return {
             success: true,
             orderId,
+            breakdown: {
+                subtotalCents: breakdown.subtotalCents,
+                discountCents: breakdown.discountCents,
+                deliveryFeeCents: breakdown.deliveryFeeCents,
+                totalCents: breakdown.totalCents,
+            },
         };
     } catch (error) {
-        console.error("Erro ao criar encomenda:", error);
+        const pgError = getPostgresErrorMetadata(error);
+        console.error("Erro ao criar encomenda:", {
+            message: error instanceof Error ? error.message : String(error),
+            postgres: pgError,
+        });
+
+        const pgCode = getPostgresErrorCode(error);
+        const errorMessage =
+            pgCode === "42703"
+                ? "Erro de base de dados ao criar encomenda (coluna SQL inválida)."
+                : error instanceof Error
+                  ? error.message
+                  : "Erro ao processar encomenda";
+
         return {
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Erro ao processar encomenda",
+            error: errorMessage,
         };
     }
 }

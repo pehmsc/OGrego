@@ -1,6 +1,15 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY?.trim() || null;
+let resendClient: Resend | null = null;
+
+function getResendClient() {
+    if (!resendApiKey) return null;
+    if (!resendClient) {
+        resendClient = new Resend(resendApiKey);
+    }
+    return resendClient;
+}
 
 type OrderEmailData = {
     to: string;
@@ -23,6 +32,17 @@ type OrderEmailData = {
 
 export async function sendOrderConfirmation(data: OrderEmailData) {
     try {
+        const resend = getResendClient();
+        if (!resend) {
+            console.warn(
+                "[email] RESEND_API_KEY não configurada. Email de confirmação não enviado.",
+            );
+            return {
+                success: false,
+                error: "RESEND_API_KEY não configurada",
+            };
+        }
+
         const {
             to,
             customerName,

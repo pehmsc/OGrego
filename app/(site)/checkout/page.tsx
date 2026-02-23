@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useCart } from "@/app/contexts/CartContext";
-import { createOrder } from "./actions";
+import { createOrder, getCheckoutPricingPreview } from "./actions";
 import Image from "next/image";
 import {
     TruckIcon,
@@ -13,14 +13,39 @@ import {
     CreditCardIcon,
 } from "@heroicons/react/24/outline";
 
+type ProfileData = {
+    name?: string;
+    email?: string;
+    phone?: string;
+    nif?: string;
+    address?: string;
+    points?: number;
+};
+
+type PricingPreview = {
+    role: "admin" | "user";
+    breakdown: {
+        subtotalCents: number;
+        discountCents: number;
+        discountKind: "none" | "promo" | "admin";
+        deliveryFeeCents: number;
+        totalCents: number;
+    };
+};
+
 export default function CheckoutPage() {
     const router = useRouter();
     const { items, subtotal, clearCart } = useCart();
     const { user, isLoaded } = useUser();
+    const userId = user?.id;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoadingUserData, setIsLoadingUserData] = useState(true);
-    const [userData, setUserData] = useState<any>(null);
+    const [isPricingLoading, setIsPricingLoading] = useState(false);
+    const [pricingPreview, setPricingPreview] = useState<PricingPreview | null>(
+        null,
+    );
+    const [userData, setUserData] = useState<ProfileData | null>(null);
 
     const [formData, setFormData] = useState({
         customerName: "",
@@ -34,7 +59,7 @@ export default function CheckoutPage() {
         notes: "",
     });
 
-    const [promoCode, setPromoCode] = useState("");
+    const promoCode = "";
 
     // ========================================
     // BUSCAR DADOS DO USER NA BD
@@ -101,6 +126,62 @@ export default function CheckoutPage() {
         fetchUserData();
     }, [user, isLoaded]);
 
+    useEffect(() => {
+        let isCancelled = false;
+
+        async function fetchPricingPreview() {
+            if (!isLoaded || !userId || items.length === 0) {
+                setPricingPreview(null);
+                setIsPricingLoading(false);
+                return;
+            }
+
+            setIsPricingLoading(true);
+
+            try {
+                const result = await getCheckoutPricingPreview({
+                    items: items.map((item) => ({
+                        id: item.id,
+                        quantidade: item.quantidade,
+                    })),
+                    orderType: formData.orderType,
+                    promoCode: promoCode || undefined,
+                });
+
+                if (isCancelled) return;
+
+                if (result.success) {
+                    setPricingPreview({
+                        role: result.role,
+                        breakdown: {
+                            subtotalCents: result.breakdown.subtotalCents,
+                            discountCents: result.breakdown.discountCents,
+                            discountKind: result.breakdown.discountKind,
+                            deliveryFeeCents: result.breakdown.deliveryFeeCents,
+                            totalCents: result.breakdown.totalCents,
+                        },
+                    });
+                } else {
+                    setPricingPreview(null);
+                }
+            } catch (error) {
+                if (isCancelled) return;
+                console.error("Erro ao calcular preview do checkout:", error);
+                setPricingPreview(null);
+            } finally {
+                if (!isCancelled) {
+                    setIsPricingLoading(false);
+                }
+            }
+        }
+
+        void fetchPricingPreview();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [isLoaded, userId, items, formData.orderType, promoCode]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -118,16 +199,29 @@ export default function CheckoutPage() {
             } else {
                 alert(result.error || "Erro ao processar encomenda");
             }
-        } catch (error) {
+        } catch {
             alert("Erro ao processar encomenda. Tente novamente.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const deliveryFee =
-        formData.orderType === "delivery" && subtotal < 30 ? 2.5 : 0;
-    const total = subtotal + deliveryFee;
+    const fallbackSubtotalCents = Math.round(subtotal * 100);
+    const fallbackDeliveryFeeCents =
+        formData.orderType === "delivery" && fallbackSubtotalCents < 3000
+            ? 250
+            : 0;
+    const fallbackTotalCents = fallbackSubtotalCents + fallbackDeliveryFeeCents;
+
+    const subtotalCents =
+        pricingPreview?.breakdown.subtotalCents ?? fallbackSubtotalCents;
+    const discountCents = pricingPreview?.breakdown.discountCents ?? 0;
+    const discountKind = pricingPreview?.breakdown.discountKind ?? "none";
+    const deliveryFeeCents =
+        pricingPreview?.breakdown.deliveryFeeCents ?? fallbackDeliveryFeeCents;
+    const totalCents = pricingPreview?.breakdown.totalCents ?? fallbackTotalCents;
+    const discountLabel =
+        discountKind === "admin" ? "Desconto Admin (50%)" : "Desconto";
 
     // ========================================
     // LOADING
@@ -181,6 +275,42 @@ export default function CheckoutPage() {
                             className="text-sm text-zinc-600 hover:text-[#1E3A8A] underline"
                         >
                             ← Voltar ao carrinho
+                        </Link>
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
+    // ========================================
+    // NIF EM FALTA
+    // ========================================
+    if (user && userData && !userData.nif) {
+        return (
+            <main className="mx-auto max-w-4xl px-4 py-12">
+                <div className="rounded-3xl border border-amber-200 bg-amber-50 p-12 text-center shadow-sm">
+                    <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100">
+                        <span className="text-4xl">📋</span>
+                    </div>
+                    <h2 className="mb-2 text-2xl font-semibold text-amber-900">
+                        NIF necessário para continuar
+                    </h2>
+                    <p className="mb-6 text-amber-800">
+                        Para emitir recibo fiscal é necessário ter o NIF preenchido no perfil.
+                        Adicione o seu NIF e volte para finalizar a encomenda.
+                    </p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <Link
+                            href="/user/profile"
+                            className="inline-flex h-12 items-center justify-center rounded-full bg-[#1E3A8A] px-8 text-sm font-medium text-white hover:bg-[#162F73] transition-all shadow-lg"
+                        >
+                            Ir para o Perfil
+                        </Link>
+                        <Link
+                            href="/menu"
+                            className="inline-flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-8 text-sm font-medium text-[#1E3A8A] hover:border-[#1E3A8A]/40 transition-all"
+                        >
+                            ← Voltar ao Menu
                         </Link>
                     </div>
                 </div>
@@ -479,7 +609,7 @@ export default function CheckoutPage() {
                 <div className="lg:col-span-1">
                     <div className="sticky top-4 space-y-6">
                         {/* Pontos do user */}
-                        {userData?.points > 0 && (
+                        {(userData?.points ?? 0) > 0 && (
                             <div className="rounded-3xl border border-[#1E3A8A]/10 bg-gradient-to-br from-amber-50 to-orange-50 p-6">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500">
@@ -490,7 +620,7 @@ export default function CheckoutPage() {
                                             Tem disponível
                                         </p>
                                         <p className="text-2xl font-bold text-amber-900">
-                                            {userData.points} pontos
+                                            {userData?.points ?? 0} pontos
                                         </p>
                                     </div>
                                 </div>
@@ -539,17 +669,26 @@ export default function CheckoutPage() {
                                         Subtotal
                                     </span>
                                     <span className="font-medium">
-                                        €{subtotal.toFixed(2)}
+                                        €{(subtotalCents / 100).toFixed(2)}
                                     </span>
                                 </div>
 
-                                {deliveryFee > 0 && (
+                                {discountCents > 0 && (
+                                    <div className="flex justify-between text-sm text-emerald-700">
+                                        <span>{discountLabel}</span>
+                                        <span className="font-medium">
+                                            -€{(discountCents / 100).toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {deliveryFeeCents > 0 && (
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600">
                                             Portes
                                         </span>
                                         <span className="font-medium">
-                                            €{deliveryFee.toFixed(2)}
+                                            €{(deliveryFeeCents / 100).toFixed(2)}
                                         </span>
                                     </div>
                                 )}
@@ -561,9 +700,15 @@ export default function CheckoutPage() {
                                         Total
                                     </span>
                                     <span className="font-bold text-[#1E3A8A]">
-                                        €{total.toFixed(2)}
+                                        €{(totalCents / 100).toFixed(2)}
                                     </span>
                                 </div>
+
+                                {isPricingLoading && (
+                                    <p className="text-xs text-gray-500">
+                                        A atualizar total...
+                                    </p>
+                                )}
                             </div>
                         </section>
 

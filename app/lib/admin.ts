@@ -1,27 +1,21 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
-
-const ADMIN_EMAILS = new Set(
-  ["pehmsc@gmail.com", "joanamcbarata@gmail.com", "damartins89@gmail.com"].map(
-    (e) => e.toLowerCase(),
-  ),
-);
+import { currentUser } from "@clerk/nextjs/server";
+import { getAuthenticatedUserContext } from "@/src/lib/auth";
 
 export async function requireAdmin() {
-  const { userId } = await auth();
+  const authContext = await getAuthenticatedUserContext();
 
-  if (!userId) {
+  if (!authContext) {
     return { ok: false as const, reason: "not_signed_in" as const };
   }
 
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
-
-  const emails = user.emailAddresses.map((e) => e.emailAddress.toLowerCase());
-  const isAdmin = emails.some((e) => ADMIN_EMAILS.has(e));
-
-  if (!isAdmin) {
-    return { ok: false as const, reason: "not_admin" as const, userId };
+  if (authContext.role !== "admin") {
+    return {
+      ok: false as const,
+      reason: "not_admin" as const,
+      userId: authContext.clerkUserId,
+    };
   }
 
-  return { ok: true as const, userId, user, emails };
+  const user = await currentUser();
+  return { ok: true as const, userId: authContext.clerkUserId, user };
 }
