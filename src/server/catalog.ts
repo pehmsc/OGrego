@@ -10,75 +10,13 @@ export type CatalogMenuItem = {
 
 type DbMenuItemRow = {
     id: string | number;
-    item_name: string;
-    item_price_raw: number | string;
+    item_name: string | null;
+    item_price_raw: string | null;
+    is_price_already_cents: boolean;
 };
 
-const MENU_NAME_COLUMN_CANDIDATES = [
-    "name",
-    "nome",
-    "title",
-    "item_name",
-] as const;
-
-const MENU_PRICE_COLUMN_CANDIDATES = [
-    "price_cents",
-    "preco_cents",
-    "unit_price_cents",
-    "price",
-    "preco",
-] as const;
-
-type ResolvedMenuColumns = {
-    nameColumn: string;
-    priceColumn: string;
-};
-
-let resolvedMenuColumnsPromise: Promise<ResolvedMenuColumns> | null = null;
-
-async function resolveMenuItemsColumns(): Promise<ResolvedMenuColumns> {
-    if (resolvedMenuColumnsPromise) {
-        return resolvedMenuColumnsPromise;
-    }
-
-    resolvedMenuColumnsPromise = (async () => {
-        const rows = await sql<{ column_name: string }[]>`
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = 'menu_items'
-        `;
-
-        const availableColumns = new Set(
-            rows.map((row) => String(row.column_name).toLowerCase()),
-        );
-
-        const nameColumn = MENU_NAME_COLUMN_CANDIDATES.find((column) =>
-            availableColumns.has(column),
-        );
-        const priceColumn = MENU_PRICE_COLUMN_CANDIDATES.find((column) =>
-            availableColumns.has(column),
-        );
-
-        if (!nameColumn || !priceColumn) {
-            throw new Error(
-                "Tabela menu_items sem colunas compatíveis para nome/preço.",
-            );
-        }
-
-        return { nameColumn, priceColumn };
-    })().catch((error) => {
-        resolvedMenuColumnsPromise = null;
-        throw error;
-    });
-
-    return resolvedMenuColumnsPromise;
-}
-
-function toPriceCents(value: number, sourceColumn: string) {
-    if (sourceColumn.endsWith("_cents")) {
-        return Math.round(value);
-    }
+function toPriceCents(value: number, isPriceAlreadyCents: boolean) {
+    if (isPriceAlreadyCents) return Math.round(value);
     return Math.round(value * 100);
 }
 
@@ -99,27 +37,49 @@ export async function getMenuItemsByIds(ids: string[]): Promise<CatalogMenuItem[
         return parsed;
     });
 
-    const { nameColumn, priceColumn } = await resolveMenuItemsColumns();
-
-    const rows = await sql.unsafe<DbMenuItemRow[]>(`
+    const rows = await sql<DbMenuItemRow[]>`
         SELECT
-            id,
-            ${nameColumn} AS item_name,
-            ${priceColumn} AS item_price_raw
-        FROM menu_items
-        WHERE id IN (${numericIds.join(",")})
-    `);
+            m.id,
+            COALESCE(
+                to_jsonb(m) ->> 'name',
+                to_jsonb(m) ->> 'nome',
+                to_jsonb(m) ->> 'title',
+                to_jsonb(m) ->> 'item_name'
+            ) AS item_name,
+            COALESCE(
+                to_jsonb(m) ->> 'price_cents',
+                to_jsonb(m) ->> 'preco_cents',
+                to_jsonb(m) ->> 'unit_price_cents',
+                to_jsonb(m) ->> 'price',
+                to_jsonb(m) ->> 'preco'
+            ) AS item_price_raw,
+            CASE
+                WHEN COALESCE(
+                    to_jsonb(m) ->> 'price_cents',
+                    to_jsonb(m) ->> 'preco_cents',
+                    to_jsonb(m) ->> 'unit_price_cents'
+                ) IS NOT NULL THEN true
+                ELSE false
+            END AS is_price_already_cents
+        FROM menu_items m
+        WHERE m.id IN ${sql(numericIds)}
+    `;
 
     return rows.map((row) => {
-        const parsedPrice = Number(row.item_price_raw);
+        const itemName = String(row.item_name ?? "").trim();
+        if (!itemName) {
+            throw new Error(`Nome inválido no catálogo para item ${row.id}.`);
+        }
+
+        const parsedPrice = Number(row.item_price_raw ?? "");
         if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
             throw new Error(`Preço inválido no catálogo para item ${row.id}.`);
         }
 
         return {
             id: String(row.id),
-            name: String(row.item_name),
-            price_cents: toPriceCents(parsedPrice, priceColumn),
+            name: itemName,
+            price_cents: toPriceCents(parsedPrice, row.is_price_already_cents),
         };
     });
 }

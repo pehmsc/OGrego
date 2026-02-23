@@ -70,6 +70,65 @@ type PromoCodeRow = {
     times_used: number;
 };
 
+type DbColumnExistsRow = {
+    exists: boolean;
+};
+
+let hasOrdersDiscountCentsColumnPromise: Promise<boolean> | null = null;
+
+async function hasOrdersDiscountCentsColumn(): Promise<boolean> {
+    if (hasOrdersDiscountCentsColumnPromise) {
+        return hasOrdersDiscountCentsColumnPromise;
+    }
+
+    hasOrdersDiscountCentsColumnPromise = (async () => {
+        const rows = await sql<DbColumnExistsRow[]>`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = 'orders'
+                  AND column_name = 'discount_cents'
+            ) AS exists
+        `;
+
+        return Boolean(rows[0]?.exists);
+    })().catch((error) => {
+        hasOrdersDiscountCentsColumnPromise = null;
+        throw error;
+    });
+
+    return hasOrdersDiscountCentsColumnPromise;
+}
+
+function getPostgresErrorCode(error: unknown): string | null {
+    if (!error || typeof error !== "object") return null;
+    const code = (error as { code?: unknown }).code;
+    return typeof code === "string" ? code : null;
+}
+
+function getPostgresErrorMetadata(error: unknown) {
+    if (!error || typeof error !== "object") return null;
+
+    const err = error as {
+        code?: unknown;
+        table?: unknown;
+        column?: unknown;
+        constraint?: unknown;
+        detail?: unknown;
+        hint?: unknown;
+    };
+
+    return {
+        code: typeof err.code === "string" ? err.code : null,
+        table: typeof err.table === "string" ? err.table : null,
+        column: typeof err.column === "string" ? err.column : null,
+        constraint: typeof err.constraint === "string" ? err.constraint : null,
+        detail: typeof err.detail === "string" ? err.detail : null,
+        hint: typeof err.hint === "string" ? err.hint : null,
+    };
+}
+
 function mapCheckoutItemsToPricingItems(items: CheckoutItemInput[]) {
     return items.map((item) => ({
         id: String(item.id),
@@ -198,48 +257,109 @@ export async function createOrder(data: CheckoutData): Promise<CreateOrderResult
             totalCents: breakdown.totalCents,
         });
 
-        const orderResult = await sql<{ id: number }[]>`
-            INSERT INTO orders (
-                user_id,
-                customer_name,
-                customer_email,
-                customer_phone,
-                order_type,
-                delivery_address,
-                delivery_postal_code,
-                delivery_city,
-                subtotal_cents,
-                delivery_fee_cents,
-                total_cents,
-                promo_code,
-                payment_method,
-                notes,
-                status,
-                created_at,
-                updated_at
-            ) VALUES (
-                ${authContext.dbUserId},
-                ${data.customerName},
-                ${data.customerEmail},
-                ${data.customerPhone || null},
-                ${data.orderType},
-                ${data.deliveryAddress || null},
-                ${data.deliveryPostalCode || null},
-                ${data.deliveryCity || null},
-                ${pricing.productSubtotalCents},
-                ${pricing.deliveryFeeCents},
-                ${pricing.totalCents},
-                ${pricing.appliedPromoCode},
-                ${data.paymentMethod},
-                ${data.notes || null},
-                'pending',
-                NOW(),
-                NOW()
-            )
-            RETURNING id
-        `;
+        const supportsDiscountCents = await hasOrdersDiscountCentsColumn();
+
+        console.log("[checkout:createOrder:operation]", {
+            operation: "insert_orders",
+            role: authContext.role,
+            orderType: data.orderType,
+            itemsCount: pricing.items.length,
+            paymentMethod: data.paymentMethod,
+            hasPromoCode: Boolean(data.promoCode),
+            supportsDiscountCents,
+        });
+
+        const orderResult = supportsDiscountCents
+            ? await sql<{ id: number }[]>`
+                  INSERT INTO orders (
+                      user_id,
+                      customer_name,
+                      customer_email,
+                      customer_phone,
+                      order_type,
+                      delivery_address,
+                      delivery_postal_code,
+                      delivery_city,
+                      subtotal_cents,
+                      discount_cents,
+                      delivery_fee_cents,
+                      total_cents,
+                      promo_code,
+                      payment_method,
+                      notes,
+                      status,
+                      created_at,
+                      updated_at
+                  ) VALUES (
+                      ${authContext.dbUserId},
+                      ${data.customerName},
+                      ${data.customerEmail},
+                      ${data.customerPhone || null},
+                      ${data.orderType},
+                      ${data.deliveryAddress || null},
+                      ${data.deliveryPostalCode || null},
+                      ${data.deliveryCity || null},
+                      ${pricing.productSubtotalCents},
+                      ${pricing.discountCents},
+                      ${pricing.deliveryFeeCents},
+                      ${pricing.totalCents},
+                      ${pricing.appliedPromoCode},
+                      ${data.paymentMethod},
+                      ${data.notes || null},
+                      'pending',
+                      NOW(),
+                      NOW()
+                  )
+                  RETURNING id
+              `
+            : await sql<{ id: number }[]>`
+                  INSERT INTO orders (
+                      user_id,
+                      customer_name,
+                      customer_email,
+                      customer_phone,
+                      order_type,
+                      delivery_address,
+                      delivery_postal_code,
+                      delivery_city,
+                      subtotal_cents,
+                      delivery_fee_cents,
+                      total_cents,
+                      promo_code,
+                      payment_method,
+                      notes,
+                      status,
+                      created_at,
+                      updated_at
+                  ) VALUES (
+                      ${authContext.dbUserId},
+                      ${data.customerName},
+                      ${data.customerEmail},
+                      ${data.customerPhone || null},
+                      ${data.orderType},
+                      ${data.deliveryAddress || null},
+                      ${data.deliveryPostalCode || null},
+                      ${data.deliveryCity || null},
+                      ${pricing.productSubtotalCents},
+                      ${pricing.deliveryFeeCents},
+                      ${pricing.totalCents},
+                      ${pricing.appliedPromoCode},
+                      ${data.paymentMethod},
+                      ${data.notes || null},
+                      'pending',
+                      NOW(),
+                      NOW()
+                  )
+                  RETURNING id
+              `;
 
         const orderId = orderResult[0].id;
+
+        console.log("[checkout:createOrder:operation]", {
+            operation: "insert_order_items",
+            orderId,
+            itemsCount: pricing.items.length,
+        });
 
         for (const item of pricing.items) {
             await sql`
@@ -317,13 +437,23 @@ export async function createOrder(data: CheckoutData): Promise<CreateOrderResult
             },
         };
     } catch (error) {
-        console.error("Erro ao criar encomenda:", error);
+        const pgError = getPostgresErrorMetadata(error);
+        console.error("Erro ao criar encomenda:", {
+            message: error instanceof Error ? error.message : String(error),
+            postgres: pgError,
+        });
+
+        const pgCode = getPostgresErrorCode(error);
+        const errorMessage =
+            pgCode === "42703"
+                ? "Erro de base de dados ao criar encomenda (coluna SQL inválida)."
+                : error instanceof Error
+                  ? error.message
+                  : "Erro ao processar encomenda";
+
         return {
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Erro ao processar encomenda",
+            error: errorMessage,
         };
     }
 }
