@@ -157,9 +157,11 @@ export async function calculateCheckoutPricing(
             throw new Error(`Preço inválido para o item ${id}.`);
         }
 
+        const itemName = String(pricedItem.name ?? "").trim() || `Item ${id}`;
+
         pricedById.set(id, {
             id,
-            name: String(pricedItem.name),
+            name: itemName,
             unit_price_cents: unitPriceCents,
         });
     }
@@ -167,7 +169,7 @@ export async function calculateCheckoutPricing(
     const validatedItems: ValidatedCheckoutItem[] = normalizedItems.map((item) => {
         const priced = pricedById.get(item.id);
         if (!priced) {
-            throw new Error(`Item ${item.id} não encontrado no catálogo.`);
+            throw new Error(`Item não encontrado: ${item.id}`);
         }
 
         const subtotalCents = priced.unit_price_cents * item.quantity;
