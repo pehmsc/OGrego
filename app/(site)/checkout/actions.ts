@@ -2,7 +2,7 @@
 
 import { sql } from "@/app/lib/db";
 import { sendOrderConfirmation } from "@/app/lib/send-email";
-import { getAuthenticatedUserContext } from "@/src/lib/auth";
+import { getAuthenticatedUserContext, type UserRole } from "@/src/lib/auth";
 import { calculateCheckoutPricing } from "@/src/lib/pricing";
 import { getMenuItemsByIds } from "@/src/server/catalog";
 
@@ -41,6 +41,26 @@ type CreateOrderResult =
           error: string;
       };
 
+type CheckoutPricingBreakdown = {
+    subtotalCents: number;
+    discountCents: number;
+    discountKind: "none" | "promo" | "admin";
+    deliveryFeeCents: number;
+    totalCents: number;
+    appliedPromoCode: string | null;
+};
+
+type CheckoutPricingPreviewResult =
+    | {
+          success: true;
+          role: UserRole;
+          breakdown: CheckoutPricingBreakdown;
+      }
+    | {
+          success: false;
+          error: string;
+      };
+
 type PromoCodeRow = {
     code: string;
     discount_type: "percentage" | "fixed";
@@ -50,25 +70,27 @@ type PromoCodeRow = {
     times_used: number;
 };
 
-export async function createOrder(data: CheckoutData): Promise<CreateOrderResult> {
-    try {
-        const authContext = await getAuthenticatedUserContext();
-        if (!authContext) {
-            return {
-                success: false,
-                error: "Necessário iniciar sessão para finalizar a encomenda.",
-            };
-        }
+function mapCheckoutItemsToPricingItems(items: CheckoutItemInput[]) {
+    return items.map((item) => ({
+        id: String(item.id),
+        quantity: item.quantidade,
+    }));
+}
 
-        const pricing = await calculateCheckoutPricing({
-            items: data.items.map((item) => ({
-                id: String(item.id),
-                quantity: item.quantidade,
-            })),
-            orderType: data.orderType,
-            role: authContext.role,
-            promoCode: data.promoCode,
-        }, {
+async function calculateServerCheckoutPricing(params: {
+    items: CheckoutItemInput[];
+    orderType: "delivery" | "takeaway";
+    role: UserRole;
+    promoCode?: string;
+}) {
+    return calculateCheckoutPricing(
+        {
+            items: mapCheckoutItemsToPricingItems(params.items),
+            orderType: params.orderType,
+            role: params.role,
+            promoCode: params.promoCode,
+        },
+        {
             fetchPricedItems: async (ids) => {
                 const menuItems = await getMenuItemsByIds(ids);
                 return menuItems.map((item) => ({
@@ -89,6 +111,91 @@ export async function createOrder(data: CheckoutData): Promise<CreateOrderResult
                 `;
                 return rows[0] ?? null;
             },
+        },
+    );
+}
+
+function toCheckoutBreakdown(
+    pricing: Awaited<ReturnType<typeof calculateServerCheckoutPricing>>,
+): CheckoutPricingBreakdown {
+    return {
+        subtotalCents: pricing.productSubtotalCents,
+        discountCents: pricing.discountCents,
+        discountKind: pricing.discountKind,
+        deliveryFeeCents: pricing.deliveryFeeCents,
+        totalCents: pricing.totalCents,
+        appliedPromoCode: pricing.appliedPromoCode,
+    };
+}
+
+export async function getCheckoutPricingPreview(input: {
+    items: CheckoutItemInput[];
+    orderType: "delivery" | "takeaway";
+    promoCode?: string;
+}): Promise<CheckoutPricingPreviewResult> {
+    try {
+        const authContext = await getAuthenticatedUserContext();
+        if (!authContext) {
+            return {
+                success: false,
+                error: "Necessário iniciar sessão para calcular o total.",
+            };
+        }
+
+        const pricing = await calculateServerCheckoutPricing({
+            items: input.items,
+            orderType: input.orderType,
+            role: authContext.role,
+            promoCode: input.promoCode,
+        });
+
+        const breakdown = toCheckoutBreakdown(pricing);
+
+        console.log("[checkout:preview]", {
+            role: authContext.role,
+            subtotalCents: breakdown.subtotalCents,
+            discountCents: breakdown.discountCents,
+            totalCents: breakdown.totalCents,
+        });
+
+        return {
+            success: true,
+            role: authContext.role,
+            breakdown,
+        };
+    } catch (error) {
+        console.error("Erro ao calcular preview do checkout:", error);
+        return {
+            success: false,
+            error: "Erro ao calcular total do checkout.",
+        };
+    }
+}
+
+export async function createOrder(data: CheckoutData): Promise<CreateOrderResult> {
+    try {
+        const authContext = await getAuthenticatedUserContext();
+        if (!authContext) {
+            return {
+                success: false,
+                error: "Necessário iniciar sessão para finalizar a encomenda.",
+            };
+        }
+
+        const pricing = await calculateServerCheckoutPricing({
+            items: data.items,
+            orderType: data.orderType,
+            role: authContext.role,
+            promoCode: data.promoCode,
+        });
+
+        const breakdown = toCheckoutBreakdown(pricing);
+
+        console.log("[checkout:createOrder]", {
+            role: authContext.role,
+            subtotalCents: breakdown.subtotalCents,
+            discountCents: breakdown.discountCents,
+            totalCents: breakdown.totalCents,
         });
 
         const orderResult = await sql<{ id: number }[]>`
@@ -203,10 +310,10 @@ export async function createOrder(data: CheckoutData): Promise<CreateOrderResult
             success: true,
             orderId,
             breakdown: {
-                subtotalCents: pricing.productSubtotalCents,
-                discountCents: pricing.discountCents,
-                deliveryFeeCents: pricing.deliveryFeeCents,
-                totalCents: pricing.totalCents,
+                subtotalCents: breakdown.subtotalCents,
+                discountCents: breakdown.discountCents,
+                deliveryFeeCents: breakdown.deliveryFeeCents,
+                totalCents: breakdown.totalCents,
             },
         };
     } catch (error) {
