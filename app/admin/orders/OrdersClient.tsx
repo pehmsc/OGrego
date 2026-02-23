@@ -177,7 +177,9 @@ export default function OrdersClient({
     const pedidosEntregues = orders.filter(
         (p) => p.estado === "Entregue",
     ).length;
-    const totalPedidos = orders.reduce((sum, p) => sum + p.total, 0);
+    const totalPedidos = orders
+        .filter((p) => p.estado !== "Cancelado")
+        .reduce((sum, p) => sum + p.total, 0);
 
     const openEditModal = (pedido: Order) => {
         setEditForm(pedido);
