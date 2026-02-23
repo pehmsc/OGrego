@@ -17,6 +17,7 @@ type ProfileData = {
     name?: string;
     email?: string;
     phone?: string;
+    nif?: string;
     address?: string;
     points?: number;
 };
