@@ -17,6 +17,7 @@ export async function GET() {
             favoriteRestaurant: userDb.favorite_restaurant ?? "",
             imageUrl: userDb.image_url ?? "",
             points: userDb.points ?? 0,
+            role: userDb.role,
         };
 
         return NextResponse.json(user);

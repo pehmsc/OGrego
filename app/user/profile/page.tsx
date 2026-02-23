@@ -6,9 +6,22 @@ import UserPageLayout from "@/app/ui/components/user/UserPageLayout";
 import LoyaltyCard from "@/app/ui/components/user/LoyaltyCard";
 import DeleteAccountButton from "@/app/ui/components/user/DeleteAccountButton";
 import Image from "next/image";
+import Link from "next/link";
+
+type ProfileUser = {
+    name: string;
+    email: string;
+    phone: string;
+    nif: string;
+    address: string;
+    favoriteRestaurant: string;
+    imageUrl: string;
+    points: number;
+    role?: "admin" | "user";
+};
 
 export default function PerfilPage() {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<ProfileUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [imagePreview, setImagePreview] = useState("");
 
@@ -17,7 +30,7 @@ export default function PerfilPage() {
         async function loadUser() {
             try {
                 const response = await fetch("/api/profile");
-                const data = await response.json();
+                const data = (await response.json()) as ProfileUser;
                 setUser(data);
                 setImagePreview(data.imageUrl || "");
             } catch (error) {
@@ -68,9 +81,19 @@ export default function PerfilPage() {
     return (
         <UserPageLayout sidebar={<LoyaltyCard points={user.points || 0} />}>
             <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
-                <h2 className="mb-6 text-2xl font-semibold text-[#1E3A8A]">
-                    Informações Pessoais
-                </h2>
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h2 className="text-2xl font-semibold text-[#1E3A8A]">
+                        Informações Pessoais
+                    </h2>
+                    {user.role === "admin" ? (
+                        <Link
+                            href="/admin/dashboard"
+                            className="inline-flex h-10 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-5 text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40 hover:bg-[#F4F7FB]"
+                        >
+                            Ir para Dashboard
+                        </Link>
+                    ) : null}
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Fotografia de Perfil */}
