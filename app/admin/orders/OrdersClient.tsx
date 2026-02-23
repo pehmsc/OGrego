@@ -80,17 +80,6 @@ function uiStatusToDb(estado: string): string {
     }
 }
 
-function uiTipoToDb(tipo: string): string {
-    switch (tipo) {
-        case "Delivery":
-            return "delivery";
-        case "Take-away":
-            return "takeaway";
-        default:
-            return "takeaway";
-    }
-}
-
 const getStatusColor = (estado: string) => {
     switch (estado) {
         case "Em preparação":
