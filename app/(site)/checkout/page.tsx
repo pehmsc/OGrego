@@ -19,6 +19,8 @@ type ProfileData = {
     phone?: string;
     nif?: string;
     address?: string;
+    postalCode?: string;
+    city?: string;
     points?: number;
 };
 
@@ -87,6 +89,8 @@ export default function CheckoutPage() {
                                 "",
                             customerPhone: data.phone || "",
                             deliveryAddress: data.address || "",
+                            deliveryPostalCode: data.postalCode || "",
+                            deliveryCity: data.city || "",
                         }));
                     } else if (
                         response.status === 401 ||
@@ -219,7 +223,8 @@ export default function CheckoutPage() {
     const discountKind = pricingPreview?.breakdown.discountKind ?? "none";
     const deliveryFeeCents =
         pricingPreview?.breakdown.deliveryFeeCents ?? fallbackDeliveryFeeCents;
-    const totalCents = pricingPreview?.breakdown.totalCents ?? fallbackTotalCents;
+    const totalCents =
+        pricingPreview?.breakdown.totalCents ?? fallbackTotalCents;
     const discountLabel =
         discountKind === "admin" ? "Desconto Admin (50%)" : "Desconto";
 
@@ -296,8 +301,9 @@ export default function CheckoutPage() {
                         NIF necessário para continuar
                     </h2>
                     <p className="mb-6 text-amber-800">
-                        Para emitir recibo fiscal é necessário ter o NIF preenchido no perfil.
-                        Adicione o seu NIF e volte para finalizar a encomenda.
+                        Para emitir recibo fiscal é necessário ter o NIF
+                        preenchido no perfil. Adicione o seu NIF e volte para
+                        finalizar a encomenda.
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                         <Link
@@ -688,7 +694,10 @@ export default function CheckoutPage() {
                                             Portes
                                         </span>
                                         <span className="font-medium">
-                                            €{(deliveryFeeCents / 100).toFixed(2)}
+                                            €
+                                            {(deliveryFeeCents / 100).toFixed(
+                                                2,
+                                            )}
                                         </span>
                                     </div>
                                 )}

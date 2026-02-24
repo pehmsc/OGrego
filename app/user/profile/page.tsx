@@ -14,6 +14,8 @@ type ProfileUser = {
     phone: string;
     nif: string;
     address: string;
+    postalCode: string;
+    city: string;
     favoriteRestaurant: string;
     imageUrl: string;
     points: number;
@@ -209,6 +211,35 @@ export default function PerfilPage() {
                             type="text"
                             defaultValue={user.address || ""}
                             placeholder="Rua Example, 123, 1200-000 Lisboa"
+                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                        />
+                    </div>
+
+                    {/* Código Postal */}
+                    <div>
+                        <label className="mb-2 block text-sm font-medium text-[#1E3A8A]">
+                            Código Postal
+                        </label>
+                        <input
+                            name="postalCode"
+                            type="text"
+                            defaultValue={user.postalCode || ""}
+                            placeholder="1000-000"
+                            maxLength={8}
+                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                        />
+                    </div>
+
+                    {/* Cidade */}
+                    <div>
+                        <label className="mb-2 block text-sm font-medium text-[#1E3A8A]">
+                            Cidade
+                        </label>
+                        <input
+                            name="city"
+                            type="text"
+                            defaultValue={user.city || ""}
+                            placeholder="Lisboa"
                             className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
                         />
                     </div>
