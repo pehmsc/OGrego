@@ -94,7 +94,7 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
             </div>
 
             <!-- Confirmação -->
-            <div style="background: #f8fafc; padding: 30px; border-left: 4px solid #10b981;">
+            <div style="background: #f8fafc; padding: 30px;">
               <h2 style="margin: 0 0 10px 0; color: #10b981; font-size: 24px;">✓ Encomenda Confirmada!</h2>
               <p style="margin: 0; color: #64748b;">Obrigado pela sua encomenda, <strong>${customerName}</strong>!</p>
             </div>
