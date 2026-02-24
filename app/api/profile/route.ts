@@ -14,6 +14,8 @@ export async function GET() {
             phone: userDb.phone ?? "",
             nif: userDb.nif ?? "",
             address: userDb.address ?? "",
+            postalCode: userDb.postal_code ?? "",
+            city: userDb.city ?? "",
             favoriteRestaurant: userDb.favorite_restaurant ?? "",
             imageUrl: userDb.image_url ?? "",
             points: userDb.points ?? 0,

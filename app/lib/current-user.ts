@@ -12,9 +12,10 @@ export type DbUser = {
     role: "user" | "admin";
     phone: string | null;
 
-    // NOVOS
     nif: string | null;
     address: string | null;
+    postal_code: string | null;
+    city: string | null;
     favorite_restaurant: string | null;
 
     total_spent_cents: number;

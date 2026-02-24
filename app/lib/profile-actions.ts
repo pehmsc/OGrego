@@ -17,6 +17,8 @@ const ProfileSchema = z.object({
         .optional()
         .or(z.literal("")),
     address: z.string().trim().max(400).optional().or(z.literal("")),
+    postal_code: z.string().trim().max(10).optional().or(z.literal("")),
+    city: z.string().trim().max(100).optional().or(z.literal("")),
     favorite_restaurant: z
         .string()
         .trim()
@@ -41,6 +43,8 @@ export async function updateProfile(formData: FormData) {
             phone: String(formData.get("phone") ?? ""),
             nif: String(formData.get("nif") ?? ""),
             address: String(formData.get("address") ?? ""),
+            postal_code: String(formData.get("postalCode") ?? ""),
+            city: String(formData.get("city") ?? ""),
             favorite_restaurant: String(
                 formData.get("favoriteRestaurant") ?? "",
             ),
@@ -103,6 +107,8 @@ export async function updateProfile(formData: FormData) {
                     phone = ${parsed.data.phone || null},
                     nif = ${parsed.data.nif || null},
                     address = ${parsed.data.address || null},
+                    postal_code = ${parsed.data.postal_code || null}, 
+                    city = ${parsed.data.city || null},    
                     favorite_restaurant = ${parsed.data.favorite_restaurant || null},
                     image_url = ${imageUrl},
                     updated_at = now()
@@ -118,6 +124,8 @@ export async function updateProfile(formData: FormData) {
                     phone = ${parsed.data.phone || null},
                     nif = ${parsed.data.nif || null},
                     address = ${parsed.data.address || null},
+                    postal_code = ${parsed.data.postal_code || null},
+        city = ${parsed.data.city || null},  
                     favorite_restaurant = ${parsed.data.favorite_restaurant || null},
                     updated_at = now()
                 WHERE clerk_user_id = ${userId}
