@@ -41,7 +41,11 @@ export async function getMenuItemsByIds(ids: string[]): Promise<CatalogMenuItem[
         SELECT
             m.id,
             COALESCE(
+                to_jsonb(m) ->> 'name_pt',
+                to_jsonb(m) ->> 'name_en',
                 to_jsonb(m) ->> 'name',
+                to_jsonb(m) ->> 'nome_pt',
+                to_jsonb(m) ->> 'nome_en',
                 to_jsonb(m) ->> 'nome',
                 to_jsonb(m) ->> 'title',
                 to_jsonb(m) ->> 'item_name'

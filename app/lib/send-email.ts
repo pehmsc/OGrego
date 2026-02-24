@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim() || null;
+const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || "O Grego <encomendas@resend.dev>";
 let resendClient: Resend | null = null;
 
 function getResendClient() {
@@ -73,8 +74,8 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
             )
             .join("");
 
-        await resend.emails.send({
-            from: "O Grego <encomendas@resend.dev>", // ⚠️ Muda depois para teu domínio
+        const result = await resend.emails.send({
+            from: resendFromEmail,
             to: to,
             subject: `Encomenda #${orderId} confirmada!`,
             html: `
@@ -200,7 +201,15 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
       `,
         });
 
-        console.log("Email enviado para:", to);
+        if (result.error) {
+            console.error("[email] Erro retornado pela API Resend:", result.error);
+            return {
+                success: false,
+                error: result.error.message || "Erro ao enviar email pelo Resend",
+            };
+        }
+
+        console.log("Email enviado para:", to, { messageId: result.data?.id ?? null });
         return { success: true };
     } catch (error) {
         console.error("Erro ao enviar email:", error);
