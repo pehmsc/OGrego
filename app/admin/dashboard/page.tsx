@@ -141,8 +141,141 @@ export default function DashboardPage() {
                             <option value="12meses">Últimos 12 meses</option>
                         </select>
                     </div>
-                    <div className="flex h-48 items-center justify-center rounded-lg bg-slate-50 text-sm text-slate-400">
-                        Área do gráfico (Line / Bar chart)
+                    <div className="flex h-56 items-end justify-center rounded-lg bg-gradient-to-b from-blue-50 to-slate-100 text-sm text-slate-400 gap-2 px-4 overflow-x-auto transition-all duration-500">
+                        {/* Gráfico de barras profissional com gradiente, animação e valores acima */}
+                        {(() => {
+                            type Bar = { label: string; value: number };
+                            let bars: Bar[];
+                            switch (timeRange) {
+                                case "hoje":
+                                    bars = [{ label: "Hoje", value: 8 }];
+                                    break;
+                                case "semana":
+                                    bars = [
+                                        { label: "Seg", value: 4 },
+                                        { label: "Ter", value: 7 },
+                                        { label: "Qua", value: 3 },
+                                        { label: "Qui", value: 6 },
+                                        { label: "Sex", value: 9 },
+                                        { label: "Sáb", value: 12 },
+                                        { label: "Dom", value: 8 },
+                                    ];
+                                    break;
+                                case "15dias":
+                                    bars = [
+                                        { label: "1", value: 5 },
+                                        { label: "2", value: 6 },
+                                        { label: "3", value: 7 },
+                                        { label: "4", value: 8 },
+                                        { label: "5", value: 6 },
+                                        { label: "6", value: 9 },
+                                        { label: "7", value: 10 },
+                                        { label: "8", value: 7 },
+                                        { label: "9", value: 8 },
+                                        { label: "10", value: 11 },
+                                        { label: "11", value: 9 },
+                                        { label: "12", value: 12 },
+                                        { label: "13", value: 8 },
+                                        { label: "14", value: 10 },
+                                        { label: "15", value: 13 },
+                                    ];
+                                    break;
+                                case "mes":
+                                    bars = [
+                                        { label: "1", value: 7 },
+                                        { label: "2", value: 8 },
+                                        { label: "3", value: 6 },
+                                        { label: "4", value: 10 },
+                                        { label: "5", value: 12 },
+                                        { label: "6", value: 9 },
+                                        { label: "7", value: 11 },
+                                        { label: "8", value: 8 },
+                                        { label: "9", value: 7 },
+                                        { label: "10", value: 13 },
+                                        { label: "11", value: 9 },
+                                        { label: "12", value: 12 },
+                                        { label: "13", value: 8 },
+                                        { label: "14", value: 10 },
+                                        { label: "15", value: 13 },
+                                        { label: "16", value: 7 },
+                                        { label: "17", value: 8 },
+                                        { label: "18", value: 6 },
+                                        { label: "19", value: 10 },
+                                        { label: "20", value: 12 },
+                                        { label: "21", value: 9 },
+                                        { label: "22", value: 11 },
+                                        { label: "23", value: 8 },
+                                        { label: "24", value: 7 },
+                                        { label: "25", value: 13 },
+                                        { label: "26", value: 9 },
+                                        { label: "27", value: 12 },
+                                        { label: "28", value: 8 },
+                                        { label: "29", value: 10 },
+                                        { label: "30", value: 13 },
+                                    ];
+                                    break;
+                                case "6meses":
+                                    bars = [
+                                        { label: "Set", value: 11 },
+                                        { label: "Out", value: 17 },
+                                        { label: "Nov", value: 8 },
+                                        { label: "Dez", value: 20 },
+                                        { label: "Jan", value: 12 },
+                                        { label: "Fev", value: 9 },
+                                    ];
+                                    break;
+                                case "12meses":
+                                    bars = [
+                                        { label: "Jan", value: 12 },
+                                        { label: "Fev", value: 9 },
+                                        { label: "Mar", value: 14 },
+                                        { label: "Abr", value: 10 },
+                                        { label: "Mai", value: 16 },
+                                        { label: "Jun", value: 13 },
+                                        { label: "Jul", value: 18 },
+                                        { label: "Ago", value: 15 },
+                                        { label: "Set", value: 11 },
+                                        { label: "Out", value: 17 },
+                                        { label: "Nov", value: 8 },
+                                        { label: "Dez", value: 20 },
+                                    ];
+                                    break;
+                                default:
+                                    bars = [];
+                            }
+                            const maxValue = Math.max(
+                                ...bars.map((b) => b.value),
+                                1,
+                            );
+                            return bars.map((bar) => (
+                                <div
+                                    key={bar.label}
+                                    className="flex flex-col items-center group w-8"
+                                >
+                                    <span className="mb-2 text-xs font-bold text-blue-700 opacity-90 group-hover:scale-110 transition-transform duration-200">
+                                        {bar.value}
+                                    </span>
+                                    <div
+                                        className="w-7 rounded-t-lg shadow-md relative flex items-end justify-center cursor-pointer transition-all duration-500"
+                                        style={{
+                                            height: `${(bar.value / maxValue) * 160 + 20}px`,
+                                            background:
+                                                "linear-gradient(180deg, #3b82f6 0%, #60a5fa 60%, #a5b4fc 100%)",
+                                            boxShadow:
+                                                "0 4px 16px 0 rgba(59,130,246,0.10)",
+                                            position: "relative",
+                                        }}
+                                    >
+                                        <div className="absolute bottom-0 left-0 w-full h-1.5 bg-white/30 rounded-b-lg" />
+                                        {/* efeito de brilho */}
+                                        <div className="absolute top-1 left-1 w-4/5 h-2 bg-white/40 rounded-full blur-sm opacity-60" />
+                                    </div>
+                                    <span className="mt-1 text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-200">
+                                        {bar.label}
+                                    </span>
+                                </div>
+                            ));
+                        })()}
                     </div>
                 </div>
 
