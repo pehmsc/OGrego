@@ -52,3 +52,58 @@ export async function updateOrderAdmin(
 
     revalidatePath("/admin/orders");
 }
+
+export async function updateReservationAdmin(
+    reservationId: number,
+    data: {
+        nome: string;
+        email: string;
+        telefone: string;
+        data: string;
+        hora: string;
+        pessoas: number;
+        notas: string;
+        estado?: string;
+    },
+) {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) throw new Error("Not authorized");
+
+    await sql`
+        UPDATE reservas SET
+            nome     = ${data.nome},
+            email    = ${data.email},
+            telefone = ${data.telefone || null},
+            data     = ${data.data},
+            hora     = ${data.hora},
+            pessoas  = ${data.pessoas},
+            notas    = ${data.notas || null},
+            "estado"   = ${data.estado || "Confirmada"}
+        WHERE id = ${reservationId}
+    `;
+
+    revalidatePath("/admin/reservations");
+}
+
+export async function createReservationAdmin(data: {
+    nome: string;
+    email: string;
+    telefone: string;
+    data: string;
+    hora: string;
+    pessoas: number;
+    notas: string;
+}) {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) throw new Error("Not authorized");
+
+    const result = await sql<{ id: number }[]>`
+    INSERT INTO reservas (nome, email, telefone, "data", hora, pessoas, notas, "estado", created_at)
+    VALUES (${data.nome}, ${data.email}, ${data.telefone || null}, ${data.data}, ${data.hora}, ${data.pessoas}, ${data.notas || null}, 'Confirmada', now())
+    RETURNING id
+`;
+
+    revalidatePath("/admin/reservations");
+
+    return result[0];
+}

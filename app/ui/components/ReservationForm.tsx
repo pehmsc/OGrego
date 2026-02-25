@@ -32,17 +32,90 @@ export default function ReservationForm() {
         setForm((p) => ({ ...p, [key]: value }));
     }
 
+    // ✅ FUNÇÃO PARA MÁSCARA DE DATA (DD-MM-YYYY)
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, ""); // Remove não-dígitos
+
+        if (value.length >= 2) {
+            value = value.slice(0, 2) + "-" + value.slice(2);
+        }
+        if (value.length >= 5) {
+            value = value.slice(0, 5) + "-" + value.slice(5);
+        }
+        if (value.length > 10) {
+            value = value.slice(0, 10);
+        }
+
+        onChange("date", value);
+    };
+
+    // ✅ FUNÇÃO PARA MÁSCARA DE HORA (HH:MM)
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, ""); // Remove não-dígitos
+
+        if (value.length >= 2) {
+            value = value.slice(0, 2) + ":" + value.slice(2);
+        }
+        if (value.length > 5) {
+            value = value.slice(0, 5);
+        }
+
+        onChange("time", value);
+    };
+
+    // ✅ VALIDAÇÃO DE DATA
+    const validateDate = (date: string): boolean => {
+        if (!/^\d{2}-\d{2}-\d{4}$/.test(date)) return false;
+
+        const [day, month, year] = date.split("-").map(Number);
+        const dateObj = new Date(year, month - 1, day);
+
+        return (
+            dateObj.getDate() === day &&
+            dateObj.getMonth() === month - 1 &&
+            dateObj.getFullYear() === year
+        );
+    };
+
+    // ✅ VALIDAÇÃO DE HORA
+    const validateTime = (time: string): boolean => {
+        if (!/^\d{2}:\d{2}$/.test(time)) return false;
+
+        const [hour, minute] = time.split(":").map(Number);
+        return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
+    };
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        // ✅ VALIDAR DATA E HORA
+        if (!validateDate(form.date)) {
+            setStatus("error");
+            setErrorMsg("Data inválida. Use o formato DD-MM-AAAA");
+            return;
+        }
+
+        if (!validateTime(form.time)) {
+            setStatus("error");
+            setErrorMsg("Hora inválida. Use o formato HH:MM (24h)");
+            return;
+        }
 
         setStatus("loading");
         setErrorMsg(null);
 
         try {
+            // ✅ CONVERTER DATA PARA FORMATO ISO (YYYY-MM-DD) PARA BD
+            const [day, month, year] = form.date.split("-");
+            const isoDate = `${year}-${month}-${day}`;
+
             const res = await fetch("/api/reservas", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
+                body: JSON.stringify({
+                    ...form,
+                    date: isoDate, // ✅ Enviar em formato ISO
+                }),
             });
 
             const data: any = await res.json().catch(() => ({}));
@@ -114,29 +187,34 @@ export default function ReservationForm() {
             </label>
 
             <div className="grid gap-3 sm:grid-cols-3">
+                {/* ✅ DATA COM MÁSCARA */}
                 <label className="grid gap-2">
                     <span className="text-sm font-semibold text-[#1E3A8A]/80">
                         Data
                     </span>
                     <input
                         required
-                        type="date"
+                        type="text"
                         value={form.date}
-                        onChange={(e) => onChange("date", e.target.value)}
-                        placeholder="dd-mm-yyyy"
+                        onChange={handleDateChange}
+                        placeholder="DD-MM-AAAA"
+                        maxLength={10}
                         className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
                     />
                 </label>
 
+                {/* ✅ HORA COM MÁSCARA */}
                 <label className="grid gap-2">
                     <span className="text-sm font-semibold text-[#1E3A8A]/80">
                         Hora
                     </span>
                     <input
                         required
-                        type="time"
+                        type="text"
                         value={form.time}
-                        onChange={(e) => onChange("time", e.target.value)}
+                        onChange={handleTimeChange}
+                        placeholder="HH:MM"
+                        maxLength={5}
                         className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
                     />
                 </label>
