@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,8 +12,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/app/contexts/CartContext";
 import { useUser } from "@clerk/nextjs";
+import { validatePromoCodeInCart } from "@/app/lib/promo-actions";
 
 export default function CartPage() {
+    const searchParams = useSearchParams();
+    const promoFromUrl = (searchParams.get("promo") || "").toUpperCase();
+
     const { user } = useUser();
     const {
         items,
@@ -26,27 +31,75 @@ export default function CartPage() {
     // ========================================
     // CÓDIGO PROMOCIONAL
     // ========================================
-    const [codigoPromocional, setCodigoPromocional] = useState("");
-    const [descontoAplicado, setDescontoAplicado] = useState(0);
+    const [codigoPromocional, setCodigoPromocional] = useState(promoFromUrl);
+    const [descontoAplicado, setDescontoAplicado] = useState(0); // em cêntimos agora
     const [mensagemCodigo, setMensagemCodigo] = useState("");
+    const [validandoCodigo, setValidandoCodigo] = useState(false);
 
-    const aplicarCodigo = () => {
-        // TODO: Validar código na BD
-        // Exemplo de códigos válidos (MOCK):
-        const codigosValidos: Record<string, number> = {
-            GREGO10: 10, // 10% desconto
-            PROMO15: 15, // 15% desconto
-            BEMVINDO: 5, // 5% desconto
+    useEffect(() => {
+        if (!promoFromUrl) return;
+
+        const autoAplicar = async () => {
+            if (!promoFromUrl.trim()) return;
+
+            setValidandoCodigo(true);
+            setMensagemCodigo("");
+
+            try {
+                const subtotalCents = Math.round(subtotal * 100);
+
+                const result = await validatePromoCodeInCart(
+                    promoFromUrl,
+                    subtotalCents,
+                );
+
+                if (result.valid && result.discountCents) {
+                    setDescontoAplicado(result.discountCents);
+                    setMensagemCodigo(result.message);
+                } else {
+                    setDescontoAplicado(0);
+                    setMensagemCodigo(result.message);
+                }
+            } catch (error) {
+                setDescontoAplicado(0);
+                setMensagemCodigo("Erro ao validar código");
+            } finally {
+                setValidandoCodigo(false);
+            }
         };
 
-        const desconto = codigosValidos[codigoPromocional.toUpperCase()];
+        autoAplicar();
+    }, [promoFromUrl, subtotal]);
 
-        if (desconto) {
-            setDescontoAplicado(desconto);
-            setMensagemCodigo(`Código aplicado! ${desconto}% de desconto`);
-        } else {
+    const aplicarCodigo = async () => {
+        if (!codigoPromocional.trim()) {
+            setMensagemCodigo("Insira um código");
+            return;
+        }
+
+        setValidandoCodigo(true);
+        setMensagemCodigo("");
+
+        try {
+            const subtotalCents = Math.round(subtotal * 100);
+
+            const result = await validatePromoCodeInCart(
+                codigoPromocional,
+                subtotalCents,
+            );
+
+            if (result.valid && result.discountCents) {
+                setDescontoAplicado(result.discountCents);
+                setMensagemCodigo(result.message);
+            } else {
+                setDescontoAplicado(0);
+                setMensagemCodigo(result.message);
+            }
+        } catch (error) {
             setDescontoAplicado(0);
-            setMensagemCodigo("Código inválido");
+            setMensagemCodigo("Erro ao validar código");
+        } finally {
+            setValidandoCodigo(false);
         }
     };
 
@@ -73,8 +126,9 @@ export default function CartPage() {
         }
     };
 
-    const valorDesconto = (subtotal * descontoAplicado) / 100;
+    const valorDesconto = descontoAplicado / 100; // Converter cêntimos para euros (antes: const valorDesconto = (subtotal * descontoAplicado) / 100;)
     const subtotalComDesconto = subtotal - valorDesconto;
+
     const portes = subtotalComDesconto > 30 ? 0 : 2.5;
     const total = subtotalComDesconto + portes;
     const pontosAGanhar = Math.floor(total);
@@ -288,9 +342,12 @@ export default function CartPage() {
                             />
                             <button
                                 onClick={aplicarCodigo}
-                                className="rounded-full bg-[#1E3A8A] px-6 py-2 text-sm font-medium text-white transition-all hover:bg-[#162F73]"
+                                disabled={
+                                    validandoCodigo || !codigoPromocional.trim()
+                                }
+                                className="rounded-full bg-[#1E3A8A] px-6 py-2 text-sm font-medium text-white transition-all hover:bg-[#162F73] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Aplicar
+                                {validandoCodigo ? "A validar..." : "Aplicar"}
                             </button>
                         </div>
                     )}
@@ -324,7 +381,7 @@ export default function CartPage() {
 
                         {descontoAplicado > 0 && (
                             <div className="flex justify-between text-emerald-600">
-                                <span>Desconto ({descontoAplicado}%)</span>
+                                <span>Desconto ({codigoPromocional})</span>
                                 <span className="font-medium">
                                     -€{valorDesconto.toFixed(2)}
                                 </span>
@@ -383,7 +440,11 @@ export default function CartPage() {
                         {user ? (
                             // User autenticado - pode finalizar compra
                             <Link
-                                href="/checkout"
+                                href={
+                                    codigoPromocional
+                                        ? `/checkout?promo=${encodeURIComponent(codigoPromocional)}`
+                                        : "/checkout"
+                                }
                                 className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                             >
                                 Finalizar Compra
@@ -398,13 +459,21 @@ export default function CartPage() {
                                     </p>
                                 </div>
                                 <Link
-                                    href="/sign-in?redirect_url=/checkout"
+                                    href={
+                                        codigoPromocional
+                                            ? `/sign-in?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
+                                            : "/sign-in?redirect_url=/checkout"
+                                    }
                                     className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                                 >
                                     Iniciar Sessão
                                 </Link>
                                 <Link
-                                    href="/sign-up?redirect_url=/checkout"
+                                    href={
+                                        codigoPromocional
+                                            ? `/sign-up?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
+                                            : "/sign-up?redirect_url=/checkout"
+                                    }
                                     className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
                                 >
                                     Criar Conta

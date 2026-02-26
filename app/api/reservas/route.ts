@@ -48,17 +48,18 @@ export async function POST(req: Request) {
 
         // INSERT
         await sql`
-      INSERT INTO reservas (nome, email, telefone, data, hora, pessoas, notas)
-      VALUES (
-        ${body.name.trim()},
-        ${body.email.trim()},
-        ${body.phone?.trim() || null},
-        ${body.date},
-        ${body.time},
-        ${people},
-        ${body.notes?.trim() || null}
-      )
-    `;
+  INSERT INTO reservas (nome, email, telefone, data, hora, pessoas, notas, "estado")
+  VALUES (
+    ${body.name.trim()},
+    ${body.email.trim()},
+    ${body.phone?.trim() || null},
+    ${body.date},
+    ${body.time},
+    ${people},
+    ${body.notes?.trim() || null},
+    'Pendente'
+  )
+`;
 
         return NextResponse.json({ ok: true }, { status: 201 });
     } catch (err) {

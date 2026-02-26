@@ -47,3 +47,6 @@ next-env.d.ts
 /.clerk/
 clerk-nextjs/
 package-lock.json
+
+# Claude IDE
+tmpclaude-*
