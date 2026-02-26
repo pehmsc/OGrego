@@ -190,8 +190,14 @@ export default function CheckoutPage() {
       });
 
       if (result.success) {
-        clearCart();
-        router.push(`/order-success/${result.orderId}`);
+        if (result.checkoutUrl) {
+          // Stripe: NÃO limpar carrinho agora, limpa no order-success
+          window.location.href = result.checkoutUrl;
+        } else {
+          // Cash: limpar carrinho e ir para sucesso
+          clearCart();
+          router.push(`/order-success/${result.orderId}`);
+        }
       } else {
         alert(result.error || "Erro ao processar encomenda");
       }

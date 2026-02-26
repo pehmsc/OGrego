@@ -147,15 +147,9 @@ function getStripePaymentMethods(
 ): Stripe.Checkout.SessionCreateParams.PaymentMethodType[] {
   switch (method) {
     case "mbway":
-      return [
-        "card",
-        "mbway" as Stripe.Checkout.SessionCreateParams.PaymentMethodType,
-      ];
+      return ["card", "mb_way"];
     case "multibanco":
-      return [
-        "card",
-        "multibanco" as Stripe.Checkout.SessionCreateParams.PaymentMethodType,
-      ];
+      return ["card", "multibanco"];
     case "card":
       return ["card"];
     default:
