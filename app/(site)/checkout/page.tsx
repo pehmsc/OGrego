@@ -63,10 +63,9 @@ export default function CheckoutPage() {
     });
 
     // LER PROMO CODE DO URL
-    const promoFromUrl = searchParams.get("promo") || "";
+    const promoFromUrl = (searchParams.get("promo") || "").trim().toUpperCase();
     const [promoCode, setPromoCode] = useState(promoFromUrl);
     const [promoMessage, setPromoMessage] = useState("");
-    const promoCode = (searchParams.get("promo") || "").trim().toUpperCase();
 
     // ========================================
     // BUSCAR DADOS DO USER NA BD

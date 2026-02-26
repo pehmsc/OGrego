@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
     TrashIcon,
     ShoppingCartIcon,
@@ -16,8 +15,6 @@ import { useUser } from "@clerk/nextjs";
 import { validatePromoCodeInCart } from "@/app/lib/promo-actions";
 
 export default function CartPage() {
-    const searchParams = useSearchParams();
-    const promoFromUrl = (searchParams.get("promo") || "").toUpperCase();
     const searchParams = useSearchParams();
     const promoFromUrl = (searchParams.get("promo") || "").toUpperCase();
 
@@ -448,11 +445,6 @@ export default function CartPage() {
                                         ? `/checkout?promo=${encodeURIComponent(codigoPromocional)}`
                                         : "/checkout"
                                 }
-                                href={
-                                    codigoPromocional
-                                        ? `/checkout?promo=${encodeURIComponent(codigoPromocional)}`
-                                        : "/checkout"
-                                }
                                 className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                             >
                                 Finalizar Compra
@@ -472,21 +464,11 @@ export default function CartPage() {
                                             ? `/sign-in?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
                                             : "/sign-in?redirect_url=/checkout"
                                     }
-                                    href={
-                                        codigoPromocional
-                                            ? `/sign-in?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
-                                            : "/sign-in?redirect_url=/checkout"
-                                    }
                                     className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                                 >
                                     Iniciar Sessão
                                 </Link>
                                 <Link
-                                    href={
-                                        codigoPromocional
-                                            ? `/sign-up?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
-                                            : "/sign-up?redirect_url=/checkout"
-                                    }
                                     href={
                                         codigoPromocional
                                             ? `/sign-up?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
