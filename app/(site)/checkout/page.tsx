@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useCart } from "@/app/contexts/CartContext";
@@ -37,6 +37,7 @@ type PricingPreview = {
 
 export default function CheckoutPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { items, subtotal, clearCart } = useCart();
     const { user, isLoaded } = useUser();
     const userId = user?.id;
@@ -61,7 +62,10 @@ export default function CheckoutPage() {
         notes: "",
     });
 
-    const promoCode = "";
+    // LER PROMO CODE DO URL
+    const promoFromUrl = searchParams.get("promo") || "";
+    const [promoCode, setPromoCode] = useState(promoFromUrl);
+    const [promoMessage, setPromoMessage] = useState("");
 
     // ========================================
     // BUSCAR DADOS DO USER NA BD
@@ -632,6 +636,157 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
                         )}
+
+                        {/* CÓDIGO PROMOCIONAL */}
+                        <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+                            <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
+                                Código Promocional
+                            </h2>
+
+                            {/* Campo de input - SEMPRE visível */}
+                            <div className="space-y-3">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        defaultValue={promoCode}
+                                        key={promoCode}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                const inputValue =
+                                                    e.currentTarget.value.trim();
+                                                if (inputValue) {
+                                                    setPromoCode(
+                                                        inputValue.toUpperCase(),
+                                                    );
+                                                }
+                                            }
+                                        }}
+                                        placeholder="Insira o código promocional"
+                                        className="flex-1 rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-2 text-sm uppercase transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                                        maxLength={50}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            const input = e.currentTarget
+                                                .previousElementSibling as HTMLInputElement;
+                                            const inputValue =
+                                                input?.value.trim();
+                                            if (inputValue) {
+                                                setPromoCode(
+                                                    inputValue.toUpperCase(),
+                                                );
+                                            } else {
+                                                setPromoMessage(
+                                                    "Insira um código",
+                                                );
+                                            }
+                                        }}
+                                        className="flex-shrink-0 rounded-full bg-[#1E3A8A] px-5 py-2 text-sm font-medium text-white transition-all hover:bg-[#162F73]"
+                                    >
+                                        Aplicar
+                                    </button>
+                                </div>
+
+                                {/* ESTADOS DO CÓDIGO */}
+                                {promoCode.trim() && isPricingLoading ? (
+                                    // A VALIDAR
+                                    <div className="rounded-lg bg-blue-50 border border-blue-200 p-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+                                            <div>
+                                                <p className="text-sm font-medium text-blue-800">
+                                                    A validar código...
+                                                </p>
+                                                <p className="text-xs text-blue-600">
+                                                    Código:{" "}
+                                                    <span className="font-mono">
+                                                        {promoCode}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : discountCents > 0 && promoCode ? (
+                                    // CÓDIGO VÁLIDO
+                                    <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1">
+                                                <p className="text-sm font-semibold text-emerald-800">
+                                                    ✓ Código válido! Desconto de
+                                                    €
+                                                    {(
+                                                        discountCents / 100
+                                                    ).toFixed(2)}
+                                                </p>
+                                                <p className="text-xs text-emerald-600 mt-1">
+                                                    Código:{" "}
+                                                    <span className="font-mono font-semibold">
+                                                        {promoCode}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPromoCode("");
+                                                    setPromoMessage("");
+                                                }}
+                                                className="text-xs text-emerald-700 hover:text-emerald-900 underline flex-shrink-0"
+                                            >
+                                                Remover
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : promoCode.trim() &&
+                                  !isPricingLoading &&
+                                  discountCents === 0 ? (
+                                    // CÓDIGO INVÁLIDO
+                                    <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1">
+                                                <p className="text-sm font-semibold text-red-800">
+                                                    Código inválido ou não
+                                                    aplicável
+                                                </p>
+                                                <p className="text-xs text-red-600 mt-1">
+                                                    Código:{" "}
+                                                    <span className="font-mono">
+                                                        {promoCode}
+                                                    </span>
+                                                </p>
+                                                <p className="text-xs text-red-700 mt-2">
+                                                    Verifique se o código está
+                                                    correto e ativo.
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPromoCode("");
+                                                    setPromoMessage("");
+                                                }}
+                                                className="text-xs text-red-700 hover:text-red-900 underline flex-shrink-0"
+                                            >
+                                                Limpar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : promoMessage ? (
+                                    // MENSAGEM DE ERRO
+                                    <p className="text-xs text-red-600">
+                                        {promoMessage}
+                                    </p>
+                                ) : (
+                                    // MENSAGEM INFORMATIVA
+                                    <p className="text-xs text-gray-600">
+                                        Digite o código e clique em "Aplicar"
+                                        para validar
+                                    </p>
+                                )}
+                            </div>
+                        </section>
 
                         {/* Resumo da Encomenda */}
                         <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
