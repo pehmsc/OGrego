@@ -9,21 +9,21 @@ import { revalidatePath } from "next/cache";
 // ═══════════════════════════════════════════════════════════════
 
 export async function updateUserAdmin(
-  userId: string,
-  data: {
-    first_name: string;
-    last_name: string;
-    phone: string;
-    nif: string;
-    address: string;
-    favorite_restaurant: string;
-    points: number;
-  },
+    userId: string,
+    data: {
+        first_name: string;
+        last_name: string;
+        phone: string;
+        nif: string;
+        address: string;
+        favorite_restaurant: string;
+        points: number;
+    },
 ) {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) throw new Error("Not authorized");
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) throw new Error("Not authorized");
 
-  await sql`
+    await sql`
         UPDATE users SET
             first_name          = ${data.first_name || null},
             last_name           = ${data.last_name || null},
@@ -36,17 +36,17 @@ export async function updateUserAdmin(
         WHERE id = ${userId}
     `;
 
-  revalidatePath("/admin/users");
+    revalidatePath("/admin/users");
 }
 
 export async function updateOrderAdmin(
-  orderId: number,
-  data: { status: string; notes: string },
+    orderId: number,
+    data: { status: string; notes: string },
 ) {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) throw new Error("Not authorized");
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) throw new Error("Not authorized");
 
-  await sql`
+    await sql`
         UPDATE orders SET
             status     = ${data.status},
             notes      = ${data.notes || null},
@@ -54,7 +54,7 @@ export async function updateOrderAdmin(
         WHERE id = ${orderId}
     `;
 
-  revalidatePath("/admin/orders");
+    revalidatePath("/admin/orders");
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -65,19 +65,19 @@ export type VendaPonto = { label: string; total_cents: number };
 export type CategoriaTop = { categoria: string; percentagem: number };
 
 export type PedidoRecente = {
-  id: number;
-  customer_name: string;
-  total_cents: number;
-  status: string;
-  created_at: string;
-  order_type: string;
+    id: number;
+    customer_name: string;
+    total_cents: number;
+    status: string;
+    created_at: string;
+    order_type: string;
 };
 
 export type Atividade = {
-  tipo: "novo_utilizador" | "reserva" | "novo_pedido" | "pedido_entregue";
-  titulo: string;
-  detalhe: string;
-  created_at: string;
+    tipo: "novo_utilizador" | "reserva" | "novo_pedido" | "pedido_entregue";
+    titulo: string;
+    detalhe: string;
+    created_at: string;
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -85,42 +85,42 @@ export type Atividade = {
 // ═══════════════════════════════════════════════════════════════
 
 function getDesdeDate(periodo: string): Date {
-  const now = new Date();
+    const now = new Date();
 
-  switch (periodo) {
-    case "hoje":
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    case "semana": {
-      const d = new Date(now);
-      d.setDate(d.getDate() - 7);
-      return d;
+    switch (periodo) {
+        case "hoje":
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        case "semana": {
+            const d = new Date(now);
+            d.setDate(d.getDate() - 7);
+            return d;
+        }
+        case "15dias": {
+            const d = new Date(now);
+            d.setDate(d.getDate() - 15);
+            return d;
+        }
+        case "mes": {
+            const d = new Date(now);
+            d.setMonth(d.getMonth() - 1);
+            return d;
+        }
+        case "6meses": {
+            const d = new Date(now);
+            d.setMonth(d.getMonth() - 6);
+            return d;
+        }
+        case "12meses": {
+            const d = new Date(now);
+            d.setMonth(d.getMonth() - 12);
+            return d;
+        }
+        default: {
+            const d = new Date(now);
+            d.setDate(d.getDate() - 7);
+            return d;
+        }
     }
-    case "15dias": {
-      const d = new Date(now);
-      d.setDate(d.getDate() - 15);
-      return d;
-    }
-    case "mes": {
-      const d = new Date(now);
-      d.setMonth(d.getMonth() - 1);
-      return d;
-    }
-    case "6meses": {
-      const d = new Date(now);
-      d.setMonth(d.getMonth() - 6);
-      return d;
-    }
-    case "12meses": {
-      const d = new Date(now);
-      d.setMonth(d.getMonth() - 12);
-      return d;
-    }
-    default: {
-      const d = new Date(now);
-      d.setDate(d.getDate() - 7);
-      return d;
-    }
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -130,74 +130,74 @@ function getDesdeDate(periodo: string): Date {
 // ─── 1. Vendas total por período (para o card) ─────────────────
 
 export async function getVendasTotal(periodo: string): Promise<number> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return 0;
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return 0;
 
-  try {
-    const desde = getDesdeDate(periodo);
+    try {
+        const desde = getDesdeDate(periodo);
 
-    const rows = await sql<{ total: string | null }[]>`
+        const rows = await sql<{ total: string | null }[]>`
             SELECT COALESCE(SUM(total_cents), 0)::text AS total
             FROM orders
             WHERE created_at >= ${desde.toISOString()}
               AND status != 'cancelled'
         `;
-    return Number(rows[0]?.total ?? 0);
-  } catch (error) {
-    console.error("getVendasTotal:", error);
-    return 0;
-  }
+        return Number(rows[0]?.total ?? 0);
+    } catch (error) {
+        console.error("getVendasTotal:", error);
+        return 0;
+    }
 }
 
 // ─── 2. Total de utilizadores ───────────────────────────────────
 
 export async function getTotalUtilizadores(): Promise<number> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return 0;
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return 0;
 
-  try {
-    const rows = await sql<{ count: string }[]>`
+    try {
+        const rows = await sql<{ count: string }[]>`
             SELECT COUNT(*)::text AS count FROM users
         `;
-    return Number(rows[0]?.count ?? 0);
-  } catch (error) {
-    console.error("getTotalUtilizadores:", error);
-    return 0;
-  }
+        return Number(rows[0]?.count ?? 0);
+    } catch (error) {
+        console.error("getTotalUtilizadores:", error);
+        return 0;
+    }
 }
 
 // ─── 3. Pedidos pendentes (pending + ready) ─────────────────────
 
 export async function getPedidosPendentes(): Promise<number> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return 0;
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return 0;
 
-  try {
-    const rows = await sql<{ count: string }[]>`
+    try {
+        const rows = await sql<{ count: string }[]>`
             SELECT COUNT(*)::text AS count
             FROM orders
             WHERE status IN ('pending', 'ready')
         `;
-    return Number(rows[0]?.count ?? 0);
-  } catch (error) {
-    console.error("getPedidosPendentes:", error);
-    return 0;
-  }
+        return Number(rows[0]?.count ?? 0);
+    } catch (error) {
+        console.error("getPedidosPendentes:", error);
+        return 0;
+    }
 }
 
 // ─── 4. Vendas por período (para gráfico) ──────────────────────
 
 export async function getVendasPorPeriodo(
-  periodo: string,
+    periodo: string,
 ): Promise<VendaPonto[]> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return [];
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return [];
 
-  try {
-    const desde = getDesdeDate(periodo);
+    try {
+        const desde = getDesdeDate(periodo);
 
-    if (periodo === "hoje") {
-      const rows = await sql<{ label: string; total_cents: string }[]>`
+        if (periodo === "hoje") {
+            const rows = await sql<{ label: string; total_cents: string }[]>`
                 SELECT
                     TO_CHAR(DATE_TRUNC('hour', created_at), 'HH24:MI') AS label,
                     COALESCE(SUM(total_cents), 0)::text AS total_cents
@@ -207,13 +207,13 @@ export async function getVendasPorPeriodo(
                 GROUP BY DATE_TRUNC('hour', created_at)
                 ORDER BY DATE_TRUNC('hour', created_at)
             `;
-      return rows.map((r) => ({
-        label: r.label,
-        total_cents: Number(r.total_cents),
-      }));
-    }
+            return rows.map((r) => ({
+                label: r.label,
+                total_cents: Number(r.total_cents),
+            }));
+        }
 
-    const rows = await sql<{ label: string; total_cents: string }[]>`
+        const rows = await sql<{ label: string; total_cents: string }[]>`
             SELECT
                 TO_CHAR(DATE_TRUNC('day', created_at), 'DD/MM') AS label,
                 COALESCE(SUM(total_cents), 0)::text AS total_cents
@@ -224,24 +224,24 @@ export async function getVendasPorPeriodo(
             ORDER BY DATE_TRUNC('day', created_at)
         `;
 
-    return rows.map((r) => ({
-      label: r.label,
-      total_cents: Number(r.total_cents),
-    }));
-  } catch (error) {
-    console.error("getVendasPorPeriodo:", error);
-    return [];
-  }
+        return rows.map((r) => ({
+            label: r.label,
+            total_cents: Number(r.total_cents),
+        }));
+    } catch (error) {
+        console.error("getVendasPorPeriodo:", error);
+        return [];
+    }
 }
 
 // ─── 5. Top Categorias (% de itens vendidos por categoria) ──────
 
 export async function getTopCategorias(): Promise<CategoriaTop[]> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return [];
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return [];
 
-  try {
-    const rows = await sql<{ categoria: string; percentagem: string }[]>`
+    try {
+        const rows = await sql<{ categoria: string; percentagem: string }[]>`
             SELECT
                 mi.category AS categoria,
                 ROUND(
@@ -255,24 +255,24 @@ export async function getTopCategorias(): Promise<CategoriaTop[]> {
             ORDER BY SUM(oi.quantity) DESC
         `;
 
-    return rows.map((r) => ({
-      categoria: r.categoria,
-      percentagem: Number(r.percentagem ?? 0),
-    }));
-  } catch (error) {
-    console.error("getTopCategorias:", error);
-    return [];
-  }
+        return rows.map((r) => ({
+            categoria: r.categoria,
+            percentagem: Number(r.percentagem ?? 0),
+        }));
+    } catch (error) {
+        console.error("getTopCategorias:", error);
+        return [];
+    }
 }
 
 // ─── 6. Últimos 5 pedidos ───────────────────────────────────────
 
 export async function getPedidosRecentes(): Promise<PedidoRecente[]> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return [];
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return [];
 
-  try {
-    const rows = await sql<PedidoRecente[]>`
+    try {
+        const rows = await sql<PedidoRecente[]>`
             SELECT
                 id,
                 customer_name,
@@ -284,47 +284,52 @@ export async function getPedidosRecentes(): Promise<PedidoRecente[]> {
             ORDER BY created_at DESC
             LIMIT 5
         `;
-    return rows;
-  } catch (error) {
-    console.error("getPedidosRecentes:", error);
-    return [];
-  }
+        return rows;
+    } catch (error) {
+        console.error("getPedidosRecentes:", error);
+        return [];
+    }
 }
 
 // ─── 7. Atualizar estado do pedido (via dashboard) ──────────────
 
 export async function atualizarEstadoPedido(
-  id: number,
-  novoEstado: string,
+    id: number,
+    novoEstado: string,
 ): Promise<boolean> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return false;
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return false;
 
-  try {
-    await sql`
+    try {
+        await sql`
             UPDATE orders
             SET status = ${novoEstado}, updated_at = NOW()
             WHERE id = ${id}
         `;
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/orders");
-    return true;
-  } catch (error) {
-    console.error("atualizarEstadoPedido:", error);
-    return false;
-  }
+        revalidatePath("/admin/dashboard");
+        revalidatePath("/admin/orders");
+        return true;
+    } catch (error) {
+        console.error("atualizarEstadoPedido:", error);
+        return false;
+    }
 }
 
 // ─── 8. Atividade recente (5 mais recentes de 4 fontes) ─────────
 
 export async function getAtividadeRecente(): Promise<Atividade[]> {
-  const adminCheck = await requireAdmin();
-  if (!adminCheck.ok) return [];
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.ok) return [];
 
-  try {
-    const rows = await sql<
-      { tipo: string; titulo: string; detalhe: string; created_at: string }[]
-    >`
+    try {
+        const rows = await sql<
+            {
+                tipo: string;
+                titulo: string;
+                detalhe: string;
+                created_at: string;
+            }[]
+        >`
             (
                 SELECT
                     'novo_utilizador' AS tipo,
@@ -373,11 +378,11 @@ export async function getAtividadeRecente(): Promise<Atividade[]> {
             LIMIT 5
         `;
 
-    return rows as Atividade[];
-  } catch (error) {
-    console.error("getAtividadeRecente:", error);
-    return [];
-  }
+        return rows as Atividade[];
+    } catch (error) {
+        console.error("getAtividadeRecente:", error);
+        return [];
+    }
 }
 
 export async function updateReservationAdmin(
@@ -426,7 +431,7 @@ export async function createReservationAdmin(data: {
 
     const result = await sql<{ id: number }[]>`
     INSERT INTO reservas (nome, email, telefone, "data", hora, pessoas, notas, "estado", created_at)
-    VALUES (${data.nome}, ${data.email}, ${data.telefone || null}, ${data.data}, ${data.hora}, ${data.pessoas}, ${data.notas || null}, 'Confirmada', now())
+    VALUES (${data.nome}, ${data.email}, ${data.telefone || null}, ${data.data}, ${data.hora}, ${data.pessoas}, ${data.notas || null}, 'Pendente', now())
     RETURNING id
 `;
 
