@@ -66,6 +66,7 @@ export default function CheckoutPage() {
     const promoFromUrl = searchParams.get("promo") || "";
     const [promoCode, setPromoCode] = useState(promoFromUrl);
     const [promoMessage, setPromoMessage] = useState("");
+    const promoCode = (searchParams.get("promo") || "").trim().toUpperCase();
 
     // ========================================
     // BUSCAR DADOS DO USER NA BD
