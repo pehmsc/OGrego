@@ -448,12 +448,6 @@ export default function ReservationsClient({
                             <h2 className="text-xl font-bold">
                                 {selected.cliente}
                             </h2>
-                            <button
-                                onClick={() => setSelected(null)}
-                                className="text-gray-600"
-                            >
-                                Fechar
-                            </button>
                         </div>
 
                         <div className="mt-4 grid grid-cols-2 gap-3">
