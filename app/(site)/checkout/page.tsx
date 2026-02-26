@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useCart } from "@/app/contexts/CartContext";
@@ -37,6 +37,7 @@ type PricingPreview = {
 
 export default function CheckoutPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { items, subtotal, clearCart } = useCart();
     const { user, isLoaded } = useUser();
     const userId = user?.id;
@@ -61,7 +62,7 @@ export default function CheckoutPage() {
         notes: "",
     });
 
-    const promoCode = "";
+    const promoCode = (searchParams.get("promo") || "").trim().toUpperCase();
 
     // ========================================
     // BUSCAR DADOS DO USER NA BD

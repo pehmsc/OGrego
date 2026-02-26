@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
     TrashIcon,
     ShoppingCartIcon,
@@ -13,6 +14,8 @@ import { useCart } from "@/app/contexts/CartContext";
 import { useUser } from "@clerk/nextjs";
 
 export default function CartPage() {
+    const searchParams = useSearchParams();
+    const promoFromUrl = (searchParams.get("promo") || "").toUpperCase();
     const { user } = useUser();
     const {
         items,
@@ -26,7 +29,7 @@ export default function CartPage() {
     // ========================================
     // CÓDIGO PROMOCIONAL
     // ========================================
-    const [codigoPromocional, setCodigoPromocional] = useState("");
+    const [codigoPromocional, setCodigoPromocional] = useState(promoFromUrl);
     const [descontoAplicado, setDescontoAplicado] = useState(0);
     const [mensagemCodigo, setMensagemCodigo] = useState("");
 
@@ -34,9 +37,12 @@ export default function CartPage() {
         // TODO: Validar código na BD
         // Exemplo de códigos válidos (MOCK):
         const codigosValidos: Record<string, number> = {
-            GREGO10: 10, // 10% desconto
-            PROMO15: 15, // 15% desconto
-            BEMVINDO: 5, // 5% desconto
+            GREGO10: 10,
+            BEMVINDO: 15,
+            PROMO20: 20,
+            FIXO5: 5,
+            ENTREGA0: 2.5,
+            VIP25: 25,
         };
 
         const desconto = codigosValidos[codigoPromocional.toUpperCase()];
@@ -49,6 +55,30 @@ export default function CartPage() {
             setMensagemCodigo("Código inválido");
         }
     };
+
+    useEffect(() => {
+        if (!promoFromUrl) return;
+
+        setCodigoPromocional(promoFromUrl);
+
+        const codigosValidos: Record<string, number> = {
+            GREGO10: 10,
+            BEMVINDO: 15,
+            PROMO20: 20,
+            FIXO5: 5,
+            ENTREGA0: 2.5,
+            VIP25: 25,
+        };
+
+        const desconto = codigosValidos[promoFromUrl];
+        if (desconto) {
+            setDescontoAplicado(desconto);
+            setMensagemCodigo(`Código aplicado! ${desconto}% de desconto`);
+        } else {
+            setDescontoAplicado(0);
+            setMensagemCodigo("Código inválido");
+        }
+    }, [promoFromUrl]);
 
     const removerCodigo = () => {
         setCodigoPromocional("");
@@ -383,7 +413,11 @@ export default function CartPage() {
                         {user ? (
                             // User autenticado - pode finalizar compra
                             <Link
-                                href="/checkout"
+                                href={
+                                    codigoPromocional
+                                        ? `/checkout?promo=${encodeURIComponent(codigoPromocional)}`
+                                        : "/checkout"
+                                }
                                 className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                             >
                                 Finalizar Compra
@@ -398,13 +432,21 @@ export default function CartPage() {
                                     </p>
                                 </div>
                                 <Link
-                                    href="/sign-in?redirect_url=/checkout"
+                                    href={
+                                        codigoPromocional
+                                            ? `/sign-in?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
+                                            : "/sign-in?redirect_url=/checkout"
+                                    }
                                     className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
                                 >
                                     Iniciar Sessão
                                 </Link>
                                 <Link
-                                    href="/sign-up?redirect_url=/checkout"
+                                    href={
+                                        codigoPromocional
+                                            ? `/sign-up?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
+                                            : "/sign-up?redirect_url=/checkout"
+                                    }
                                     className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
                                 >
                                     Criar Conta
