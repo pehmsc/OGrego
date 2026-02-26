@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
     TrashIcon,
     ShoppingCartIcon,
@@ -12,10 +12,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/app/contexts/CartContext";
 import { useUser } from "@clerk/nextjs";
+import { validatePromoCodeInCart } from "@/app/lib/promo-actions";
 
 export default function CartPage() {
     const searchParams = useSearchParams();
     const promoFromUrl = (searchParams.get("promo") || "").toUpperCase();
+
     const { user } = useUser();
     const {
         items,
@@ -30,55 +32,76 @@ export default function CartPage() {
     // CÓDIGO PROMOCIONAL
     // ========================================
     const [codigoPromocional, setCodigoPromocional] = useState(promoFromUrl);
-    const [descontoAplicado, setDescontoAplicado] = useState(0);
+    const [descontoAplicado, setDescontoAplicado] = useState(0); // em cêntimos agora
     const [mensagemCodigo, setMensagemCodigo] = useState("");
-
-    const aplicarCodigo = () => {
-        // TODO: Validar código na BD
-        // Exemplo de códigos válidos (MOCK):
-        const codigosValidos: Record<string, number> = {
-            GREGO10: 10,
-            BEMVINDO: 15,
-            PROMO20: 20,
-            FIXO5: 5,
-            ENTREGA0: 2.5,
-            VIP25: 25,
-        };
-
-        const desconto = codigosValidos[codigoPromocional.toUpperCase()];
-
-        if (desconto) {
-            setDescontoAplicado(desconto);
-            setMensagemCodigo(`Código aplicado! ${desconto}% de desconto`);
-        } else {
-            setDescontoAplicado(0);
-            setMensagemCodigo("Código inválido");
-        }
-    };
+    const [validandoCodigo, setValidandoCodigo] = useState(false);
 
     useEffect(() => {
         if (!promoFromUrl) return;
 
-        setCodigoPromocional(promoFromUrl);
+        const autoAplicar = async () => {
+            if (!promoFromUrl.trim()) return;
 
-        const codigosValidos: Record<string, number> = {
-            GREGO10: 10,
-            BEMVINDO: 15,
-            PROMO20: 20,
-            FIXO5: 5,
-            ENTREGA0: 2.5,
-            VIP25: 25,
+            setValidandoCodigo(true);
+            setMensagemCodigo("");
+
+            try {
+                const subtotalCents = Math.round(subtotal * 100);
+
+                const result = await validatePromoCodeInCart(
+                    promoFromUrl,
+                    subtotalCents,
+                );
+
+                if (result.valid && result.discountCents) {
+                    setDescontoAplicado(result.discountCents);
+                    setMensagemCodigo(result.message);
+                } else {
+                    setDescontoAplicado(0);
+                    setMensagemCodigo(result.message);
+                }
+            } catch (error) {
+                setDescontoAplicado(0);
+                setMensagemCodigo("Erro ao validar código");
+            } finally {
+                setValidandoCodigo(false);
+            }
         };
 
-        const desconto = codigosValidos[promoFromUrl];
-        if (desconto) {
-            setDescontoAplicado(desconto);
-            setMensagemCodigo(`Código aplicado! ${desconto}% de desconto`);
-        } else {
-            setDescontoAplicado(0);
-            setMensagemCodigo("Código inválido");
+        autoAplicar();
+    }, [promoFromUrl, subtotal]);
+
+    const aplicarCodigo = async () => {
+        if (!codigoPromocional.trim()) {
+            setMensagemCodigo("Insira um código");
+            return;
         }
-    }, [promoFromUrl]);
+
+        setValidandoCodigo(true);
+        setMensagemCodigo("");
+
+        try {
+            const subtotalCents = Math.round(subtotal * 100);
+
+            const result = await validatePromoCodeInCart(
+                codigoPromocional,
+                subtotalCents,
+            );
+
+            if (result.valid && result.discountCents) {
+                setDescontoAplicado(result.discountCents);
+                setMensagemCodigo(result.message);
+            } else {
+                setDescontoAplicado(0);
+                setMensagemCodigo(result.message);
+            }
+        } catch (error) {
+            setDescontoAplicado(0);
+            setMensagemCodigo("Erro ao validar código");
+        } finally {
+            setValidandoCodigo(false);
+        }
+    };
 
     const removerCodigo = () => {
         setCodigoPromocional("");
@@ -103,8 +126,9 @@ export default function CartPage() {
         }
     };
 
-    const valorDesconto = (subtotal * descontoAplicado) / 100;
+    const valorDesconto = descontoAplicado / 100; // Converter cêntimos para euros (antes: const valorDesconto = (subtotal * descontoAplicado) / 100;)
     const subtotalComDesconto = subtotal - valorDesconto;
+
     const portes = subtotalComDesconto > 30 ? 0 : 2.5;
     const total = subtotalComDesconto + portes;
     const pontosAGanhar = Math.floor(total);
@@ -318,9 +342,12 @@ export default function CartPage() {
                             />
                             <button
                                 onClick={aplicarCodigo}
-                                className="rounded-full bg-[#1E3A8A] px-6 py-2 text-sm font-medium text-white transition-all hover:bg-[#162F73]"
+                                disabled={
+                                    validandoCodigo || !codigoPromocional.trim()
+                                }
+                                className="rounded-full bg-[#1E3A8A] px-6 py-2 text-sm font-medium text-white transition-all hover:bg-[#162F73] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Aplicar
+                                {validandoCodigo ? "A validar..." : "Aplicar"}
                             </button>
                         </div>
                     )}
@@ -354,7 +381,7 @@ export default function CartPage() {
 
                         {descontoAplicado > 0 && (
                             <div className="flex justify-between text-emerald-600">
-                                <span>Desconto ({descontoAplicado}%)</span>
+                                <span>Desconto ({codigoPromocional})</span>
                                 <span className="font-medium">
                                     -€{valorDesconto.toFixed(2)}
                                 </span>
