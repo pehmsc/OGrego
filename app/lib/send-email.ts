@@ -1,7 +1,8 @@
 import { Resend } from "resend";
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim() || null;
-const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || "O Grego <encomendas@resend.dev>";
+const resendFromEmail =
+    process.env.RESEND_FROM_EMAIL?.trim() || "O Grego <onboarding@resend.dev>";
 let resendClient: Resend | null = null;
 
 function getResendClient() {
@@ -202,14 +203,20 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
         });
 
         if (result.error) {
-            console.error("[email] Erro retornado pela API Resend:", result.error);
+            console.error(
+                "[email] Erro retornado pela API Resend:",
+                result.error,
+            );
             return {
                 success: false,
-                error: result.error.message || "Erro ao enviar email pelo Resend",
+                error:
+                    result.error.message || "Erro ao enviar email pelo Resend",
             };
         }
 
-        console.log("Email enviado para:", to, { messageId: result.data?.id ?? null });
+        console.log("Email enviado para:", to, {
+            messageId: result.data?.id ?? null,
+        });
         return { success: true };
     } catch (error) {
         console.error("Erro ao enviar email:", error);
