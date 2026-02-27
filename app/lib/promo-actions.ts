@@ -122,3 +122,50 @@ export async function validatePromoCodeInCart(
         return { valid: false, message: "Erro ao validar código" };
     }
 }
+
+export type Promo = {
+    code: string;
+    discount: string;
+    minOrder: string;
+    usageLimit: string;
+    validFrom: string;
+    validUntil: string;
+    image: string | null;
+};
+export async function getPromos(): Promise<Promo[]> {
+    const rows = await sql<
+        {
+            code: string;
+            discount_type: string;
+            discount_value: number;
+            min_order_value_cents: number;
+            max_uses: number | null;
+            times_used: number;
+            valid_from: string;
+            valid_until: string | null;
+            image: string | null;
+        }[]
+    >`        SELECT            code,            discount_type,            discount_value,            min_order_value_cents,            max_uses,            times_used,            valid_from::text,            valid_until::text,            image        FROM promo_codes        WHERE is_active = true        ORDER BY id ASC    `;
+    return rows.map((r) => ({
+        code: r.code,
+        discount:
+            r.discount_type === "percentage"
+                ? `${r.discount_value}% de desconto`
+                : `${(r.discount_value / 100).toFixed(2).replace(".", ",")} € de desconto fixo`,
+        minOrder:
+            r.min_order_value_cents === 0
+                ? "Sem mínimo de encomenda"
+                : `Mínimo de ${(r.min_order_value_cents / 100).toFixed(2).replace(".", ",")} €`,
+        usageLimit:
+            r.max_uses === null
+                ? "Utilizações ilimitadas"
+                : `Até ${r.max_uses} utilizações`,
+        validFrom: r.valid_from
+            ? new Date(r.valid_from).toLocaleDateString("pt-PT")
+            : "—",
+        validUntil: r.valid_until
+            ? new Date(r.valid_until).toLocaleDateString("pt-PT")
+            : "—",
+        image: r.image ?? null,
+    }));
+}
