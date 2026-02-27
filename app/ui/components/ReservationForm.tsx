@@ -186,7 +186,7 @@ export default function ReservationForm() {
                 />
             </label>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="flex flex-col sm:flex-row sm:gap-x-2 gap-y-3">
                 {/* ✅ DATA COM MÁSCARA */}
                 <label className="grid gap-2">
                     <span className="text-sm font-semibold text-[#1E3A8A]/80">
