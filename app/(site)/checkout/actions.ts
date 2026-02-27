@@ -481,7 +481,8 @@ export async function createOrder(
         discounts = [{ coupon: coupon.id }];
       }
 
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      const appUrl =
+        process.env.NEXT_PUBLIC_APP_URL || "http://ogrego.vercel.app";
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: getStripePaymentMethods(data.paymentMethod),
