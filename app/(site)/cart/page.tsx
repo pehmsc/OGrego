@@ -17,6 +17,14 @@ import { validatePromoCodeInCart } from "@/app/lib/promo-actions";
 export default function CartPage() {
     const searchParams = useSearchParams();
     const promoFromUrl = (searchParams.get("promo") || "").toUpperCase();
+    // Check localStorage for promo if not in URL
+    const [promoFromStorage, setPromoFromStorage] = useState("");
+    useEffect(() => {
+        if (!promoFromUrl && typeof window !== "undefined") {
+            const promo = localStorage.getItem("promoSelecionada") || "";
+            setPromoFromStorage(promo.toUpperCase());
+        }
+    }, [promoFromUrl]);
 
     const { user } = useUser();
     const {
@@ -31,16 +39,20 @@ export default function CartPage() {
     // ========================================
     // CÓDIGO PROMOCIONAL
     // ========================================
-    const [codigoPromocional, setCodigoPromocional] = useState(promoFromUrl);
+    const [codigoPromocional, setCodigoPromocional] = useState(
+        promoFromUrl || promoFromStorage,
+    );
     const [descontoAplicado, setDescontoAplicado] = useState(0); // em cêntimos agora
     const [mensagemCodigo, setMensagemCodigo] = useState("");
     const [validandoCodigo, setValidandoCodigo] = useState(false);
 
     useEffect(() => {
-        if (!promoFromUrl) return;
+        // Auto-aplicar promo se existir
+        const promo = promoFromUrl || promoFromStorage;
+        if (!promo) return;
 
         const autoAplicar = async () => {
-            if (!promoFromUrl.trim()) return;
+            if (!promo.trim()) return;
 
             setValidandoCodigo(true);
             setMensagemCodigo("");
@@ -49,7 +61,7 @@ export default function CartPage() {
                 const subtotalCents = Math.round(subtotal * 100);
 
                 const result = await validatePromoCodeInCart(
-                    promoFromUrl,
+                    promo,
                     subtotalCents,
                 );
 
@@ -69,7 +81,7 @@ export default function CartPage() {
         };
 
         autoAplicar();
-    }, [promoFromUrl, subtotal]);
+    }, [promoFromUrl, promoFromStorage, subtotal]);
 
     const aplicarCodigo = async () => {
         if (!codigoPromocional.trim()) {
@@ -107,6 +119,9 @@ export default function CartPage() {
         setCodigoPromocional("");
         setDescontoAplicado(0);
         setMensagemCodigo("");
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("promoSelecionada");
+        }
     };
 
     // ========================================
