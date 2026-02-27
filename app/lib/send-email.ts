@@ -184,7 +184,7 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
                 Tem alguma questão? Contacte-nos:
               </p>
               <p style="margin: 0; color: #1E3A8A; font-weight: 600;">
-                📞 +351 21 123 4567 | 📧 info@ogrego.pt
+                📞 +351 21 123 4567 | 📧 ogrego.rest@gmail.com
               </p>
               <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 12px;">
                 © 2025 O Grego. Todos os direitos reservados.
