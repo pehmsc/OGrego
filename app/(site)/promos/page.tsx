@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import PromoLink from "./PromoLink";
 
 type Promo = {
     code: string;
@@ -84,8 +84,9 @@ export default function PromosPage() {
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {promos.map((promo) => (
-                    <Link
+                    <PromoLink
                         key={promo.code}
+                        code={promo.code}
                         href={`/cart?promo=${promo.code}`}
                         className="block rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6 shadow-sm transition-all hover:-translate-y-[1px] hover:border-[#1E3A8A]/30 hover:shadow-md"
                     >
@@ -140,7 +141,7 @@ export default function PromosPage() {
                                 <dd>{promo.validUntil}</dd>
                             </div>
                         </dl>
-                    </Link>
+                    </PromoLink>
                 ))}
             </div>
         </section>
