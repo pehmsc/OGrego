@@ -145,7 +145,7 @@ export default function ReciboClient({
             780,
         );
         doc.text(
-            "Para solicitar fatura, contacte-nos: info@ogrego.pt",
+            "Para solicitar fatura, contacte-nos: ogrego.rest@gmail.com",
             marginLeft,
             795,
         );
@@ -300,7 +300,8 @@ export default function ReciboClient({
                 <div className="mt-12 border-t pt-6 text-center text-xs text-gray-500">
                     <p>Este documento não é válido como fatura.</p>
                     <p className="mt-2">
-                        Para solicitar fatura, contacte-nos: info@ogrego.pt
+                        Para solicitar fatura, contacte-nos:
+                        ogrego.rest@gmail.com
                     </p>
                 </div>
 
