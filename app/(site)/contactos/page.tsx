@@ -45,6 +45,13 @@ export default function ContactosPage() {
                             <div>+351 961 234 567</div>
                         </div>
 
+                        <div>
+                            <div className="text-sm font-semibold text-[#1E3A8A]/80">
+                                Email
+                            </div>
+                            <div>ogrego.rest@gmail.com</div>
+                        </div>
+
                         <div className="flex flex-col gap-3 sm:flex-row">
                             <Link
                                 href="tel:+351900000000"

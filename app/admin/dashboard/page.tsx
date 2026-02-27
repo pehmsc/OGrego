@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   SquaresPlusIcon,
   ArrowTrendingUpIcon,
@@ -120,7 +120,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
   }
 
   const max = Math.max(...data.map((d) => d.total_cents), 1);
-  // Add 10% padding on top
   const yMax = max * 1.1;
 
   const getX = (i: number) =>
@@ -130,18 +129,15 @@ function LineChart({ data }: { data: VendaPonto[] }) {
   const getY = (val: number) =>
     CHART_PADDING.top + plotH - (val / yMax) * plotH;
 
-  // Line path
   const linePath = data
     .map((d, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(d.total_cents)}`)
     .join(" ");
 
-  // Area path (for gradient fill)
   const areaPath =
     linePath +
     ` L ${getX(data.length - 1)} ${CHART_PADDING.top + plotH}` +
     ` L ${getX(0)} ${CHART_PADDING.top + plotH} Z`;
 
-  // Y-axis ticks (4 lines)
   const yTicks = Array.from({ length: 5 }, (_, i) => (yMax / 4) * i);
 
   return (
@@ -160,7 +156,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
             </linearGradient>
           </defs>
 
-          {/* Horizontal grid lines */}
           {yTicks.map((tick, i) => (
             <g key={i}>
               <line
@@ -184,10 +179,8 @@ function LineChart({ data }: { data: VendaPonto[] }) {
             </g>
           ))}
 
-          {/* Area fill */}
           <path d={areaPath} fill="url(#areaGrad)" />
 
-          {/* Line */}
           <path
             d={linePath}
             fill="none"
@@ -197,7 +190,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
             strokeLinejoin="round"
           />
 
-          {/* Data points + labels + invisible hover areas */}
           {data.map((d, i) => {
             const cx = getX(i);
             const cy = getY(d.total_cents);
@@ -205,7 +197,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
 
             return (
               <g key={i}>
-                {/* Invisible wider hover target */}
                 <rect
                   x={cx - plotW / data.length / 2}
                   y={CHART_PADDING.top}
@@ -215,7 +206,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
                   onMouseEnter={() => setActiveIndex(i)}
                 />
 
-                {/* Vertical guide line */}
                 {isActive && (
                   <line
                     x1={cx}
@@ -229,7 +219,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
                   />
                 )}
 
-                {/* Dot */}
                 <circle
                   cx={cx}
                   cy={cy}
@@ -240,7 +229,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
                   className="transition-all duration-150"
                 />
 
-                {/* Tooltip */}
                 {isActive && (
                   <g>
                     <rect
@@ -251,7 +239,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
                       rx={6}
                       fill="#1e293b"
                     />
-                    {/* Arrow */}
                     <polygon
                       points={`${cx - 5},${cy - 12} ${cx + 5},${cy - 12} ${cx},${cy - 6}`}
                       fill="#1e293b"
@@ -269,7 +256,6 @@ function LineChart({ data }: { data: VendaPonto[] }) {
                   </g>
                 )}
 
-                {/* X-axis label */}
                 <text
                   x={cx}
                   y={CHART_PADDING.top + plotH + 20}
@@ -301,65 +287,75 @@ function Skeleton({ className = "" }: { className?: string }) {
 
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState("semana");
+
+  // loading gerais (dados fixos do dashboard)
   const [loading, setLoading] = useState(true);
 
-  const [vendasTotal, setVendasTotal] = useState(0);
+  // loading por bloco (quando muda o período)
   const [loadingVendas, setLoadingVendas] = useState(false);
+  const [loadingGrafico, setLoadingGrafico] = useState(false);
+  const [loadingCategorias, setLoadingCategorias] = useState(false);
+
+  const [vendasTotal, setVendasTotal] = useState(0);
   const [totalUtilizadores, setTotalUtilizadores] = useState(0);
   const [pedidosPendentes, setPedidosPendentes] = useState(0);
 
   const [vendasGrafico, setVendasGrafico] = useState<VendaPonto[]>([]);
-  const [loadingGrafico, setLoadingGrafico] = useState(false);
-
   const [categorias, setCategorias] = useState<CategoriaTop[]>([]);
   const [recentes, setRecentes] = useState<PedidoRecente[]>([]);
   const [atividade, setAtividade] = useState<Atividade[]>([]);
 
-  // ── Fetch inicial ───────────────────────────────────────────
+  // ── Load inicial (não depende do período) ─────────────────────
 
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [users, pendentes, cats, pedidos, atv] = await Promise.all([
+
+      const [users, pendentes, pedidos, atv] = await Promise.all([
         getTotalUtilizadores(),
         getPedidosPendentes(),
-        getTopCategorias(),
         getPedidosRecentes(),
         getAtividadeRecente(),
       ]);
 
       setTotalUtilizadores(users);
       setPedidosPendentes(pendentes);
-      setCategorias(cats);
       setRecentes(pedidos);
       setAtividade(atv);
+
       setLoading(false);
     }
+
     load();
   }, []);
 
-  // ── Fetch vendas card + gráfico ─────────────────────────────
+  // ── Fetch por período: vendas + gráfico + categorias ──────────
 
-  const fetchVendas = useCallback(async (periodo: string) => {
+  const fetchPeriodo = useCallback(async (periodo: string) => {
     setLoadingVendas(true);
     setLoadingGrafico(true);
+    setLoadingCategorias(true);
 
-    const [total, grafico] = await Promise.all([
+    const [total, grafico, cats] = await Promise.all([
       getVendasTotal(periodo),
       getVendasPorPeriodo(periodo),
+      getTopCategorias(periodo),
     ]);
 
     setVendasTotal(total);
     setVendasGrafico(grafico);
+    setCategorias(cats);
+
     setLoadingVendas(false);
     setLoadingGrafico(false);
+    setLoadingCategorias(false);
   }, []);
 
   useEffect(() => {
-    fetchVendas(timeRange);
-  }, [timeRange, fetchVendas]);
+    fetchPeriodo(timeRange);
+  }, [timeRange, fetchPeriodo]);
 
-  // ── Atualizar estado do pedido ──────────────────────────────
+  // ── Atualizar estado do pedido ────────────────────────────────
 
   const handleEstadoChange = async (id: number, novoEstado: string) => {
     const sucesso = await atualizarEstadoPedido(id, novoEstado);
@@ -374,7 +370,7 @@ export default function DashboardPage() {
     }
   };
 
-  // ── Render ──────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────
 
   return (
     <main className="p-6 space-y-6">
@@ -391,6 +387,7 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
+
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
@@ -405,7 +402,7 @@ export default function DashboardPage() {
         </select>
       </header>
 
-      {/* ── Stats Cards ────────────────────────────────── */}
+      {/* ── Stats Cards ─────────────────────────────────────────── */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-4 text-white">
           <div className="flex items-center justify-between">
@@ -452,7 +449,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ── Gráfico + Top Categorias ───────────────────── */}
+      {/* ── Gráfico + Top Categorias ────────────────────────────── */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 bg-white rounded-2xl shadow border p-6">
           <div className="mb-6">
@@ -468,8 +465,11 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow border p-6">
-          <h2 className="text-lg font-semibold mb-4">Top Categorias</h2>
-          {loading ? (
+          <h2 className="text-lg font-semibold mb-4">
+            Top Categorias · {PERIOD_LABELS[timeRange]}
+          </h2>
+
+          {loading || loadingCategorias ? (
             <div className="space-y-3">
               <Skeleton className="h-5 w-full" />
               <Skeleton className="h-5 w-3/4" />
@@ -493,7 +493,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ── Pedidos Recentes + Atividade ────────────────── */}
+      {/* ── Pedidos Recentes + Atividade ────────────────────────── */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 bg-white rounded-2xl shadow border overflow-x-auto">
           <div className="p-6 border-b">
