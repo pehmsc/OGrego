@@ -2,39 +2,43 @@ import Header from "@/app/ui/components/Header";
 import UserHeader from "@/app/ui/components/user/UserHeader";
 import UserNav from "@/app/ui/components/user/UserNav";
 import { getCurrentUserDb } from "@/app/lib/current-user";
+import { redirect } from "next/navigation";
 
 export default async function UserLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  // const session = await getServerSession();
+    // Buscar dados reais do user
+    let userDb;
+    try {
+        userDb = await getCurrentUserDb();
+    } catch {
+        redirect("/entrar");
+    }
 
-  // Comentado por enquanto - adicionar quando tivermos NextAuth
-  // if (!session) {
-  //   redirect("/auth/entrar");
-  // }
+    if (!userDb) redirect("/entrar");
 
-  // Buscar dados reais do user
-  const userDb = await getCurrentUserDb();
+    const name =
+        [userDb.first_name, userDb.last_name].filter(Boolean).join(" ") ||
+        "Utilizador";
 
-  const name =
-    [userDb.first_name, userDb.last_name].filter(Boolean).join(" ") ||
-    "Utilizador";
+    const user = {
+        name,
+        email: userDb.email ?? "",
+        photo: userDb.image_url ?? "",
+        loyalty_points: userDb.points ?? 0,
+    };
 
-  const user = {
-    name,
-    email: userDb.email ?? "",
-    photo: userDb.image_url ?? "",
-    loyalty_points: userDb.points ?? 0,
-  };
+    return (
+        <>
+            {/* Header fixo no topo (comum a todo o site) */}
+            <Header />
 
-  return (
-    <>
-      {/* Header fixo no topo (comum a todo o site) */}
-      <Header />
-
-      <div id="user_navegacao" className="site-shell min-h-screen bg-[var(--background)]">
+            <div
+                id="user_navegacao"
+                className="site-shell min-h-screen bg-[var(--background)]"
+            >
         {/* Navegação secundária - mt-20 para ficar abaixo do header fixo */}
 
         {/* Conteúdo da página */}
@@ -56,7 +60,7 @@ export default async function UserLayout({
           {/* Conteúdo dinâmico de cada página */}
           {children}
         </div>
-      </div>
-    </>
-  );
+            </div>
+        </>
+    );
 }

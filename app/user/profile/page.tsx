@@ -72,9 +72,35 @@ export default function PerfilPage() {
 
     if (!user) {
         return (
-            <UserPageLayout sidebar={<LoyaltyCard points={0} />}>
+            <UserPageLayout
+                sidebar={
+                    <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6 shadow-sm dark:border-white/10 dark:bg-slate-950/70 sm:p-8">
+                        <div className="space-y-4 animate-pulse">
+                            <div className="h-6 w-32 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            <div className="h-10 w-20 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800" />
+                            <div className="space-y-2 border-t border-[#1E3A8A]/10 pt-4 dark:border-white/10">
+                                <div className="h-4 w-28 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                                <div className="h-4 w-36 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                                <div className="h-4 w-24 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            >
                 <div className="site-card p-6 sm:p-8">
-                    <p className="text-center text-zinc-600 dark:text-slate-300">A carregar...</p>
+                    <div className="space-y-4 animate-pulse">
+                        <div className="flex items-center gap-4 sm:gap-6">
+                            <div className="h-20 w-20 shrink-0 rounded-full bg-slate-200 dark:bg-slate-800 sm:h-24 sm:w-24" />
+                            <div className="flex-1 space-y-2">
+                                <div className="h-6 w-40 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                                <div className="h-4 w-28 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            </div>
+                        </div>
+                        <div className="h-12 w-full rounded-full bg-slate-200 dark:bg-slate-800" />
+                        <div className="h-12 w-full rounded-full bg-slate-200 dark:bg-slate-800" />
+                        <div className="h-12 w-full rounded-full bg-slate-200 dark:bg-slate-800" />
+                    </div>
                 </div>
             </UserPageLayout>
         );
