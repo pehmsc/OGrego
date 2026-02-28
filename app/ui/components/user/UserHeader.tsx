@@ -18,7 +18,7 @@ export default function UserHeader({
     const info = getLoyaltyInfo(loyaltyPoints);
 
     return (
-        <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+        <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:bg-slate-950/70">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
                 {/* Avatar */}
                 <div className="relative h-24 w-24 shrink-0">
@@ -38,18 +38,21 @@ export default function UserHeader({
 
                 {/* Nome + Badge + Pontos */}
                 <div className="flex flex-col justify-center gap-2">
-                    <h1 className="text-2xl font-semibold text-[#1E3A8A]">
+                    <h1 className="text-2xl font-semibold text-[#1E3A8A] dark:text-slate-50">
                         {name}
                     </h1>
+                    <p className="text-sm text-zinc-600 dark:text-slate-300">
+                        {email}
+                    </p>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <span
                             className={`flex h-8 items-center gap-1 rounded-full bg-gradient-to-r ${info.badgeGradient} px-4 text-sm font-medium text-white shadow-sm`}
                         >
                             <CheckBadgeIcon className="h-4 w-4" /> {info.level}
                         </span>
 
-                        <span className="text-sm font-medium text-zinc-600">
+                        <span className="text-sm font-medium text-zinc-600 dark:text-slate-300">
                             {loyaltyPoints} pontos
                         </span>
                     </div>

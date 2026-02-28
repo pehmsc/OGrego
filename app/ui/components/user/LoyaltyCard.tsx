@@ -7,6 +7,10 @@ interface LoyaltyCardProps {
 
 export default function LoyaltyCard({ points }: LoyaltyCardProps) {
     const info = getLoyaltyInfo(points);
+    const nextLevel =
+        info.pointsToNext !== null
+            ? getLoyaltyInfo(points + info.pointsToNext).level
+            : null;
 
     return (
         <div
@@ -36,8 +40,7 @@ export default function LoyaltyCard({ points }: LoyaltyCardProps) {
                     <span>Nível: {info.level}</span>
                     {info.pointsToNext !== null ? (
                         <span>
-                            {info.pointsToNext} pts até{" "}
-                            {getLoyaltyInfo(points + info.pointsToNext).level}
+                            {info.pointsToNext} pts até {nextLevel}
                         </span>
                     ) : (
                         <span>Nível máximo atingido 🎉</span>

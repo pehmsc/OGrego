@@ -373,10 +373,10 @@ export default function DashboardPage() {
   // ── Render ────────────────────────────────────────────────────
 
   return (
-    <main className="p-6 space-y-6">
+    <main className="admin-page">
       {/* Header + Filtro global */}
       <header className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-4">
           <div className="p-3 bg-gradient-to-br from-slate-500 to-slate-600 rounded-2xl shadow">
             <SquaresPlusIcon className="h-6 w-6 text-white" />
           </div>
@@ -391,7 +391,7 @@ export default function DashboardPage() {
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 bg-white shadow-sm"
+          className="admin-input w-full sm:w-auto"
         >
           <option value="hoje">Hoje</option>
           <option value="semana">Esta semana</option>
@@ -451,7 +451,7 @@ export default function DashboardPage() {
 
       {/* ── Gráfico + Top Categorias ────────────────────────────── */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow border p-6">
+        <div className="admin-surface lg:col-span-2 p-4 sm:p-6">
           <div className="mb-6">
             <h2 className="text-lg font-semibold">
               Vendas · {PERIOD_LABELS[timeRange]}
@@ -464,7 +464,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl shadow border p-6">
+        <div className="admin-surface p-4 sm:p-6">
           <h2 className="text-lg font-semibold mb-4">
             Top Categorias · {PERIOD_LABELS[timeRange]}
           </h2>
@@ -495,7 +495,7 @@ export default function DashboardPage() {
 
       {/* ── Pedidos Recentes + Atividade ────────────────────────── */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow border overflow-x-auto">
+        <div className="admin-table-scroll lg:col-span-2">
           <div className="p-6 border-b">
             <h2 className="text-lg font-semibold">Pedidos Recentes</h2>
           </div>
@@ -506,7 +506,7 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table className="min-w-[720px] w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left">Pedido</th>
@@ -552,7 +552,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl shadow border p-6">
+        <div className="admin-surface p-4 sm:p-6">
           <h2 className="text-lg font-semibold mb-4">Atividade Recente</h2>
           {loading ? (
             <div className="space-y-3">

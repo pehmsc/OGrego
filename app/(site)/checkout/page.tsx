@@ -64,7 +64,7 @@ export default function CheckoutPage() {
 
   // LER PROMO CODE DO URL
   const promoFromUrl = (searchParams.get("promo") || "").trim().toUpperCase();
-  const [promoCode, setPromoCode] = useState(promoFromUrl);
+  const promoCode = promoFromUrl;
 
   // ========================================
   // BUSCAR DADOS DO USER NA BD
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#1E3A8A]/20 border-t-[#1E3A8A]"></div>
-            <p className="text-zinc-600">A carregar dados...</p>
+            <p className="text-zinc-600 dark:text-slate-300">A carregar dados...</p>
           </div>
         </div>
       </main>
@@ -251,14 +251,14 @@ export default function CheckoutPage() {
   if (isLoaded && !user) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-12 text-center shadow-sm">
+        <div className="site-card p-8 text-center sm:p-12">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100">
             <span className="text-4xl">🔒</span>
           </div>
           <h2 className="mb-2 text-2xl font-semibold text-[#1E3A8A]">
             Necessário iniciar sessão
           </h2>
-          <p className="mb-6 text-zinc-600">
+          <p className="mb-6 text-zinc-600 dark:text-slate-300">
             Para fazer encomendas precisa de ter uma conta.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
             </Link>
             <Link
               href="/sign-up?redirect_url=/checkout"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-8 text-sm font-medium text-[#1E3A8A] hover:border-[#1E3A8A]/40 transition-all"
+              className="site-button-secondary inline-flex h-12 px-8"
             >
               Criar Conta
             </Link>
@@ -278,7 +278,7 @@ export default function CheckoutPage() {
           <div className="mt-6">
             <Link
               href="/cart"
-              className="text-sm text-zinc-600 hover:text-[#1E3A8A] underline"
+              className="text-sm text-zinc-600 underline hover:text-[#1E3A8A] dark:text-slate-300"
             >
               ← Voltar ao carrinho
             </Link>
@@ -294,7 +294,7 @@ export default function CheckoutPage() {
   if (user && userData && !userData.nif) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-12 text-center shadow-sm">
+        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center shadow-sm dark:border-amber-900/60 dark:bg-amber-500/10 sm:p-12">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-100">
             <span className="text-4xl">📋</span>
           </div>
@@ -314,7 +314,7 @@ export default function CheckoutPage() {
             </Link>
             <Link
               href="/menu"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-8 text-sm font-medium text-[#1E3A8A] hover:border-[#1E3A8A]/40 transition-all"
+              className="site-button-secondary inline-flex h-12 px-8"
             >
               ← Voltar ao Menu
             </Link>
@@ -330,11 +330,11 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-12">
-        <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-12 text-center">
+        <div className="site-card p-8 text-center sm:p-12">
           <h2 className="mb-4 text-2xl font-semibold text-[#1E3A8A]">
             Carrinho vazio
           </h2>
-          <p className="mb-6 text-zinc-600">
+          <p className="mb-6 text-zinc-600 dark:text-slate-300">
             Adicione produtos antes de fazer checkout.
           </p>
           <Link
@@ -358,7 +358,7 @@ export default function CheckoutPage() {
       </h1>
 
       {/* Banner user autenticado */}
-      <div className="mb-6 rounded-2xl bg-emerald-50 p-4">
+      <div className="mb-6 rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
         <p className="text-sm text-emerald-800">
           ✓ Sessão iniciada como{" "}
           <strong>
@@ -373,14 +373,14 @@ export default function CheckoutPage() {
         {/* COLUNA ESQUERDA - FORMULÁRIO */}
         <div className="lg:col-span-2 space-y-6">
           {/* Dados Pessoais */}
-          <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+          <section className="site-card p-6">
             <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
               Dados Pessoais
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                   Nome completo *
                 </label>
                 <input
@@ -393,12 +393,12 @@ export default function CheckoutPage() {
                       customerName: e.target.value,
                     })
                   }
-                  className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                  className="site-input-pill"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                   Email *
                 </label>
                 <input
@@ -411,12 +411,12 @@ export default function CheckoutPage() {
                       customerEmail: e.target.value,
                     })
                   }
-                  className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                  className="site-input-pill"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                   Telefone
                 </label>
                 <input
@@ -428,14 +428,14 @@ export default function CheckoutPage() {
                       customerPhone: e.target.value,
                     })
                   }
-                  className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                  className="site-input-pill"
                 />
               </div>
             </div>
           </section>
 
           {/* Tipo de Encomenda */}
-          <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+          <section className="site-card p-6">
             <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
               Tipo de Encomenda
             </h2>
@@ -458,7 +458,7 @@ export default function CheckoutPage() {
                 <TruckIcon className="h-6 w-6 text-[#1E3A8A]" />
                 <div className="text-left">
                   <p className="font-semibold text-[#1E3A8A]">Delivery</p>
-                  <p className="text-xs text-gray-600">Entrega ao domicílio</p>
+                  <p className="text-xs text-gray-600 dark:text-slate-300">Entrega ao domicílio</p>
                 </div>
               </button>
 
@@ -479,7 +479,7 @@ export default function CheckoutPage() {
                 <ShoppingBagIcon className="h-6 w-6 text-[#1E3A8A]" />
                 <div className="text-left">
                   <p className="font-semibold text-[#1E3A8A]">Takeaway</p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-600 dark:text-slate-300">
                     Levantar no restaurante
                   </p>
                 </div>
@@ -489,14 +489,14 @@ export default function CheckoutPage() {
 
           {/* Morada (só se delivery) */}
           {formData.orderType === "delivery" && (
-            <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+            <section className="site-card p-6">
               <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
                 Morada de Entrega
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                     Morada completa *
                   </label>
                   <input
@@ -510,13 +510,13 @@ export default function CheckoutPage() {
                       })
                     }
                     placeholder="Rua, número, andar"
-                    className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    className="site-input-pill"
                   />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                       Código Postal *
                     </label>
                     <input
@@ -530,12 +530,12 @@ export default function CheckoutPage() {
                         })
                       }
                       placeholder="1000-000"
-                      className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                      className="site-input-pill"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                       Cidade *
                     </label>
                     <input
@@ -549,7 +549,7 @@ export default function CheckoutPage() {
                         })
                       }
                       placeholder="Lisboa"
-                      className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                      className="site-input-pill"
                     />
                   </div>
                 </div>
@@ -558,7 +558,7 @@ export default function CheckoutPage() {
           )}
 
           {/* Pagamento */}
-          <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+          <section className="site-card p-6">
             <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
               Método de Pagamento
             </h2>
@@ -571,7 +571,7 @@ export default function CheckoutPage() {
                   paymentMethod: e.target.value,
                 })
               }
-              className="w-full rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+              className="site-input-pill"
             >
               <option value="mbway">MB WAY</option>
               <option value="card">Cartão</option>
@@ -580,14 +580,14 @@ export default function CheckoutPage() {
             </select>
 
             {formData.paymentMethod !== "cash" && (
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-gray-500 dark:text-slate-400">
                 Será redirecionado para uma página de pagamento segura.
               </p>
             )}
           </section>
 
           {/* Observações */}
-          <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+          <section className="site-card p-6">
             <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
               Observações (opcional)
             </h2>
@@ -602,17 +602,17 @@ export default function CheckoutPage() {
               }
               rows={3}
               placeholder="Ex: sem cebola, tocar à campainha, etc."
-              className="w-full rounded-2xl border border-[#1E3A8A]/20 bg-white px-4 py-3 transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+              className="site-input"
             />
           </section>
         </div>
 
         {/* COLUNA DIREITA - RESUMO */}
         <div className="lg:col-span-1">
-          <div className="sticky top-4 space-y-6">
+          <div className="space-y-6 lg:sticky lg:top-4">
             {/* Pontos do user */}
             {(userData?.points ?? 0) > 0 && (
-              <div className="rounded-3xl border border-[#1E3A8A]/10 bg-gradient-to-br from-amber-50 to-orange-50 p-6">
+              <div className="rounded-3xl border border-[#1E3A8A]/10 bg-gradient-to-br from-amber-50 to-orange-50 p-6 dark:border-white/10 dark:from-amber-500/10 dark:to-orange-500/10">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500">
                     <span className="text-2xl">🏆</span>
@@ -628,7 +628,7 @@ export default function CheckoutPage() {
             )}
 
             {/* Resumo da Encomenda */}
-            <section className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6">
+            <section className="site-card p-6">
               <h2 className="mb-4 text-xl font-semibold text-[#1E3A8A]">
                 Resumo
               </h2>
@@ -646,7 +646,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">{item.nome}</p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-600 dark:text-slate-300">
                         {item.quantidade}x €{item.preco.toFixed(2)}
                       </p>
                     </div>
@@ -659,7 +659,7 @@ export default function CheckoutPage() {
                 <div className="my-3 border-t border-[#1E3A8A]/10"></div>
 
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600 dark:text-slate-300">Subtotal</span>
                   <span className="font-medium">
                     €{(subtotalCents / 100).toFixed(2)}
                   </span>
@@ -677,7 +677,7 @@ export default function CheckoutPage() {
 
                 {deliveryFeeCents > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Portes</span>
+                    <span className="text-gray-600 dark:text-slate-300">Portes</span>
                     <span className="font-medium">
                       €{(deliveryFeeCents / 100).toFixed(2)}
                     </span>
@@ -694,7 +694,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {isPricingLoading && (
-                  <p className="text-xs text-gray-500">A atualizar total...</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">A atualizar total...</p>
                 )}
               </div>
             </section>

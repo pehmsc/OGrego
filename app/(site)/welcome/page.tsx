@@ -7,9 +7,6 @@ import Link from "next/link";
 // O array é preenchido dinamicamente
 
 export default function WelcomePage() {
-    const [promoHighlights, setPromoHighlights] = useState<
-        { src: string; alt: string; title: string }[]
-    >([]);
     const [randomPromo, setRandomPromo] = useState<{
         src: string;
         alt: string;
@@ -26,7 +23,6 @@ export default function WelcomePage() {
                     alt: `Promoção ${i + 1}`,
                     title: "Ofertas especiais à sua espera",
                 }));
-                setPromoHighlights(highlights);
                 setRandomPromo(
                     highlights[Math.floor(Math.random() * highlights.length)],
                 );
@@ -34,8 +30,8 @@ export default function WelcomePage() {
     }, []);
 
     return (
-        <section className="grid gap-16">
-            <div className="grid items-center gap-10 lg:grid-cols-2">
+        <section className="grid gap-10 sm:gap-16">
+            <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
                 <div className="grid gap-5">
                     <h1 className="text-4xl font-semibold tracking-tight text-[#1E3A8A] sm:text-5xl dark:text-white">
                         Bem-vindo a O Grego
@@ -57,7 +53,7 @@ export default function WelcomePage() {
 
                         <Link
                             href="/menu"
-                            className="flex h-12 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 text-sm font-medium text-[#1E3A8A] shadow-sm transition-all hover:border-[#1E3A8A]/40 hover:-translate-y-[1px]"
+                            className="site-button-secondary flex h-12 px-6 shadow-sm"
                         >
                             Encomendar
                         </Link>
@@ -80,7 +76,7 @@ export default function WelcomePage() {
 
             <Link
                 href="/promos"
-                className="group grid items-center gap-6 rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm transition-all hover:-translate-y-[1px] hover:border-[#1E3A8A]/30 hover:shadow-md lg:grid-cols-[1fr_340px]"
+                className="site-card group grid items-center gap-6 p-6 transition-all hover:-translate-y-[1px] hover:border-[#1E3A8A]/30 hover:shadow-md sm:p-8 lg:grid-cols-[1fr_340px]"
             >
                 <div className="grid gap-3">
                     <p className="w-fit rounded-full bg-[#1E3A8A]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#1E3A8A]">
@@ -89,7 +85,7 @@ export default function WelcomePage() {
                     <h2 className="text-2xl font-semibold text-[#1E3A8A] sm:text-3xl">
                         {randomPromo?.title ?? "Promoção"}
                     </h2>
-                    <p className="max-w-2xl leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
+                    <p className="max-w-2xl leading-7 text-zinc-600/90 dark:text-slate-300">
                         Clique para ver todas as promoções ativas e aplicar o
                         seu código diretamente no checkout.
                     </p>
@@ -108,12 +104,12 @@ export default function WelcomePage() {
                     />
                 </div>
             </Link>
-            <div className="grid gap-8 rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm lg:grid-cols-3">
+            <div className="site-card grid gap-8 p-6 sm:p-8 lg:grid-cols-3">
                 <div className="lg:col-span-2">
                     <h2 className="text-2xl font-semibold text-[#1E3A8A]">
                         Horário & Localização
                     </h2>
-                    <p className="mt-3 max-w-2xl leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
+                    <p className="mt-3 max-w-2xl leading-7 text-zinc-600/90 dark:text-slate-300">
                         Terça a Domingo — 12:00–15:00 / 19:00–23:00. <br />
                         Reservas recomendadas ao jantar.
                     </p>

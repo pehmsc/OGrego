@@ -240,14 +240,14 @@ export default function MenuPage() {
     return (
         <section className="w-full space-y-8 py-6">
             {/* Toggle de idioma */}
-            <div className="flex items-center gap-3 justify-center sm:justify-start">
+            <div className="flex items-center justify-center gap-3 sm:justify-start">
                 <button
                     type="button"
                     onClick={() => setLang("pt")}
                     className={` cursor-pointer h-10 rounded-full px-4 text-sm font-semibold transition ${
                         lang === "pt"
                             ? "bg-[#1E3A8A] text-white"
-                            : "border border-[#1E3A8A]/20 bg-white/60 text-[#1E3A8A] hover:border-[#1E3A8A]/40"
+                            : "border border-[#1E3A8A]/20 bg-white/60 text-[#1E3A8A] hover:border-[#1E3A8A]/40 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100"
                     }`}
                 >
                     PT
@@ -258,7 +258,7 @@ export default function MenuPage() {
                     className={`cursor-pointer h-10 rounded-full px-4 text-sm font-semibold transition ${
                         lang === "en"
                             ? "bg-[#1E3A8A] text-white"
-                            : "border border-[#1E3A8A]/20 bg-white/60 text-[#1E3A8A] hover:border-[#1E3A8A]/40"
+                            : "border border-[#1E3A8A]/20 bg-white/60 text-[#1E3A8A] hover:border-[#1E3A8A]/40 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100"
                     }`}
                 >
                     EN
@@ -269,11 +269,11 @@ export default function MenuPage() {
                 <h1 className="text-3xl font-semibold text-[#1E3A8A]">
                     {tituloSite}
                 </h1>
-                <p className="text-gray-600">{subtitulo}</p>
+                <p className="text-gray-600 dark:text-slate-300">{subtitulo}</p>
             </header>
 
             {/* Tabs de categorias */}
-            <nav className="flex flex-wrap gap-3">
+            <nav className="flex gap-3 overflow-x-auto pb-2 sm:flex-wrap">
                 {categorias.map((cat) => (
                     <button
                         key={cat.id}
@@ -282,7 +282,7 @@ export default function MenuPage() {
                         className={`h-10 rounded-full px-4 text-sm font-semibold transition ${
                             categoriaAtiva === cat.id
                                 ? "bg-[#1E3A8A] text-white"
-                                : "border border-[#1E3A8A]/20 bg-white/60 text-[#1E3A8A] hover:border-[#1E3A8A]/40"
+                                : "border border-[#1E3A8A]/20 bg-white/60 text-[#1E3A8A] hover:border-[#1E3A8A]/40 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100"
                         }`}
                     >
                         {cat.titulo[lang]}
@@ -295,7 +295,7 @@ export default function MenuPage() {
                 {categoria.itens.map((item) => (
                     <article
                         key={item.id}
-                        className="flex flex-col border rounded-lg overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow"
+                        className="flex flex-col overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-slate-950/80"
                     >
                         {/* Imagem */}
                         <div className="relative h-65 w-full">
@@ -317,14 +317,14 @@ export default function MenuPage() {
                                     </h2>
                                     <span className="text-emerald-700 font-semibold whitespace-nowrap flex flex-col items-end">
                                         {item.preco}
-                                        <span className="text-xs text-gray-500 mt-1">
+                                        <span className="mt-1 text-xs text-gray-500 dark:text-slate-400">
                                             (IVA incl.)
                                         </span>
                                     </span>
                                 </div>
 
                                 {item.descricao && (
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-gray-600 dark:text-slate-300">
                                         {item.descricao[lang]}
                                     </p>
                                 )}

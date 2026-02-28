@@ -23,7 +23,7 @@ export default async function EncomendasPage() {
                 />
             }
         >
-            <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+            <div className="site-card p-6 sm:p-8">
                 <h2 className="mb-6 text-2xl font-semibold text-[#1E3A8A]">
                     Histórico de Encomendas
                 </h2>
@@ -31,7 +31,7 @@ export default async function EncomendasPage() {
                 {orders.length > 0 ? (
                     <>
                         {/* Tabela Desktop */}
-                        <div className="hidden md:block overflow-x-auto">
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-[#1E3A8A]/10">
@@ -62,7 +62,7 @@ export default async function EncomendasPage() {
                                     {orders.map((order) => (
                                         <tr
                                             key={order.id}
-                                            className="border-b border-[#1E3A8A]/5 transition-colors hover:bg-[#F4F7FB]"
+                                            className="border-b border-[#1E3A8A]/5 transition-colors hover:bg-[#F4F7FB] dark:hover:bg-slate-900/80"
                                         >
                                             <td className="py-4 text-sm font-medium text-[#1E3A8A]">
                                                 #{order.id}
@@ -126,7 +126,7 @@ export default async function EncomendasPage() {
                             {orders.map((order) => (
                                 <div
                                     key={order.id}
-                                    className="rounded-2xl border border-[#1E3A8A]/10 bg-white p-4"
+                                    className="rounded-2xl border border-[#1E3A8A]/10 bg-white p-4 dark:border-white/10 dark:bg-slate-950/80"
                                 >
                                     <div className="mb-3 flex items-center justify-between">
                                         <span className="text-sm font-medium text-[#1E3A8A]">
@@ -185,7 +185,7 @@ export default async function EncomendasPage() {
                     </>
                 ) : (
                     <div className="py-12 text-center">
-                        <p className="text-zinc-600/70">
+                        <p className="text-zinc-600/70 dark:text-slate-400">
                             Ainda não fez nenhuma encomenda
                         </p>
                     </div>

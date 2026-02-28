@@ -35,28 +35,31 @@ export default async function UserLayout({
             {/* Header fixo no topo (comum a todo o site) */}
             <Header />
 
-            <div id="user_navegacao" className="min-h-screen bg-[#F4F7FB]">
-                {/* Navegação secundária - mt-20 para ficar abaixo do header fixo */}
+            <div
+                id="user_navegacao"
+                className="site-shell min-h-screen bg-[var(--background)]"
+            >
+        {/* Navegação secundária - mt-20 para ficar abaixo do header fixo */}
 
-                {/* Conteúdo da página */}
-                <div
-                    id="user_header"
-                    className="mx-auto max-w-7xl flex-1 px-6 pt-28 pb-10"
-                >
-                    {/* Header interno com avatar e pontos (comum a todas as páginas user) */}
-                    <div className="mb-8">
-                        <UserHeader
-                            name={user.name}
-                            email={user.email}
-                            photo={user.photo}
-                            loyaltyPoints={user.loyalty_points}
-                        />
-                        <UserNav />
-                    </div>
+        {/* Conteúdo da página */}
+        <div
+          id="user_header"
+          className="mx-auto max-w-7xl flex-1 px-4 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10"
+        >
+          {/* Header interno com avatar e pontos (comum a todas as páginas user) */}
+          <div className="mb-8">
+            <UserHeader
+              name={user.name}
+              email={user.email}
+              photo={user.photo}
+              loyaltyPoints={user.loyalty_points}
+            />
+            <UserNav />
+          </div>
 
-                    {/* Conteúdo dinâmico de cada página */}
-                    {children}
-                </div>
+          {/* Conteúdo dinâmico de cada página */}
+          {children}
+        </div>
             </div>
         </>
     );

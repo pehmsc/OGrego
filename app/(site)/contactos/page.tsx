@@ -1,6 +1,5 @@
 import ReservationForm from "../../ui/components/ReservationForm";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function ContactosPage() {
     return (
@@ -16,7 +15,7 @@ export default function ContactosPage() {
             </header>
 
             <div className="grid gap-8 lg:grid-cols-2">
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/60 p-8 shadow-sm">
+                <div className="site-card p-6 sm:p-8">
                     <h2 className="text-2xl font-bold tracking-tight text-[#1E3A8A]">
                         Informações
                     </h2>
@@ -74,7 +73,7 @@ export default function ContactosPage() {
                     </div>
                 </div>
 
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/60 p-8 shadow-sm">
+                <div className="site-card p-6 sm:p-8">
                     <h2 className="text-2xl font-bold tracking-tight text-[#1E3A8A]">
                         Pedido de reserva
                     </h2>

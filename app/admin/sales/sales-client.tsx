@@ -95,8 +95,8 @@ export default function SalesClient({ vendas, stats }: Props) {
     };
 
     return (
-        <main className="p-6 space-y-6">
-            <header className="flex items-center gap-4">
+        <main className="admin-page">
+            <header className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow">
                     <CurrencyEuroIcon className="h-6 w-6 text-white" />
                 </div>
@@ -144,8 +144,8 @@ export default function SalesClient({ vendas, stats }: Props) {
                 </div>
             </section>
 
-            <section className="flex items-start gap-6">
-                <div className="relative">
+            <section className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                <div className="relative w-full sm:max-w-xs">
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
                         fill="none"
@@ -164,13 +164,13 @@ export default function SalesClient({ vendas, stats }: Props) {
                         placeholder="Pesquisar..."
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
-                        className="w-56 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-purple-400"
+                        className="admin-input pl-10"
                     />
                 </div>
             </section>
 
-            <section className="bg-white rounded-2xl shadow border overflow-x-auto">
-                <table className="w-full text-sm">
+            <section className="admin-table-scroll">
+                <table className="min-w-[760px] w-full text-sm">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-4 py-3 text-left">Número</th>
@@ -261,11 +261,11 @@ export default function SalesClient({ vendas, stats }: Props) {
             {/* Modal: Ver detalhes */}
             {selected && !editing && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
                     onClick={() => setSelected(null)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6 overflow-y-auto max-h-[90vh]"
+                        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-between items-start">
@@ -279,7 +279,7 @@ export default function SalesClient({ vendas, stats }: Props) {
                                 Fechar
                             </button>
                         </div>
-                        <div className="mt-4 grid grid-cols-2 gap-3">
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
                                 <p className="text-xs text-gray-500">Cliente</p>
                                 <p className="font-medium">
@@ -301,7 +301,7 @@ export default function SalesClient({ vendas, stats }: Props) {
                                 <p className="font-medium">{selected.metodo}</p>
                             </div>
                         </div>
-                        <div className="mt-6 flex gap-3">
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
                             <button
                                 onClick={() => setSelected(null)}
                                 className="flex-1 py-2 rounded-lg border"
@@ -322,14 +322,14 @@ export default function SalesClient({ vendas, stats }: Props) {
             {/* Modal: Editar */}
             {editing && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
                     onClick={() => {
                         setEditing(null);
                         setSelected(null);
                     }}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6 overflow-y-auto max-h-[90vh]"
+                        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-xl font-bold mb-4">Editar Venda</h2>
@@ -402,7 +402,7 @@ export default function SalesClient({ vendas, stats }: Props) {
                                     className="w-full border rounded-lg px-3 py-2 resize-none"
                                 />
                             </div>
-                            <div className="flex gap-3 mt-6">
+                            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
                                 <button
                                     type="button"
                                     className="flex-1 py-2 rounded-lg border"

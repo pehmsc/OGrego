@@ -31,7 +31,6 @@ export default function CartPage() {
         items,
         removeItem,
         updateQuantity,
-        clearCart,
         totalItems,
         subtotal,
     } = useCart();
@@ -72,7 +71,7 @@ export default function CartPage() {
                     setDescontoAplicado(0);
                     setMensagemCodigo(result.message);
                 }
-            } catch (error) {
+            } catch {
                 setDescontoAplicado(0);
                 setMensagemCodigo("Erro ao validar código");
             } finally {
@@ -107,7 +106,7 @@ export default function CartPage() {
                 setDescontoAplicado(0);
                 setMensagemCodigo(result.message);
             }
-        } catch (error) {
+        } catch {
             setDescontoAplicado(0);
             setMensagemCodigo("Erro ao validar código");
         } finally {
@@ -154,14 +153,14 @@ export default function CartPage() {
     if (items.length === 0) {
         return (
             <main className="mx-auto max-w-4xl px-4 py-12">
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-12 text-center shadow-sm">
+                <div className="site-card p-8 text-center sm:p-12">
                     <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#1E3A8A]/10">
                         <ShoppingCartIcon className="h-10 w-10 text-[#1E3A8A]" />
                     </div>
                     <h2 className="mb-2 text-2xl font-semibold text-[#1E3A8A]">
                         O seu carrinho está vazio
                     </h2>
-                    <p className="mb-6 text-zinc-600">
+                    <p className="mb-6 text-zinc-600 dark:text-slate-300">
                         Adicione pratos deliciosos ao seu carrinho!
                     </p>
                     <Link
@@ -185,7 +184,7 @@ export default function CartPage() {
                 <h1 className="text-3xl font-semibold text-[#1E3A8A]">
                     Carrinho de Compras
                 </h1>
-                <p className="text-zinc-600">
+                <p className="text-zinc-600 dark:text-slate-300">
                     {totalItems} {totalItems === 1 ? "item" : "itens"} no
                     carrinho
                 </p>
@@ -196,7 +195,7 @@ export default function CartPage() {
                 {items.map((item) => (
                     <article
                         key={item.id}
-                        className="flex gap-4 rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-4 shadow-sm transition-shadow hover:shadow-md"
+                        className="site-card flex flex-col gap-4 p-4 transition-shadow hover:shadow-md sm:flex-row"
                     >
                         {/* Imagem */}
                         <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl">
@@ -214,7 +213,7 @@ export default function CartPage() {
                                 <h2 className="text-lg font-semibold text-[#1E3A8A]">
                                     {item.nome}
                                 </h2>
-                                <p className="text-sm text-zinc-600">
+                                <p className="text-sm text-zinc-600 dark:text-slate-300">
                                     {item.descricao}
                                 </p>
                             </div>
@@ -233,7 +232,7 @@ export default function CartPage() {
                                 </div>
 
                                 {/* Quantidade */}
-                                <div className="flex items-center gap-2 rounded-full border border-[#1E3A8A]/20 bg-white px-3 py-1">
+                                <div className="flex items-center gap-2 rounded-full border border-[#1E3A8A]/20 bg-white px-3 py-1 dark:border-white/10 dark:bg-slate-900">
                                     <button
                                         onClick={() =>
                                             diminuirQuantidade(item.id)
@@ -269,7 +268,7 @@ export default function CartPage() {
                         {/* Preço e Controles - Desktop */}
                         <div className="hidden flex-col items-end justify-between md:flex">
                             <div className="text-right">
-                                <div className="text-sm text-zinc-600">
+                                <div className="text-sm text-zinc-600 dark:text-slate-300">
                                     €{item.preco.toFixed(2)} × {item.quantidade}
                                 </div>
                                 <div className="text-xl font-semibold text-[#1E3A8A]">
@@ -279,7 +278,7 @@ export default function CartPage() {
 
                             <div className="flex items-center gap-3">
                                 {/* Quantidade */}
-                                <div className="flex items-center gap-2 rounded-full border border-[#1E3A8A]/20 bg-white px-3 py-1">
+                                <div className="flex items-center gap-2 rounded-full border border-[#1E3A8A]/20 bg-white px-3 py-1 dark:border-white/10 dark:bg-slate-900">
                                     <button
                                         onClick={() =>
                                             diminuirQuantidade(item.id)
@@ -315,7 +314,7 @@ export default function CartPage() {
                 ))}
 
                 {/* Código Promocional */}
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6 shadow-sm">
+                <div className="site-card p-6">
                     <div className="mb-3 flex items-center gap-2">
                         <TicketIcon className="h-5 w-5 text-[#1E3A8A]" />
                         <h3 className="font-semibold text-[#1E3A8A]">
@@ -325,7 +324,7 @@ export default function CartPage() {
 
                     {descontoAplicado > 0 ? (
                         // Código aplicado
-                        <div className="flex items-center justify-between rounded-lg bg-emerald-50 p-3">
+                        <div className="flex flex-col gap-3 rounded-lg bg-emerald-50 p-3 sm:flex-row sm:items-center sm:justify-between dark:bg-emerald-500/10">
                             <div>
                                 <p className="text-sm font-medium text-emerald-800">
                                     {mensagemCodigo}
@@ -343,7 +342,7 @@ export default function CartPage() {
                         </div>
                     ) : (
                         // Campo para inserir código
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row">
                             <input
                                 type="text"
                                 value={codigoPromocional}
@@ -353,7 +352,7 @@ export default function CartPage() {
                                     )
                                 }
                                 placeholder="Insira o código"
-                                className="flex-1 rounded-full border border-[#1E3A8A]/20 bg-white px-4 py-2 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                                className="site-input-pill flex-1 py-2"
                             />
                             <button
                                 onClick={aplicarCodigo}
@@ -375,7 +374,7 @@ export default function CartPage() {
                 </div>
 
                 {/* Resumo da Encomenda */}
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6 shadow-sm">
+                <div className="site-card p-6">
                     <div className="mb-4 flex items-center gap-2">
                         <TruckIcon className="h-6 w-6 text-[#1E3A8A]" />
                         <h3 className="text-xl font-semibold text-[#1E3A8A]">
@@ -385,7 +384,7 @@ export default function CartPage() {
 
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-zinc-600">
+                            <span className="text-zinc-600 dark:text-slate-300">
                                 Subtotal ({totalItems}{" "}
                                 {totalItems === 1 ? "item" : "itens"})
                             </span>
@@ -404,7 +403,7 @@ export default function CartPage() {
                         )}
 
                         <div className="flex justify-between">
-                            <span className="text-zinc-600">
+                            <span className="text-zinc-600 dark:text-slate-300">
                                 Portes e taxas
                             </span>
                             <span className="font-medium">
@@ -419,7 +418,7 @@ export default function CartPage() {
                         </div>
 
                         {subtotalComDesconto < 30 && (
-                            <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+                            <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-500/10">
                                 <TruckIcon className="mt-0.5 h-4 w-4 flex-shrink-0" />
                                 <p>
                                     Adicione €
@@ -441,8 +440,8 @@ export default function CartPage() {
                         </div>
 
                         {/* Pontos a ganhar */}
-                        <div className="rounded-lg bg-[#1E3A8A]/5 p-3">
-                            <p className="text-xs text-[#1E3A8A]">
+                        <div className="rounded-lg bg-[#1E3A8A]/5 p-3 dark:bg-slate-900/80">
+                            <p className="text-xs text-[#1E3A8A] dark:text-slate-200">
                                 Vai ganhar{" "}
                                 <strong>{pontosAGanhar} pontos</strong> com esta
                                 compra!
@@ -467,7 +466,7 @@ export default function CartPage() {
                         ) : (
                             // User NÃO autenticado - precisa login
                             <div className="space-y-2">
-                                <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-center">
+                                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center dark:border-amber-900/60 dark:bg-amber-500/10">
                                     <p className="text-xs text-amber-800">
                                         🔒 Necessário iniciar sessão para
                                         finalizar compra
@@ -489,7 +488,7 @@ export default function CartPage() {
                                             ? `/sign-up?redirect_url=${encodeURIComponent(`/checkout?promo=${codigoPromocional}`)}`
                                             : "/sign-up?redirect_url=/checkout"
                                     }
-                                    className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
+                                    className="site-button-secondary flex h-12 w-full"
                                 >
                                     Criar Conta
                                 </Link>
@@ -498,7 +497,7 @@ export default function CartPage() {
 
                         <Link
                             href="/menu"
-                            className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
+                            className="site-button-secondary flex h-12 w-full"
                         >
                             Continuar a Comprar
                         </Link>
