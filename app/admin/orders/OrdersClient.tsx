@@ -120,8 +120,6 @@ export default function OrdersClient({
     >("");
     const [selectedPedido, setSelectedPedido] = useState<Order | null>(null);
 
-    const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
-
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editForm, setEditForm] = useState<Partial<Order>>({});
 
@@ -282,12 +280,6 @@ export default function OrdersClient({
                         className="w-56 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-orange-400"
                     />
                 </div>
-                <button
-                    onClick={() => setIsCreateOrderOpen(true)}
-                    className="ml-2 inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-colors"
-                >
-                    Criar Pedido
-                </button>
             </section>
 
             <section className="flex gap-2 flex-wrap mt-2">
@@ -489,38 +481,6 @@ export default function OrdersClient({
                                 Editar
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL CRIAR PEDIDO */}
-            {isCreateOrderOpen && (
-                <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
-                    onClick={() => setIsCreateOrderOpen(false)}
-                >
-                    <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold">Criar Pedido</h2>
-                            <button
-                                onClick={() => setIsCreateOrderOpen(false)}
-                                className="text-gray-500"
-                            >
-                                Fechar
-                            </button>
-                        </div>
-                        <p className="text-sm text-gray-500 py-6 text-center">
-                            Funcionalidade em desenvolvimento.
-                        </p>
-                        <button
-                            onClick={() => setIsCreateOrderOpen(false)}
-                            className="w-full py-2 border rounded-lg text-sm"
-                        >
-                            Cancelar
-                        </button>
                     </div>
                 </div>
             )}
