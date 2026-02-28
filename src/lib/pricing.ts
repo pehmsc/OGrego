@@ -1,4 +1,8 @@
 import "server-only";
+import {
+    getLoyaltyDiscountPercent,
+    hasLoyaltyFreeDelivery,
+} from "@/app/lib/loyalty";
 
 import type { UserRole } from "@/src/lib/roles";
 
@@ -40,7 +44,7 @@ export type CheckoutPricingBreakdown = {
     items: ValidatedCheckoutItem[];
     productSubtotalCents: number;
     discountCents: number;
-    discountKind: "none" | "promo" | "admin";
+    discountKind: "none" | "promo" | "admin" | "loyalty";
     deliveryFeeCents: number;
     totalCents: number;
     appliedPromoCode: string | null;
@@ -52,11 +56,14 @@ type PricingInput = {
     orderType: CheckoutOrderType;
     role: UserRole;
     promoCode?: string;
+    loyaltyPoints?: number;
 };
 
 type PricingDeps = {
     fetchPricedItems: (ids: string[]) => Promise<PricedCatalogItem[]>;
-    fetchPromoByCode?: (normalizedCode: string) => Promise<PricingPromoCandidate | null>;
+    fetchPromoByCode?: (
+        normalizedCode: string,
+    ) => Promise<PricingPromoCandidate | null>;
 };
 
 function normalizeAndAggregateItems(items: CheckoutPricingItemInput[]) {
@@ -130,7 +137,8 @@ function applyPromoDiscount(
 
     return {
         discountCents,
-        appliedPromoCode: discountCents > 0 ? String(promo.code).trim().toUpperCase() : null,
+        appliedPromoCode:
+            discountCents > 0 ? String(promo.code).trim().toUpperCase() : null,
         shouldIncrementPromoUsage: discountCents > 0,
     };
 }
@@ -166,21 +174,23 @@ export async function calculateCheckoutPricing(
         });
     }
 
-    const validatedItems: ValidatedCheckoutItem[] = normalizedItems.map((item) => {
-        const priced = pricedById.get(item.id);
-        if (!priced) {
-            throw new Error(`Item não encontrado: ${item.id}`);
-        }
+    const validatedItems: ValidatedCheckoutItem[] = normalizedItems.map(
+        (item) => {
+            const priced = pricedById.get(item.id);
+            if (!priced) {
+                throw new Error(`Item não encontrado: ${item.id}`);
+            }
 
-        const subtotalCents = priced.unit_price_cents * item.quantity;
-        return {
-            menuItemId: item.id,
-            name: priced.name,
-            quantity: item.quantity,
-            unitPriceCents: priced.unit_price_cents,
-            subtotalCents,
-        };
-    });
+            const subtotalCents = priced.unit_price_cents * item.quantity;
+            return {
+                menuItemId: item.id,
+                name: priced.name,
+                quantity: item.quantity,
+                unitPriceCents: priced.unit_price_cents,
+                subtotalCents,
+            };
+        },
+    );
 
     const productSubtotalCents = validatedItems.reduce(
         (acc, item) => acc + item.subtotalCents,
@@ -198,15 +208,40 @@ export async function calculateCheckoutPricing(
             (productSubtotalCents * ADMIN_DISCOUNT_PERCENT) / 100,
         );
         discountKind = discountCents > 0 ? "admin" : "none";
-    } else if (deps.fetchPromoByCode) {
-        const normalizedCode = input.promoCode?.trim().toUpperCase();
-        if (normalizedCode) {
-            const promo = await deps.fetchPromoByCode(normalizedCode);
-            const promoResult = applyPromoDiscount(promo, productSubtotalCents);
-            discountCents = promoResult.discountCents;
-            appliedPromoCode = promoResult.appliedPromoCode;
-            shouldIncrementPromoUsage = promoResult.shouldIncrementPromoUsage;
-            discountKind = discountCents > 0 ? "promo" : "none";
+    } else {
+        // Desconto de promo code
+        let promoDiscountCents = 0;
+        if (deps.fetchPromoByCode) {
+            const normalizedCode = input.promoCode?.trim().toUpperCase();
+            if (normalizedCode) {
+                const promo = await deps.fetchPromoByCode(normalizedCode);
+                const promoResult = applyPromoDiscount(
+                    promo,
+                    productSubtotalCents,
+                );
+                promoDiscountCents = promoResult.discountCents;
+                appliedPromoCode = promoResult.appliedPromoCode;
+                shouldIncrementPromoUsage =
+                    promoResult.shouldIncrementPromoUsage;
+            }
+        }
+
+        // Desconto de fidelização
+        const points = input.loyaltyPoints ?? 0;
+        const loyaltyPercent = getLoyaltyDiscountPercent(points);
+        const loyaltyDiscountCents = Math.round(
+            (productSubtotalCents * loyaltyPercent) / 100,
+        );
+
+        // Aplica o maior desconto
+        if (loyaltyDiscountCents > promoDiscountCents) {
+            discountCents = loyaltyDiscountCents;
+            discountKind = "loyalty";
+            appliedPromoCode = null;
+            shouldIncrementPromoUsage = false;
+        } else {
+            discountCents = promoDiscountCents;
+            discountKind = promoDiscountCents > 0 ? "promo" : "none";
         }
     }
 
@@ -214,8 +249,12 @@ export async function calculateCheckoutPricing(
         0,
         productSubtotalCents - discountCents,
     );
+    const loyaltyFreeDelivery = hasLoyaltyFreeDelivery(
+        input.loyaltyPoints ?? 0,
+    );
     const deliveryFeeCents =
         input.orderType === "delivery" &&
+        !loyaltyFreeDelivery &&
         subtotalAfterDiscountCents < DELIVERY_FREE_THRESHOLD_CENTS
             ? DELIVERY_FEE_CENTS
             : 0;
