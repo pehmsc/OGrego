@@ -204,7 +204,9 @@ export default function SalesClient({ vendas, stats }: Props) {
                                         €{v.total.toFixed(2)}
                                     </td>
                                     <td className="px-4 py-3">{v.itens}</td>
-                                    <td className="px-4 py-3">{v.data}</td>
+                                    <td className="px-4 py-3">
+                                        {v.data.split("-").reverse().join("-")}
+                                    </td>
                                     <td className="px-4 py-3">
                                         <select
                                             value={v.metodo}
