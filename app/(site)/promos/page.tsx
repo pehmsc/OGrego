@@ -1,74 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
+import PromoLink from "./PromoLink";
+import { getPromos } from "@/app/lib/promo-actions";
 
-type Promo = {
-    code: string;
-    discount: string;
-    minOrder: string;
-    usageLimit: string;
-    validFrom: string;
-    validUntil: string;
-    image?: string;
-};
+export default async function PromosPage() {
+    const promos = await getPromos();
 
-const promos: Promo[] = [
-    {
-        code: "GREGO10",
-        discount: "10% de desconto",
-        minOrder: "Sem mínimo de encomenda",
-        usageLimit: "Utilizações ilimitadas",
-        validFrom: "09/02/2026",
-        validUntil: "31/12/2026",
-        image: "/grego10.png",
-    },
-    {
-        code: "BEMVINDO",
-        discount: "15% de desconto",
-        minOrder: "Sem mínimo de encomenda",
-        usageLimit: "1 utilização por conta (até 100 utilizações)",
-        validFrom: "09/02/2026",
-        validUntil: "30/06/2026",
-        image: "/bemvindo.png",
-    },
-    {
-        code: "PROMO20",
-        discount: "20% de desconto",
-        minOrder: "Mínimo de 30,00 €",
-        usageLimit: "Até 50 utilizações",
-        validFrom: "09/02/2026",
-        validUntil: "31/03/2026",
-        image: "/promo20.png",
-    },
-    {
-        code: "FIXO5",
-        discount: "5,00 € de desconto fixo",
-        minOrder: "Sem mínimo de encomenda",
-        usageLimit: "Utilizações ilimitadas",
-        validFrom: "09/02/2026",
-        validUntil: "31/12/2026",
-        image: "/fixo5.png",
-    },
-    {
-        code: "ENTREGA0",
-        discount: "2,50 € de desconto fixo",
-        minOrder: "Mínimo de 20,00 €",
-        usageLimit: "Utilizações ilimitadas",
-        validFrom: "09/02/2026",
-        validUntil: "31/12/2026",
-        image: "/entregao.png",
-    },
-    {
-        code: "VIP25",
-        discount: "25% de desconto",
-        minOrder: "Mínimo de 50,00 €",
-        usageLimit: "Até 20 utilizações",
-        validFrom: "09/02/2026",
-        validUntil: "31/12/2026",
-        image: "/vip025.png",
-    },
-];
-
-export default function PromosPage() {
     return (
         <section className="grid gap-10 py-6">
             <div className="grid gap-4">
@@ -84,8 +20,9 @@ export default function PromosPage() {
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {promos.map((promo) => (
-                    <Link
+                    <PromoLink
                         key={promo.code}
+                        code={promo.code}
                         href={`/cart?promo=${promo.code}`}
                         className="block rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-6 shadow-sm transition-all hover:-translate-y-[1px] hover:border-[#1E3A8A]/30 hover:shadow-md"
                     >
@@ -140,7 +77,7 @@ export default function PromosPage() {
                                 <dd>{promo.validUntil}</dd>
                             </div>
                         </dl>
-                    </Link>
+                    </PromoLink>
                 ))}
             </div>
         </section>

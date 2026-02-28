@@ -1,34 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const promoHighlights = [
-    {
-        src: "/grego10.png",
-        alt: "Promoção GREGO10",
-        title: "Descubra os códigos em destaque",
-    },
-    {
-        src: "/bemvindo.png",
-        alt: "Promoção BEMVINDO",
-        title: "Ofertas especiais à sua espera",
-    },
-    {
-        src: "/promo20.png",
-        alt: "Promoção PROMO20",
-        title: "Poupe na próxima encomenda",
-    },
-];
+// O array é preenchido dinamicamente
 
 export default function WelcomePage() {
-    const [randomPromo] = useState(
-        () =>
-            promoHighlights[
-                Math.floor(Math.random() * promoHighlights.length)
-            ] ?? promoHighlights[0],
-    );
+    const [promoHighlights, setPromoHighlights] = useState<
+        { src: string; alt: string; title: string }[]
+    >([]);
+    const [randomPromo, setRandomPromo] = useState<{
+        src: string;
+        alt: string;
+        title: string;
+    } | null>(null);
+
+    useEffect(() => {
+        fetch("/api/promo-images")
+            .then((res) => res.json())
+            .then((images) => {
+                if (!images || images.length === 0) return;
+                const highlights = images.map((src: string, i: number) => ({
+                    src,
+                    alt: `Promoção ${i + 1}`,
+                    title: "Ofertas especiais à sua espera",
+                }));
+                setPromoHighlights(highlights);
+                setRandomPromo(
+                    highlights[Math.floor(Math.random() * highlights.length)],
+                );
+            });
+    }, []);
 
     return (
         <section className="grid gap-16">
@@ -84,7 +87,7 @@ export default function WelcomePage() {
                         Promoções O Grego
                     </p>
                     <h2 className="text-2xl font-semibold text-[#1E3A8A] sm:text-3xl">
-                        {randomPromo.title}
+                        {randomPromo?.title ?? "Promoção"}
                     </h2>
                     <p className="max-w-2xl leading-7 text-zinc-600/90 dark:text-[#1e3a8a]/90">
                         Clique para ver todas as promoções ativas e aplicar o
@@ -97,8 +100,8 @@ export default function WelcomePage() {
 
                 <div className="overflow-hidden rounded-2xl border border-[#1E3A8A]/10">
                     <Image
-                        src={randomPromo.src}
-                        alt={randomPromo.alt}
+                        src={randomPromo?.src || "/placeholder.png"}
+                        alt={randomPromo?.alt ?? "Promoção"}
                         width={720}
                         height={500}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
