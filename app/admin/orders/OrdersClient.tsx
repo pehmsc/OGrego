@@ -210,8 +210,8 @@ export default function OrdersClient({
     };
 
     return (
-        <main className="p-6 space-y-6">
-            <header className="flex items-center gap-4">
+        <main className="admin-page">
+            <header className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <div className="p-3 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow">
                     <ShoppingBagIcon className="h-6 w-6 text-white" />
                 </div>
@@ -259,8 +259,8 @@ export default function OrdersClient({
                 </div>
             </section>
 
-            <section className="flex items-center gap-6">
-                <div className="relative">
+            <section className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative w-full sm:max-w-xs">
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
                         fill="none"
@@ -279,18 +279,18 @@ export default function OrdersClient({
                         placeholder="Pesquisar..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-56 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-orange-400"
+                        className="admin-input pl-10"
                     />
                 </div>
                 <button
                     onClick={() => setIsCreateOrderOpen(true)}
-                    className="ml-2 inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-colors"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm text-white transition-colors hover:bg-orange-700 sm:w-auto"
                 >
                     Criar Pedido
                 </button>
             </section>
 
-            <section className="flex gap-2 flex-wrap mt-2">
+            <section className="mt-2 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
                 {(
                     [
                         "",
@@ -316,8 +316,8 @@ export default function OrdersClient({
                 ))}
             </section>
 
-            <section className="bg-white rounded-2xl shadow border overflow-x-auto">
-                <table className="w-full text-sm">
+            <section className="admin-table-scroll">
+                <table className="min-w-[760px] w-full text-sm">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-4 py-3 text-left">Número</th>
@@ -404,11 +404,11 @@ export default function OrdersClient({
             {/* MODAL VER PEDIDO */}
             {selectedPedido && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
                     onClick={() => setSelectedPedido(null)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
+                        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-between items-start">
@@ -422,7 +422,7 @@ export default function OrdersClient({
                                 Fechar
                             </button>
                         </div>
-                        <div className="mt-4 grid grid-cols-2 gap-3">
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
                                 <p className="text-xs text-gray-500">Cliente</p>
                                 <p className="font-medium">
@@ -475,7 +475,7 @@ export default function OrdersClient({
                                 </p>
                             </div>
                         )}
-                        <div className="mt-6 flex gap-3">
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
                             <button
                                 onClick={() => setSelectedPedido(null)}
                                 className="flex-1 py-2 rounded-lg border"
@@ -496,11 +496,11 @@ export default function OrdersClient({
             {/* MODAL CRIAR PEDIDO */}
             {isCreateOrderOpen && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
                     onClick={() => setIsCreateOrderOpen(false)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
+                        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-4">
@@ -528,11 +528,11 @@ export default function OrdersClient({
             {/* MODAL EDITAR PEDIDO */}
             {isEditOpen && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
                     onClick={closeEditModal}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6"
+                        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-4">
@@ -546,7 +546,7 @@ export default function OrdersClient({
                         </div>
 
                         <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div>
                                     <label className="text-xs text-gray-600 block mb-1">
                                         Número
@@ -580,7 +580,7 @@ export default function OrdersClient({
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div>
                                     <label className="text-xs text-gray-600 block mb-1">
                                         Data
@@ -636,7 +636,7 @@ export default function OrdersClient({
                                 />
                             </div>
 
-                            <div className="flex gap-3 pt-2">
+                            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
                                 <button
                                     onClick={handleEditSave}
                                     disabled={isPending}

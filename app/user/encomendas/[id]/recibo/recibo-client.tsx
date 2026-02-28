@@ -3,19 +3,44 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+type ReceiptOrder = {
+    id: number;
+    created_at: string;
+    order_type: string;
+    customer_name: string;
+    customer_email: string;
+    total_cents: number;
+    subtotal_cents: number;
+    delivery_fee_cents: number;
+};
+
+type ReceiptItem = {
+    id: number;
+    item_name: string;
+    quantity: number;
+    item_price_cents: number;
+    subtotal_cents: number;
+};
+
+type JsPdfWithAutoTable = jsPDF & {
+    lastAutoTable: {
+        finalY: number;
+    };
+};
+
 export default function ReciboClient({
     orderData,
     items,
 }: {
-    orderData: any;
-    items: any[];
+    orderData: ReceiptOrder;
+    items: ReceiptItem[];
 }) {
     const handlePDF = () => {
         const doc = new jsPDF({
             orientation: "portrait",
             unit: "pt",
             format: "a4",
-        });
+        }) as JsPdfWithAutoTable;
 
         // Margens e layout
         const marginLeft = 50;
@@ -69,7 +94,7 @@ export default function ReciboClient({
         autoTable(doc, {
             startY: y + 60,
             head: [["Item", "Qtd", "Preço", "Total"]],
-            body: items.map((item: any) => [
+            body: items.map((item) => [
                 item.item_name,
                 item.quantity,
                 `€${(item.item_price_cents / 100).toFixed(2)}`,
@@ -100,7 +125,7 @@ export default function ReciboClient({
         const valorIVA = total - semIVA;
 
         // Totais
-        let finalY = (doc as any).lastAutoTable.finalY + 20;
+        let finalY = doc.lastAutoTable.finalY + 20;
         doc.setFontSize(12);
         doc.setTextColor("#000");
         doc.text(
@@ -155,14 +180,14 @@ export default function ReciboClient({
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="mx-auto max-w-3xl bg-white p-12 shadow-lg">
+        <div className="site-shell min-h-screen bg-gray-50 p-4 sm:p-8">
+            <div className="mx-auto max-w-3xl bg-white p-6 shadow-lg dark:bg-slate-950 sm:p-12">
                 {/* Header */}
                 <div className="mb-8 border-b pb-6">
                     <h1 className="text-3xl font-bold text-[#1E3A8A]">
                         O Grego
                     </h1>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-slate-300">
                         Sabores Autênticos da Grécia
                     </p>
                 </div>
@@ -182,7 +207,7 @@ export default function ReciboClient({
                         Recibo de Encomenda #{orderData.id}
                     </h2>
 
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                         <div>
                             <p className="text-gray-600">Data:</p>
                             <p className="font-medium">
@@ -215,42 +240,50 @@ export default function ReciboClient({
                 </div>
 
                 {/* Items */}
-                <table className="mb-8 w-full">
-                    <thead>
-                        <tr className="border-b">
-                            <th className="pb-2 text-left text-sm font-semibold">
-                                Item
-                            </th>
-                            <th className="pb-2 text-center text-sm font-semibold">
-                                Qtd
-                            </th>
-                            <th className="pb-2 text-right text-sm font-semibold">
-                                Preço
-                            </th>
-                            <th className="pb-2 text-right text-sm font-semibold">
-                                Total
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item) => (
-                            <tr key={item.id} className="border-b">
-                                <td className="py-3 text-sm">
-                                    {item.item_name}
-                                </td>
-                                <td className="py-3 text-center text-sm">
-                                    {item.quantity}
-                                </td>
-                                <td className="py-3 text-right text-sm">
-                                    €{(item.item_price_cents / 100).toFixed(2)}
-                                </td>
-                                <td className="py-3 text-right text-sm">
-                                    €{(item.subtotal_cents / 100).toFixed(2)}
-                                </td>
+                <div className="mb-8 overflow-x-auto">
+                    <table className="w-full min-w-[560px]">
+                        <thead>
+                            <tr className="border-b">
+                                <th className="pb-2 text-left text-sm font-semibold">
+                                    Item
+                                </th>
+                                <th className="pb-2 text-center text-sm font-semibold">
+                                    Qtd
+                                </th>
+                                <th className="pb-2 text-right text-sm font-semibold">
+                                    Preço
+                                </th>
+                                <th className="pb-2 text-right text-sm font-semibold">
+                                    Total
+                                </th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {items.map((item) => (
+                                <tr key={item.id} className="border-b">
+                                    <td className="py-3 text-sm">
+                                        {item.item_name}
+                                    </td>
+                                    <td className="py-3 text-center text-sm">
+                                        {item.quantity}
+                                    </td>
+                                    <td className="py-3 text-right text-sm">
+                                        €
+                                        {(
+                                            item.item_price_cents / 100
+                                        ).toFixed(2)}
+                                    </td>
+                                    <td className="py-3 text-right text-sm">
+                                        €
+                                        {(
+                                            item.subtotal_cents / 100
+                                        ).toFixed(2)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Totais */}
                 <div className="ml-auto max-w-xs space-y-2">
@@ -297,7 +330,7 @@ export default function ReciboClient({
                 </div>
 
                 {/* Footer */}
-                <div className="mt-12 border-t pt-6 text-center text-xs text-gray-500">
+                <div className="mt-12 border-t pt-6 text-center text-xs text-gray-500 dark:text-slate-400">
                     <p>Este documento não é válido como fatura.</p>
                     <p className="mt-2">
                         Para solicitar fatura, contacte-nos:
@@ -306,7 +339,7 @@ export default function ReciboClient({
                 </div>
 
                 {/* Botões */}
-                <div className="mt-8 flex gap-4 print:hidden">
+                <div className="mt-8 flex flex-col gap-4 print:hidden sm:flex-row">
                     <button
                         onClick={handlePDF}
                         className="flex-1 rounded-full bg-[#1E3A8A] px-6 py-3 text-white hover:bg-[#162F73] transition-all"
@@ -315,7 +348,7 @@ export default function ReciboClient({
                     </button>
                     <button
                         onClick={() => window.history.back()}
-                        className="flex-1 rounded-full border border-gray-300 px-6 py-3 hover:bg-gray-50 transition-all"
+                        className="flex-1 rounded-full border border-gray-300 px-6 py-3 transition-all hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-900"
                     >
                         ← Voltar
                     </button>

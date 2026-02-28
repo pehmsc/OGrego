@@ -10,7 +10,7 @@ export default function FeedbackStatsCard({
     lastFeedback,
 }: FeedbackStatsCardProps) {
     return (
-        <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+        <div className="site-card p-6 sm:p-8">
             <h3 className="mb-6 text-2xl font-semibold text-[#1E3A8A]">
                 As Suas Avaliações
             </h3>
@@ -63,7 +63,7 @@ export default function FeedbackStatsCard({
                 )}
 
                 {/* Info */}
-                <div className="rounded-2xl bg-blue-50 p-4">
+                <div className="rounded-2xl bg-blue-50 p-4 dark:bg-blue-500/10">
                     <p className="text-sm text-[#1E3A8A]">
                         O seu feedback ajuda-nos a melhorar! Obrigado pela sua
                         opinião.

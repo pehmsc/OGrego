@@ -9,10 +9,10 @@ export default function SiteLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--background)]">
+    <div className="site-shell flex min-h-screen flex-col bg-[var(--background)]">
       <Header />
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-28 pb-10">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10">
         {children}
       </main>
 

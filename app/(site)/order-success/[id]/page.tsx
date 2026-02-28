@@ -20,23 +20,6 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-function getStatusLabel(status: string): string {
-  switch (status) {
-    case "awaiting_payment":
-      return "Aguarda Pagamento";
-    case "pending":
-      return "Pendente";
-    case "ready":
-      return "Pronta";
-    case "delivered":
-      return "Entregue";
-    case "cancelled":
-      return "Cancelada";
-    default:
-      return status;
-  }
-}
-
 export default async function OrderSuccessPage({ params }: Props) {
   const { id } = await params;
   const orderId = parseInt(id);
@@ -78,7 +61,7 @@ export default async function OrderSuccessPage({ params }: Props) {
   return (
     <main className="mx-auto max-w-2xl px-4 py-12">
       <ClearCart />
-      <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-12 text-center shadow-sm">
+      <div className="site-card p-8 text-center sm:p-12">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
           <CheckCircleIcon className="h-12 w-12 text-green-600" />
         </div>
@@ -87,21 +70,21 @@ export default async function OrderSuccessPage({ params }: Props) {
           Encomenda Confirmada!
         </h1>
 
-        <p className="mb-8 text-gray-600">
+        <p className="mb-8 text-gray-600 dark:text-slate-300">
           Obrigado pela sua encomenda, {order.customer_name}!
         </p>
 
-        <div className="mb-8 rounded-2xl bg-[#1E3A8A]/5 p-6">
-          <p className="mb-2 text-sm text-gray-600">Número da encomenda</p>
+        <div className="mb-8 rounded-2xl bg-[#1E3A8A]/5 p-6 dark:bg-slate-900/80">
+          <p className="mb-2 text-sm text-gray-600 dark:text-slate-300">Número da encomenda</p>
           <p className="text-3xl font-bold text-[#1E3A8A]">#{orderId}</p>
         </div>
 
         <div className="space-y-4 text-left">
-          <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+          <div className="site-card-soft flex items-center gap-3 rounded-lg p-4">
             <TruckIcon className="h-6 w-6 text-[#1E3A8A]" />
             <div>
               <p className="text-sm font-medium">Tipo de encomenda</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-slate-300">
                 {order.order_type === "delivery"
                   ? "Entrega ao domicílio"
                   : "Levantar no restaurante"}
@@ -109,15 +92,15 @@ export default async function OrderSuccessPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+          <div className="site-card-soft flex items-center gap-3 rounded-lg p-4">
             <ClockIcon className="h-6 w-6 text-[#1E3A8A]" />
             <div>
               <p className="text-sm font-medium">Tempo estimado</p>
-              <p className="text-sm text-gray-600">30-45 minutos</p>
+              <p className="text-sm text-gray-600 dark:text-slate-300">30-45 minutos</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+          <div className="site-card-soft flex items-center gap-3 rounded-lg p-4">
             <CheckCircleIcon className="h-6 w-6 text-[#1E3A8A]" />
             <div>
               <p className="text-sm font-medium">Total pago</p>
@@ -128,15 +111,15 @@ export default async function OrderSuccessPage({ params }: Props) {
           </div>
         </div>
 
-        <p className="mt-8 text-sm text-gray-600">
+        <p className="mt-8 text-sm text-gray-600 dark:text-slate-300">
           Enviámos um email de confirmação para{" "}
           <strong>{order.customer_email}</strong>
         </p>
 
-        <div className="mt-8 flex gap-3">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/menu"
-            className="flex h-12 flex-1 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
+            className="site-button-secondary flex h-12 flex-1"
           >
             Ver Menu
           </Link>

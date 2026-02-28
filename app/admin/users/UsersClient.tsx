@@ -126,8 +126,8 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
 
     return (
         <>
-            <main className="p-6 space-y-6">
-                <header className="flex items-center gap-4">
+            <main className="admin-page">
+                <header className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                     <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow">
                         <UsersIcon className="h-6 w-6 text-white" />
                     </div>
@@ -139,7 +139,7 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
                     </div>
                 </header>
 
-                <section className="flex items-center gap-4">
+                <section className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                     <div className="relative flex-1 max-w-md">
                         <svg
                             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
@@ -164,7 +164,7 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
                     </div>
                     <button
                         onClick={openNewUserModal}
-                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700 sm:w-auto"
                     >
                         <UserPlusIcon className="h-4 w-4" />
                         <span className="text-sm font-medium">Novo Cliente</span>
@@ -251,7 +251,7 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
                     onClick={closeModal}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6"
+                        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-6">
@@ -309,7 +309,7 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div>
                                     <label className="block text-xs font-medium text-gray-600 mb-1">
                                         Telefone
@@ -358,7 +358,7 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div>
                                     <label className="block text-xs font-medium text-gray-600 mb-1">
                                         Pontos
@@ -391,7 +391,7 @@ export default function UsersClient({ users }: { users: DbUser[] }) {
                                 </div>
                             </div>
 
-                            <div className="flex gap-3 pt-4">
+                            <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row">
                                 <button
                                     type="button"
                                     onClick={handleSave}

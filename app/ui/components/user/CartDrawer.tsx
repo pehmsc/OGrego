@@ -29,34 +29,34 @@ export function CartDrawer({ open, onClose }: Props) {
     <div className="fixed inset-0 z-[999]">
       {/* overlay */}
       <button
-        className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/30 backdrop-blur-[2px] dark:bg-slate-950/70"
         onClick={onClose}
         aria-label="Fechar carrinho"
       />
 
       {/* painel */}
-      <aside className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl">
-        <div className="flex h-16 items-center justify-between border-b border-[#1E3A8A]/10 px-5">
+      <aside className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl dark:bg-slate-950">
+        <div className="flex h-16 items-center justify-between border-b border-[#1E3A8A]/10 px-5 dark:border-white/10">
           <div>
-            <p className="text-sm text-[#1E3A8A]/70">Carrinho</p>
-            <p className="text-base font-semibold text-[#1E3A8A]">
+            <p className="text-sm text-[#1E3A8A]/70 dark:text-slate-300">Carrinho</p>
+            <p className="text-base font-semibold text-[#1E3A8A] dark:text-slate-50">
               {totalItems} {totalItems === 1 ? "item" : "itens"}
             </p>
           </div>
 
           <button
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#1E3A8A]/15 hover:bg-[#F4F7FB]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#1E3A8A]/15 hover:bg-[#F4F7FB] dark:border-white/10 dark:hover:bg-slate-800"
             aria-label="Fechar"
           >
-            <XMarkIcon className="h-5 w-5 text-[#1E3A8A]" />
+            <XMarkIcon className="h-5 w-5 text-[#1E3A8A] dark:text-slate-100" />
           </button>
         </div>
 
         {/* conteúdo */}
         <div className="h-[calc(100%-16rem)] overflow-auto p-5">
           {items.length === 0 ? (
-            <p className="text-sm text-zinc-600">O carrinho está vazio.</p>
+            <p className="text-sm text-zinc-600 dark:text-slate-300">O carrinho está vazio.</p>
           ) : (
             <div className="space-y-4">
               {items.map((item) => (
@@ -76,10 +76,10 @@ export function CartDrawer({ open, onClose }: Props) {
                   <div className="flex flex-1 flex-col">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-[#1E3A8A]">
+                        <p className="text-sm font-semibold text-[#1E3A8A] dark:text-slate-50">
                           {item.nome}
                         </p>
-                        <p className="text-xs text-zinc-600">
+                        <p className="text-xs text-zinc-600 dark:text-slate-300">
                           €{item.preco.toFixed(2)}
                         </p>
                       </div>
@@ -95,10 +95,10 @@ export function CartDrawer({ open, onClose }: Props) {
 
                     {/* quantidade */}
                     <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2 rounded-full border border-[#1E3A8A]/20 bg-white px-2 py-1">
+                      <div className="flex items-center gap-2 rounded-full border border-[#1E3A8A]/20 bg-white px-2 py-1 dark:border-white/10 dark:bg-slate-900">
                         <button
                           onClick={() => diminuir(item.id)}
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-[#1E3A8A] hover:bg-[#1E3A8A]/10"
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-[#1E3A8A] hover:bg-[#1E3A8A]/10 dark:text-slate-100 dark:hover:bg-slate-800"
                         >
                           −
                         </button>
@@ -107,13 +107,13 @@ export function CartDrawer({ open, onClose }: Props) {
                         </span>
                         <button
                           onClick={() => aumentar(item.id)}
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-[#1E3A8A] hover:bg-[#1E3A8A]/10"
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-[#1E3A8A] hover:bg-[#1E3A8A]/10 dark:text-slate-100 dark:hover:bg-slate-800"
                         >
                           +
                         </button>
                       </div>
 
-                      <p className="text-sm font-semibold text-[#1E3A8A]">
+                      <p className="text-sm font-semibold text-[#1E3A8A] dark:text-slate-50">
                         €{(item.preco * item.quantidade).toFixed(2)}
                       </p>
                     </div>
@@ -125,10 +125,10 @@ export function CartDrawer({ open, onClose }: Props) {
         </div>
 
         {/* footer */}
-        <div className="border-t border-[#1E3A8A]/10 p-5">
+        <div className="border-t border-[#1E3A8A]/10 p-5 dark:border-white/10">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm text-zinc-600">Subtotal</span>
-            <span className="text-base font-semibold text-[#1E3A8A]">
+            <span className="text-sm text-zinc-600 dark:text-slate-300">Subtotal</span>
+            <span className="text-base font-semibold text-[#1E3A8A] dark:text-slate-50">
               €{subtotal.toFixed(2)}
             </span>
           </div>
@@ -145,7 +145,7 @@ export function CartDrawer({ open, onClose }: Props) {
             <Link
               href="/menu"
               onClick={onClose}
-              className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40"
+              className="flex h-12 w-full items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40 dark:border-white/10 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
             >
               Continuar a comprar
             </Link>

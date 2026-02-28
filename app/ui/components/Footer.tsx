@@ -13,8 +13,8 @@ export default function Footer({ className }: FooterProps) {
         className,
       )}
     >
-      <div className="mx-auto max-w-7xl px-6 py-8 text-sm text-[#1E3A8A]/70">
-        <div className="grid gap-4 text-center sm:grid-cols-3 sm:items-center sm:text-left dark:text-white/70">
+      <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-[#1E3A8A]/70 sm:px-6 dark:text-white/70">
+        <div className="grid gap-4 text-center sm:grid-cols-3 sm:items-center sm:text-left">
           <p>
             © {new Date().getFullYear()} O Grego. Todos os direitos reservados.
           </p>
@@ -29,7 +29,7 @@ export default function Footer({ className }: FooterProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="transition hover:text-[#1E3A8A]"
+              className="transition hover:text-[#1E3A8A] dark:hover:text-white"
             >
               <FacebookIcon />
             </Link>
@@ -39,7 +39,7 @@ export default function Footer({ className }: FooterProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="transition hover:text-[#1E3A8A]"
+              className="transition hover:text-[#1E3A8A] dark:hover:text-white"
             >
               <InstagramIcon />
             </Link>
@@ -49,7 +49,7 @@ export default function Footer({ className }: FooterProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
-              className="transition hover:text-[#1E3A8A]"
+              className="transition hover:text-[#1E3A8A] dark:hover:text-white"
             >
               <YouTubeIcon />
             </Link>

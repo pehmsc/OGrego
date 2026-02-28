@@ -10,7 +10,7 @@ export default function OrderSummaryCard({
     lastOrder,
 }: OrderSummaryCardProps) {
     return (
-        <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+        <div className="site-card p-6 sm:p-8">
             <h3 className="mb-6 text-2xl font-semibold text-[#1E3A8A]">
                 Resumo de Encomendas
             </h3>
@@ -47,7 +47,7 @@ export default function OrderSummaryCard({
                 )}
 
                 {/* Pontos Ganhos */}
-                <div className="rounded-2xl bg-yellow-50 p-4">
+                <div className="rounded-2xl bg-yellow-50 p-4 dark:bg-amber-500/10">
                     <div className="flex items-center gap-2">
                         <span className="text-2xl text-yellow-600">★</span>
                         <div>

@@ -270,8 +270,8 @@ export default function ReservationsClient({
     };
 
     return (
-        <main className="p-6 space-y-6">
-            <header className="flex items-center gap-4">
+        <main className="admin-page">
+            <header className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow">
                     <CalendarIcon className="h-6 w-6 text-white" />
                 </div>
@@ -315,8 +315,8 @@ export default function ReservationsClient({
                 </div>
             </section>
 
-            <section className="flex items-start gap-6">
-                <div className="relative">
+            <section className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative w-full sm:max-w-xs">
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
                         fill="none"
@@ -335,19 +335,19 @@ export default function ReservationsClient({
                         placeholder="Pesquisar..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        className="w-56 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-blue-400"
+                        className="admin-input pl-10"
                     />
                 </div>
                 <button
-                    className="py-2 px-4 rounded-lg bg-blue-600 text-white shadow hover:bg-blue-700 transition text-sm"
+                    className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm text-white shadow transition hover:bg-blue-700 sm:w-auto"
                     onClick={() => setShowCreate(true)}
                 >
                     Nova Reserva
                 </button>
             </section>
 
-            <section className="bg-white rounded-2xl shadow border overflow-x-auto">
-                <table className="w-full text-sm">
+            <section className="admin-table-scroll">
+                <table className="min-w-[760px] w-full text-sm">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-4 py-3 text-left">Número</th>
@@ -437,11 +437,11 @@ export default function ReservationsClient({
             {/* MODAL VER */}
             {selected && !editing && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 overflow-y-auto"
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center overflow-y-auto p-4"
                     onClick={() => setSelected(null)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6 my-8"
+                        className="my-8 w-full max-w-lg rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-between items-start">
@@ -450,7 +450,7 @@ export default function ReservationsClient({
                             </h2>
                         </div>
 
-                        <div className="mt-4 grid grid-cols-2 gap-3">
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
                                 <p className="text-xs text-gray-500">Número</p>
                                 <p className="font-medium">{selected.numero}</p>
@@ -491,7 +491,7 @@ export default function ReservationsClient({
                             </div>
                         )}
 
-                        <div className="mt-6 flex gap-3">
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
                             <button
                                 onClick={() => setSelected(null)}
                                 className="flex-1 py-2 rounded-lg border"
@@ -512,14 +512,14 @@ export default function ReservationsClient({
             {/* MODAL EDITAR */}
             {editing && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 overflow-y-auto"
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center overflow-y-auto p-4"
                     onClick={() => {
                         setEditing(null);
                         setSelected(null);
                     }}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6 my-8 max-h-[90vh] overflow-y-auto"
+                        className="my-8 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-xl font-bold mb-4">
@@ -629,7 +629,7 @@ export default function ReservationsClient({
                                     rows={2}
                                 />
                             </div>
-                            <div className="flex gap-3 mt-6">
+                            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
                                 <button
                                     type="button"
                                     className="flex-1 py-2 rounded-lg border"
@@ -657,11 +657,11 @@ export default function ReservationsClient({
             {/* MODAL CRIAR */}
             {showCreate && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 overflow-y-auto"
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center overflow-y-auto p-4"
                     onClick={() => setShowCreate(false)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow max-w-lg w-full p-6 my-8 max-h-[90vh] overflow-y-auto"
+                        className="my-8 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-xl font-bold mb-4">Nova Reserva</h2>
@@ -689,7 +689,7 @@ export default function ReservationsClient({
                             }}
                             className="space-y-4"
                         >
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <div>
                                     <label className="text-xs text-gray-600 block mb-1">
                                         Nome{" "}
@@ -734,7 +734,7 @@ export default function ReservationsClient({
                                 />
                             </div>
 
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                 <div>
                                     <label className="text-xs text-gray-600 block mb-1">
                                         Data{" "}
@@ -792,7 +792,7 @@ export default function ReservationsClient({
                                 />
                             </div>
 
-                            <div className="flex gap-3 pt-2">
+                            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
                                 <button
                                     type="button"
                                     onClick={() => {

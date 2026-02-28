@@ -55,7 +55,7 @@ export default function FeedbackForm({
                     type="number"
                     defaultValue={initialOrderId ?? ""}
                     placeholder="ex: 42"
-                    className="w-full max-w-xs rounded-2xl border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    className="site-input max-w-xs"
                 />
             </div>
 
@@ -85,7 +85,7 @@ export default function FeedbackForm({
                     ))}
                 </div>
                 {rating > 0 && (
-                    <p className="mt-2 text-sm text-zinc-600">
+                    <p className="mt-2 text-sm text-zinc-600 dark:text-slate-300">
                         {rating === 1 && "Muito insatisfeito"}
                         {rating === 2 && "Insatisfeito"}
                         {rating === 3 && "Neutro"}
@@ -106,7 +106,7 @@ export default function FeedbackForm({
                     required
                     minLength={10}
                     placeholder="Conte-nos sobre a sua experiência... (mínimo 10 caracteres)"
-                    className="w-full rounded-2xl border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                    className="site-input"
                 />
             </div>
 
@@ -119,13 +119,13 @@ export default function FeedbackForm({
                     name="image"
                     type="file"
                     accept="image/*"
-                    className="block w-full text-sm text-zinc-600
+                    className="block w-full text-sm text-zinc-600 dark:text-slate-300
                         file:mr-4 file:rounded-full file:border-0
                         file:bg-[#1E3A8A] file:px-4 file:py-2
                         file:text-sm file:font-medium file:text-white
                         file:transition-all hover:file:bg-[#162F73]"
                 />
-                <p className="mt-1 text-xs text-zinc-600/70">
+                <p className="mt-1 text-xs text-zinc-600/70 dark:text-slate-400">
                     Máximo 5MB (JPG, PNG, WEBP)
                 </p>
             </div>

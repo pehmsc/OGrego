@@ -169,9 +169,9 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
     };
 
     return (
-        <main className="p-6 space-y-6">
+        <main className="admin-page">
             {/* Header */}
-            <header className="flex items-center gap-4">
+            <header className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow">
                     <DocumentTextIcon className="h-6 w-6 text-white" />
                 </div>
@@ -255,7 +255,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
             </section>
 
             {/* Search Bar */}
-            <section className="flex items-center gap-4">
+            <section className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1 max-w-md">
                     <svg
                         className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
@@ -275,7 +275,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
                         placeholder="Pesquisar..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm bg-white/90 focus:ring-2 focus:ring-blue-400"
+                        className="admin-input pl-10"
                     />
                     {searchQuery && (
                         <button
@@ -301,7 +301,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
             </section>
 
             {/* Tabs */}
-            <section className="flex flex-wrap gap-2">
+            <section className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
                 <button
                     onClick={() => setActiveTab("todos")}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -338,7 +338,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
             {/* Lista de Recibos */}
             <section className="space-y-4">
                 {filteredReceipts.length === 0 ? (
-                    <div className="text-center py-12 rounded-2xl border border-gray-200 bg-gray-50">
+                    <div className="rounded-2xl border border-gray-200 bg-gray-50 py-12 text-center">
                         <svg
                             className="mx-auto h-12 w-12 text-gray-400 mb-4"
                             fill="none"
@@ -367,9 +367,9 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
                             <div
                                 key={receipt.id}
                                 onClick={() => setSelectedReceipt(receipt)}
-                                className="group cursor-pointer border border-gray-200 rounded-2xl p-4 bg-white hover:shadow-lg hover:-translate-y-1 transition-all"
+                                className="group cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
                             >
-                                <div className="flex items-start justify-between gap-4">
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-2">
                                             <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow">
@@ -400,7 +400,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
                                             {receipt.date}
                                         </p>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                    <div className="flex flex-row items-center justify-between gap-3 sm:flex-col sm:items-end">
                                         <span className="text-xl font-bold text-gray-900">
                                             €{receipt.amount.toFixed(2)}
                                         </span>
@@ -420,15 +420,15 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
             {/* Modal do Documento */}
             {selectedReceipt && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
                     onClick={() => setSelectedReceipt(null)}
                 >
                     <div
-                        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header do Modal */}
-                        <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 flex items-center justify-between">
+                        <div className="sticky top-0 flex flex-col gap-4 bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white sm:flex-row sm:items-center sm:justify-between sm:p-6">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-white/20 rounded-xl">
                                     <DocumentTextIcon className="h-5 w-5 text-white" />
@@ -487,7 +487,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
                                 <h3 className="font-semibold text-gray-900 mb-3">
                                     Detalhes
                                 </h3>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <div className="bg-blue-50 rounded-lg p-3">
                                         <p className="text-xs text-blue-600 font-medium">
                                             Número
@@ -572,7 +572,7 @@ export default function InvoicesClient({ receipts }: { receipts: Receipt[] }) {
                         </div>
 
                         {/* Footer com Botões */}
-                        <div className="sticky bottom-0 bg-gray-50 p-4 border-t flex gap-3">
+                        <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t bg-gray-50 p-4 sm:flex-row">
                             <button
                                 onClick={() => setSelectedReceipt(null)}
                                 className="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-all text-sm"

@@ -4,8 +4,8 @@ interface LoyaltyCardProps {
 
 export default function LoyaltyCard({ points }: LoyaltyCardProps) {
     const maxPoints = 50;
-    const progress = (points / maxPoints) * 100;
-    const pointsToNext = maxPoints - points;
+    const progress = Math.min((points / maxPoints) * 100, 100);
+    const pointsToNext = Math.max(maxPoints - points, 0);
 
     return (
         <div className="rounded-3xl border border-[#1E3A8A]/10 bg-gradient-to-br from-yellow-400 to-yellow-600 p-8 text-white shadow-sm">

@@ -73,8 +73,8 @@ export default function PerfilPage() {
     if (!user) {
         return (
             <UserPageLayout sidebar={<LoyaltyCard points={0} />}>
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
-                    <p className="text-center text-zinc-600">A carregar...</p>
+                <div className="site-card p-6 sm:p-8">
+                    <p className="text-center text-zinc-600 dark:text-slate-300">A carregar...</p>
                 </div>
             </UserPageLayout>
         );
@@ -82,7 +82,7 @@ export default function PerfilPage() {
 
     return (
         <UserPageLayout sidebar={<LoyaltyCard points={user.points || 0} />}>
-            <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+            <div className="site-card p-6 sm:p-8">
                 <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h2 className="text-2xl font-semibold text-[#1E3A8A]">
                         Informações Pessoais
@@ -90,7 +90,7 @@ export default function PerfilPage() {
                     {user.role === "admin" ? (
                         <Link
                             href="/admin/dashboard"
-                            className="inline-flex h-10 items-center justify-center rounded-full border border-[#1E3A8A]/20 bg-white px-5 text-sm font-medium text-[#1E3A8A] transition-all hover:border-[#1E3A8A]/40 hover:bg-[#F4F7FB]"
+                            className="site-button-secondary inline-flex h-10 px-5"
                         >
                             Ir para Dashboard
                         </Link>
@@ -104,7 +104,7 @@ export default function PerfilPage() {
                             Fotografia de Perfil
                         </label>
 
-                        <div className="flex items-center gap-6">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
                             {/* Preview da imagem */}
                             <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-[#1E3A8A]/20">
                                 {imagePreview ? (
@@ -129,13 +129,13 @@ export default function PerfilPage() {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className="block w-full text-sm text-zinc-600
+                                    className="block w-full text-sm text-zinc-600 dark:text-slate-300
                                         file:mr-4 file:rounded-full file:border-0
                                         file:bg-[#1E3A8A] file:px-4 file:py-2
                                         file:text-sm file:font-medium file:text-white
                                         file:transition-all hover:file:bg-[#162F73]"
                                 />
-                                <p className="mt-1 text-xs text-zinc-600/70">
+                                <p className="mt-1 text-xs text-zinc-600/70 dark:text-slate-400">
                                     Máximo 5MB (JPG, PNG, WEBP)
                                 </p>
                             </div>
@@ -152,7 +152,7 @@ export default function PerfilPage() {
                             type="text"
                             defaultValue={user.name || ""}
                             required
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         />
                     </div>
 
@@ -165,9 +165,9 @@ export default function PerfilPage() {
                             type="email"
                             value={user.email || ""}
                             disabled
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-zinc-100 px-6 py-3 text-sm text-zinc-500"
+                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-zinc-100 px-6 py-3 text-sm text-zinc-500 dark:border-white/10 dark:bg-slate-900 dark:text-slate-400"
                         />
-                        <p className="mt-1 text-xs text-zinc-600/70">
+                        <p className="mt-1 text-xs text-zinc-600/70 dark:text-slate-400">
                             O email não pode ser alterado
                         </p>
                     </div>
@@ -182,7 +182,7 @@ export default function PerfilPage() {
                             type="tel"
                             defaultValue={user.phone || ""}
                             placeholder="+351 912 345 678"
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         />
                     </div>
 
@@ -197,7 +197,7 @@ export default function PerfilPage() {
                             defaultValue={user.nif || ""}
                             maxLength={9}
                             placeholder="123456789"
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         />
                     </div>
 
@@ -211,7 +211,7 @@ export default function PerfilPage() {
                             type="text"
                             defaultValue={user.address || ""}
                             placeholder="Rua Example, 123, 1200-000 Lisboa"
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         />
                     </div>
 
@@ -226,7 +226,7 @@ export default function PerfilPage() {
                             defaultValue={user.postalCode || ""}
                             placeholder="1000-000"
                             maxLength={8}
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         />
                     </div>
 
@@ -240,7 +240,7 @@ export default function PerfilPage() {
                             type="text"
                             defaultValue={user.city || ""}
                             placeholder="Lisboa"
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         />
                     </div>
 
@@ -252,7 +252,7 @@ export default function PerfilPage() {
                         <select
                             name="favoriteRestaurant"
                             defaultValue={user.favoriteRestaurant || ""}
-                            className="w-full rounded-full border border-[#1E3A8A]/20 bg-white/80 px-6 py-3 text-sm transition-all focus:border-[#1E3A8A]/40 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]/20"
+                            className="site-input-pill px-6"
                         >
                             <option value="">Selecione...</option>
                             <option value="Lisboa">O Grego - Lisboa</option>
@@ -273,7 +273,7 @@ export default function PerfilPage() {
 
                 {/* Zona perigosa */}
                 <div className="mt-10 border-t border-red-100 pt-8">
-                    <p className="mb-4 text-sm text-zinc-500">
+                    <p className="mb-4 text-sm text-zinc-500 dark:text-slate-400">
                         Ao eliminar a sua conta, os seus dados pessoais serão
                         apagados permanentemente.
                     </p>

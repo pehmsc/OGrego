@@ -118,7 +118,9 @@ export default function ReservationForm() {
                 }),
             });
 
-            const data: any = await res.json().catch(() => ({}));
+            const data = (await res.json().catch(() => ({}))) as {
+                error?: string;
+            };
 
             if (!res.ok) {
                 setStatus("error");
@@ -157,7 +159,7 @@ export default function ReservationForm() {
                         required
                         value={form.name}
                         onChange={(e) => onChange("name", e.target.value)}
-                        className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
+                        className="site-input h-11 rounded-2xl px-4 py-0"
                     />
                 </label>
 
@@ -170,7 +172,7 @@ export default function ReservationForm() {
                         type="email"
                         value={form.email}
                         onChange={(e) => onChange("email", e.target.value)}
-                        className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
+                        className="site-input h-11 rounded-2xl px-4 py-0"
                     />
                 </label>
             </div>
@@ -182,7 +184,7 @@ export default function ReservationForm() {
                 <input
                     value={form.phone}
                     onChange={(e) => onChange("phone", e.target.value)}
-                    className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
+                    className="site-input h-11 rounded-2xl px-4 py-0"
                 />
             </label>
 
@@ -199,7 +201,7 @@ export default function ReservationForm() {
                         onChange={handleDateChange}
                         placeholder="DD-MM-AAAA"
                         maxLength={10}
-                        className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
+                        className="site-input h-11 rounded-2xl px-4 py-0"
                     />
                 </label>
 
@@ -215,7 +217,7 @@ export default function ReservationForm() {
                         onChange={handleTimeChange}
                         placeholder="HH:MM"
                         maxLength={5}
-                        className="h-11 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
+                        className="site-input h-11 rounded-2xl px-4 py-0"
                     />
                 </label>
 
@@ -229,7 +231,7 @@ export default function ReservationForm() {
                         type="number"
                         value={form.people}
                         onChange={(e) => onChange("people", e.target.value)}
-                        className="h-11 w-full rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 text-sm outline-none focus:border-[#1E3A8A]/35"
+                        className="site-input h-11 rounded-2xl px-4 py-0"
                     />
                 </label>
             </div>
@@ -241,7 +243,7 @@ export default function ReservationForm() {
                 <textarea
                     value={form.notes}
                     onChange={(e) => onChange("notes", e.target.value)}
-                    className="min-h-28 rounded-2xl border border-[#1E3A8A]/15 bg-white px-4 py-3 text-sm outline-none focus:border-[#1E3A8A]/35"
+                    className="site-input min-h-28"
                 />
             </label>
 
@@ -254,7 +256,7 @@ export default function ReservationForm() {
             </button>
 
             {status === "ok" && (
-                <div className="rounded-2xl border border-[#1E3A8A]/15 bg-[#F4F7FB] p-4 text-sm text-[#1E3A8A]/80">
+                <div className="site-card-soft rounded-2xl border border-[#1E3A8A]/15 p-4 text-sm text-[#1E3A8A]/80 dark:border-white/10 dark:text-slate-200">
                     Pedido enviado! Obrigado por reservar uma mesa no O Grego.
                 </div>
             )}

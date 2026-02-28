@@ -8,6 +8,14 @@ import FeedbackStatsCard from "@/app/ui/components/user/FeedbackStatsCard";
 import FeedbackForm from "@/app/ui/components/FeedbackForm";
 import Image from "next/image";
 
+type UserFeedback = {
+    id: number;
+    rating: number;
+    date: string;
+    comment: string;
+    image_url: string | null;
+};
+
 export default async function FeedbackPage({
     searchParams,
 }: {
@@ -21,7 +29,7 @@ export default async function FeedbackPage({
 
     // ✅ Dados reais da BD
     const stats = await getUserFeedbackStats(userDb.id);
-    const feedbacks = await getUserFeedbacks(userDb.id);
+    const feedbacks = (await getUserFeedbacks(userDb.id)) as UserFeedback[];
 
     return (
         <UserPageLayout
@@ -35,11 +43,11 @@ export default async function FeedbackPage({
         >
             <div className="space-y-8">
                 {/* Formulário */}
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+                <div className="site-card p-6 sm:p-8">
                     <h2 className="mb-6 text-2xl font-semibold text-[#1E3A8A]">
                         Deixe o seu Feedback
                         {initialOrderId && (
-                            <span className="ml-3 text-base font-normal text-zinc-500">
+                            <span className="ml-3 text-base font-normal text-zinc-500 dark:text-slate-400">
                                 — Encomenda #{initialOrderId}
                             </span>
                         )}
@@ -50,16 +58,16 @@ export default async function FeedbackPage({
 
                 {/* Histórico */}
                 {feedbacks.length > 0 && (
-                    <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
+                    <div className="site-card p-6 sm:p-8">
                         <h3 className="mb-6 text-lg font-semibold text-[#1E3A8A]">
                             Os Seus Feedbacks Anteriores
                         </h3>
 
                         <div className="space-y-4">
-                            {feedbacks.map((feedback: any) => (
+                            {feedbacks.map((feedback) => (
                                 <div
                                     key={feedback.id}
-                                    className="rounded-2xl border border-[#1E3A8A]/10 bg-[#F4F7FB] p-4"
+                                    className="site-card-soft rounded-2xl border border-[#1E3A8A]/10 p-4 dark:border-white/10"
                                 >
                                     <div className="mb-2 flex items-center justify-between">
                                         <div className="flex gap-1">
@@ -76,11 +84,11 @@ export default async function FeedbackPage({
                                                 </span>
                                             ))}
                                         </div>
-                                        <span className="text-xs text-zinc-600/70">
+                                        <span className="text-xs text-zinc-600/70 dark:text-slate-400">
                                             {feedback.date}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-zinc-600">
+                                    <p className="text-sm text-zinc-600 dark:text-slate-300">
                                         {feedback.comment}
                                     </p>
 
