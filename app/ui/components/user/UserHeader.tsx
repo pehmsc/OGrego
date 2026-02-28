@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { getLoyaltyInfo } from "@/app/lib/loyalty";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 interface UserHeaderProps {
     name: string;
@@ -13,6 +15,8 @@ export default function UserHeader({
     photo,
     loyaltyPoints,
 }: UserHeaderProps) {
+    const info = getLoyaltyInfo(loyaltyPoints);
+
     return (
         <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
@@ -39,8 +43,10 @@ export default function UserHeader({
                     </h1>
 
                     <div className="flex items-center gap-3">
-                        <span className="flex h-8 items-center rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-4 text-sm font-medium text-white shadow-sm">
-                            Ouro
+                        <span
+                            className={`flex h-8 items-center gap-1 rounded-full bg-gradient-to-r ${info.badgeGradient} px-4 text-sm font-medium text-white shadow-sm`}
+                        >
+                            <CheckBadgeIcon className="h-4 w-4" /> {info.level}
                         </span>
 
                         <span className="text-sm font-medium text-zinc-600">

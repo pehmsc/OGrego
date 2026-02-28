@@ -72,9 +72,42 @@ export default function PerfilPage() {
 
     if (!user) {
         return (
-            <UserPageLayout sidebar={<LoyaltyCard points={0} />}>
-                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm">
-                    <p className="text-center text-zinc-600">A carregar...</p>
+            <UserPageLayout
+                sidebar={
+                    <div className="rounded-3xl bg-slate-200 animate-pulse p-8 space-y-6">
+                        <div className="space-y-2">
+                            <div className="h-7 w-32 rounded-lg bg-slate-300" />
+                            <div className="h-4 w-24 rounded-lg bg-slate-300" />
+                        </div>
+                        <div className="space-y-1">
+                            <div className="h-4 w-20 rounded-lg bg-slate-300" />
+                            <div className="h-10 w-16 rounded-lg bg-slate-300" />
+                            <div className="h-4 w-12 rounded-lg bg-slate-300" />
+                        </div>
+                        <div className="space-y-2">
+                            <div className="h-3 w-full rounded-full bg-slate-300" />
+                            <div className="h-2 w-full rounded-full bg-slate-300" />
+                        </div>
+                        <div className="space-y-2 pt-4 border-t border-slate-300">
+                            <div className="h-3 w-28 rounded-lg bg-slate-300" />
+                            <div className="h-4 w-24 rounded-lg bg-slate-300" />
+                            <div className="h-4 w-32 rounded-lg bg-slate-300" />
+                            <div className="h-4 w-20 rounded-lg bg-slate-300" />
+                        </div>
+                    </div>
+                }
+            >
+                <div className="rounded-3xl border border-[#1E3A8A]/10 bg-white/80 p-8 shadow-sm space-y-4">
+                    <div className="flex items-center gap-6">
+                        <div className="animate-pulse rounded-full bg-slate-200 h-24 w-24 shrink-0" />
+                        <div className="space-y-2 flex-1">
+                            <div className="animate-pulse rounded-lg bg-slate-200 h-6 w-40" />
+                            <div className="animate-pulse rounded-lg bg-slate-200 h-5 w-24" />
+                        </div>
+                    </div>
+                    <div className="animate-pulse rounded-lg bg-slate-200 h-10 w-full" />
+                    <div className="animate-pulse rounded-lg bg-slate-200 h-10 w-full" />
+                    <div className="animate-pulse rounded-lg bg-slate-200 h-10 w-full" />
                 </div>
             </UserPageLayout>
         );
