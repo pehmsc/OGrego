@@ -32,7 +32,7 @@ const LEVELS = [
         level: "Ouro" as LoyaltyLevel,
         min: 101,
         max: 150,
-        benefits: ["10% desconto", "Entrega grátis", "Sobremesa grátis"],
+        benefits: ["10% desconto", "Entrega grátis"],
         gradient: "from-yellow-400 to-yellow-600",
         badgeGradient: "from-yellow-400 to-yellow-600",
     },
@@ -40,12 +40,7 @@ const LEVELS = [
         level: "Platina" as LoyaltyLevel,
         min: 151,
         max: null,
-        benefits: [
-            "15% desconto",
-            "Entrega grátis",
-            "Sobremesa grátis",
-            "Reserva prioritária",
-        ],
+        benefits: ["15% desconto", "Entrega grátis"],
         gradient: "from-sky-400 to-indigo-600",
         badgeGradient: "from-sky-400 to-indigo-600",
     },
@@ -80,4 +75,23 @@ export function getLoyaltyInfo(points: number): LoyaltyInfo {
         gradient: current.gradient,
         badgeGradient: current.badgeGradient,
     };
+}
+
+export function getLoyaltyDiscountPercent(points: number): number {
+    const info = getLoyaltyInfo(points);
+    switch (info.level) {
+        case "Bronze":
+            return 5;
+        case "Prata":
+            return 8;
+        case "Ouro":
+            return 10;
+        case "Platina":
+            return 15;
+    }
+}
+
+export function hasLoyaltyFreeDelivery(points: number): boolean {
+    const info = getLoyaltyInfo(points);
+    return info.level !== "Bronze";
 }
