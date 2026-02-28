@@ -5,6 +5,26 @@ import ReciboClient from "./recibo-client";
 
 const sql = postgres(process.env.DATABASE_URL!, { ssl: "require" });
 
+type ReceiptOrderRow = {
+    id: number;
+    created_at: string;
+    order_type: string;
+    customer_name: string;
+    customer_email: string;
+    total_cents: number;
+    subtotal_cents: number;
+    delivery_fee_cents: number;
+    clerk_user_id: string | null;
+};
+
+type ReceiptItemRow = {
+    id: number;
+    item_name: string;
+    quantity: number;
+    item_price_cents: number;
+    subtotal_cents: number;
+};
+
 export default async function ReciboPage({
     params,
 }: {
@@ -18,7 +38,7 @@ export default async function ReciboPage({
     }
 
     // Buscar encomenda
-    const order = await sql`
+    const order = await sql<ReceiptOrderRow[]>`
     SELECT o.*, u.clerk_user_id
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.id
@@ -33,7 +53,7 @@ export default async function ReciboPage({
     const orderData = order[0];
 
     // Buscar items
-    const items = await sql`
+    const items = await sql<ReceiptItemRow[]>`
     SELECT * FROM order_items
     WHERE order_id = ${id}
     ORDER BY id
