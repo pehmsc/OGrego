@@ -15,11 +15,13 @@ export type AuthenticatedUserContext = {
     clerkUserId: string;
     dbUserId: string | null;
     role: UserRole;
+    points: number;
 };
 
 type DbUserRoleRow = {
     id: string;
     role: string | null;
+    points: number | null;
 };
 
 export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserContext | null> {
@@ -32,7 +34,7 @@ export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserCo
         getRoleFromClerkUserMetadata(clerkUser);
 
     const dbRows = await sql<DbUserRoleRow[]>`
-        SELECT id, role
+        SELECT id, role, points
         FROM users
         WHERE clerk_user_id = ${userId}
         LIMIT 1
@@ -82,6 +84,7 @@ export async function getAuthenticatedUserContext(): Promise<AuthenticatedUserCo
         clerkUserId: userId,
         dbUserId: dbUser?.id ?? null,
         role: clerkRole ?? normalizeUserRole(dbUser?.role) ?? "user",
+        points: dbUser?.points ?? 0,
     };
 }
 
