@@ -345,7 +345,7 @@ export default function CheckoutPage() {
     // ========================================
     // CARRINHO VAZIO
     // ========================================
-    if (items.length === 0) {
+    if (items.length === 0 && !isSubmitting) {
         return (
             <main className="mx-auto max-w-4xl px-4 py-12">
                 <div className="site-card p-8 text-center sm:p-12">

@@ -186,6 +186,7 @@ async function calculateServerCheckoutPricing(params: {
             orderType: params.orderType,
             role: params.role,
             promoCode: params.promoCode,
+            loyaltyPoints: params.loyaltyPoints,
         },
         {
             fetchPricedItems: async (ids) => {
