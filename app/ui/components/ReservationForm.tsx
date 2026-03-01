@@ -159,7 +159,7 @@ export default function ReservationForm() {
                         required
                         value={form.name}
                         onChange={(e) => onChange("name", e.target.value)}
-                        className="site-input h-11 rounded-2xl px-4 py-0"
+                        className="site-input h-16 rounded-2xl px-4 py-0"
                     />
                 </label>
 
@@ -172,7 +172,7 @@ export default function ReservationForm() {
                         type="email"
                         value={form.email}
                         onChange={(e) => onChange("email", e.target.value)}
-                        className="site-input h-11 rounded-2xl px-4 py-0"
+                        className="site-input h-16 rounded-2xl px-4 py-0"
                     />
                 </label>
             </div>
@@ -184,7 +184,7 @@ export default function ReservationForm() {
                 <input
                     value={form.phone}
                     onChange={(e) => onChange("phone", e.target.value)}
-                    className="site-input h-11 rounded-2xl px-4 py-0"
+                    className="site-input h-16 rounded-2xl px-4 py-0"
                 />
             </label>
 
@@ -201,7 +201,7 @@ export default function ReservationForm() {
                         onChange={handleDateChange}
                         placeholder="DD-MM-AAAA"
                         maxLength={10}
-                        className="site-input h-11 rounded-2xl px-4 py-0"
+                        className="site-input h-16 rounded-2xl px-4 py-0"
                     />
                 </label>
 
@@ -217,7 +217,7 @@ export default function ReservationForm() {
                         onChange={handleTimeChange}
                         placeholder="HH:MM"
                         maxLength={5}
-                        className="site-input h-11 rounded-2xl px-4 py-0"
+                        className="site-input h-16 rounded-2xl px-4 py-0"
                     />
                 </label>
 
@@ -231,7 +231,7 @@ export default function ReservationForm() {
                         type="number"
                         value={form.people}
                         onChange={(e) => onChange("people", e.target.value)}
-                        className="site-input h-11 rounded-2xl px-4 py-0"
+                        className="site-input h-16 rounded-2xl px-4 py-0"
                     />
                 </label>
             </div>
@@ -243,7 +243,7 @@ export default function ReservationForm() {
                 <textarea
                     value={form.notes}
                     onChange={(e) => onChange("notes", e.target.value)}
-                    className="site-input min-h-28"
+                    className="site-input min-h-32"
                 />
             </label>
 
