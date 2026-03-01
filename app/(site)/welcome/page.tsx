@@ -61,10 +61,10 @@ export default function WelcomePage() {
                         </Link>
 
                         <Link
-                            href="/menu"
+                            href="/contactos"
                             className="site-button-secondary flex h-12 px-6 shadow-sm"
                         >
-                            Encomendar
+                            Reservas
                         </Link>
                     </div>
                 </div>
