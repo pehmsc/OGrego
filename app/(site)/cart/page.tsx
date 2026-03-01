@@ -27,13 +27,8 @@ export default function CartPage() {
     }, [promoFromUrl]);
 
     const { user } = useUser();
-    const {
-        items,
-        removeItem,
-        updateQuantity,
-        totalItems,
-        subtotal,
-    } = useCart();
+    const { items, removeItem, updateQuantity, totalItems, subtotal } =
+        useCart();
 
     // ========================================
     // CÓDIGO PROMOCIONAL
@@ -453,16 +448,23 @@ export default function CartPage() {
                     <div className="mt-6 space-y-3">
                         {user ? (
                             // User autenticado - pode finalizar compra
-                            <Link
-                                href={
-                                    codigoPromocional
-                                        ? `/checkout?promo=${encodeURIComponent(codigoPromocional)}`
-                                        : "/checkout"
-                                }
-                                className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
-                            >
-                                Finalizar Compra
-                            </Link>
+                            <>
+                                <p className="text-xs text-center text-zinc-500">
+                                    Os descontos de fidelização serão calculados
+                                    no checkout.
+                                </p>
+
+                                <Link
+                                    href={
+                                        codigoPromocional
+                                            ? `/checkout?promo=${encodeURIComponent(codigoPromocional)}`
+                                            : "/checkout"
+                                    }
+                                    className="flex h-12 w-full items-center justify-center rounded-full bg-[#1E3A8A] text-sm font-medium text-white shadow-xl transition-all hover:-translate-y-[1px] hover:bg-[#162F73]"
+                                >
+                                    Finalizar Compra
+                                </Link>
+                            </>
                         ) : (
                             // User NÃO autenticado - precisa login
                             <div className="space-y-2">
