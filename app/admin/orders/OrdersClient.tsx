@@ -409,9 +409,21 @@ export default function OrdersClient({
                             </h2>
                             <button
                                 onClick={() => setSelectedPedido(null)}
-                                className="text-gray-600"
+                                className="text-gray-400 hover:text-gray-600"
                             >
-                                Fechar
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
                             </button>
                         </div>
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -499,9 +511,21 @@ export default function OrdersClient({
                             <h2 className="text-lg font-bold">Editar Pedido</h2>
                             <button
                                 onClick={closeEditModal}
-                                className="text-gray-500"
+                                className="text-gray-400 hover:text-gray-600"
                             >
-                                Fechar
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
                             </button>
                         </div>
 
