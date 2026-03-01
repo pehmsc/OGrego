@@ -714,19 +714,23 @@ export default function CheckoutPage() {
                                     </div>
                                 )}
 
-                                {deliveryFeeCents > 0 && (
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 dark:text-slate-300">
-                                            Portes
-                                        </span>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600 dark:text-slate-300">
+                                        Portes
+                                    </span>
+                                    {deliveryFeeCents > 0 ? (
                                         <span className="font-medium">
                                             €
                                             {(deliveryFeeCents / 100).toFixed(
                                                 2,
                                             )}
                                         </span>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <span className="font-medium text-emerald-600">
+                                            Grátis
+                                        </span>
+                                    )}
+                                </div>
 
                                 <div className="my-3 border-t border-[#1E3A8A]/10"></div>
 
