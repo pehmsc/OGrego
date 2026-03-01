@@ -25,7 +25,7 @@ const links = [
   },
   {
     name: "Recibos",
-    href: "/admin/invoices-and-receipts",
+    href: "/admin/receipts",
     icon: DocumentDuplicateIcon,
   },
   {
