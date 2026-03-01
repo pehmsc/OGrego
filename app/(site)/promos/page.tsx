@@ -51,27 +51,27 @@ export default async function PromosPage() {
                             </div>
                         ) : null}
 
-                        <dl className="mt-4 grid gap-3 text-sm leading-6 text-zinc-700/90">
+                        <dl className="mt-4 grid gap-3 text-sm leading-6 text-zinc-700/90 dark:text-white/90">
                             <div>
-                                <dt className="font-medium text-zinc-800">
+                                <dt className="font-medium text-zinc-800 dark:text-white/90">
                                     Encomenda mínima
                                 </dt>
                                 <dd>{promo.minOrder}</dd>
                             </div>
                             <div>
-                                <dt className="font-medium text-zinc-800">
+                                <dt className="font-medium text-zinc-800 dark:text-white/90">
                                     Limite de utilizações
                                 </dt>
                                 <dd>{promo.usageLimit}</dd>
                             </div>
                             <div>
-                                <dt className="font-medium text-zinc-800">
+                                <dt className="font-medium text-zinc-800 dark:text-white/90">
                                     Válida de
                                 </dt>
                                 <dd>{promo.validFrom}</dd>
                             </div>
                             <div>
-                                <dt className="font-medium text-zinc-800">
+                                <dt className="font-medium text-zinc-800 dark:text-white/90">
                                     Válida até
                                 </dt>
                                 <dd>{promo.validUntil}</dd>

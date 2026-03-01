@@ -12,6 +12,7 @@ export default function WelcomePage() {
         alt: string;
         title: string;
     } | null>(null);
+    const [heroUrl, setHeroUrl] = useState<string | null>(null);
 
     useEffect(() => {
         fetch("/api/promo-images")
@@ -26,6 +27,14 @@ export default function WelcomePage() {
                 setRandomPromo(
                     highlights[Math.floor(Math.random() * highlights.length)],
                 );
+            });
+    }, []);
+
+    useEffect(() => {
+        fetch("/api/hero-image")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data && data.url) setHeroUrl(data.url);
             });
     }, []);
 
@@ -52,10 +61,10 @@ export default function WelcomePage() {
                         </Link>
 
                         <Link
-                            href="/menu"
+                            href="/contactos"
                             className="site-button-secondary flex h-12 px-6 shadow-sm"
                         >
-                            Encomendar
+                            Reservas
                         </Link>
                     </div>
                 </div>
@@ -63,7 +72,7 @@ export default function WelcomePage() {
                 <div className="relative w-full">
                     <div className="relative aspect-[16/10] overflow-hidden rounded-3xl bg-[#F4F7FB] shadow-sm">
                         <Image
-                            src="/homehero.png"
+                            src={heroUrl || "/homehero.png"}
                             alt="Ambiente do restaurante O Grego"
                             fill
                             className="object-cover object-[50%_30%]"
