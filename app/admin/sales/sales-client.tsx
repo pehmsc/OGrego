@@ -274,9 +274,21 @@ export default function SalesClient({ vendas, stats }: Props) {
                             </h2>
                             <button
                                 onClick={() => setSelected(null)}
-                                className="text-gray-600"
+                                className="text-gray-400 hover:text-gray-600"
                             >
-                                Fechar
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
                             </button>
                         </div>
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -332,7 +344,30 @@ export default function SalesClient({ vendas, stats }: Props) {
                         className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <h2 className="text-xl font-bold mb-4">Editar Venda</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold">Editar Venda</h2>
+                            <button
+                                onClick={() => {
+                                    setEditing(null);
+                                    setSelected(null);
+                                }}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
                         <form onSubmit={handleEdit} className="space-y-4">
                             <div>
                                 <label className="text-xs text-gray-500">

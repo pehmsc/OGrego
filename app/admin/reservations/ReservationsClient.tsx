@@ -437,7 +437,7 @@ export default function ReservationsClient({
             {/* MODAL VER */}
             {selected && !editing && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center overflow-y-auto p-4"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center overflow-y-auto p-4"
                     onClick={() => setSelected(null)}
                 >
                     <div
@@ -448,6 +448,24 @@ export default function ReservationsClient({
                             <h2 className="text-xl font-bold">
                                 {selected.cliente}
                             </h2>
+                            <button
+                                onClick={() => setSelected(null)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
                         </div>
 
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -512,7 +530,7 @@ export default function ReservationsClient({
             {/* MODAL EDITAR */}
             {editing && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center overflow-y-auto p-4"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center overflow-y-auto p-4"
                     onClick={() => {
                         setEditing(null);
                         setSelected(null);
@@ -522,9 +540,32 @@ export default function ReservationsClient({
                         className="my-8 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <h2 className="text-xl font-bold mb-4">
-                            Editar Reserva
-                        </h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold">
+                                Editar Reserva
+                            </h2>
+                            <button
+                                onClick={() => {
+                                    setEditing(null);
+                                    setSelected(null);
+                                }}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
@@ -657,14 +698,34 @@ export default function ReservationsClient({
             {/* MODAL CRIAR */}
             {showCreate && (
                 <div
-                    className="fixed inset-0 bg-black/40 flex items-center justify-center overflow-y-auto p-4"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center overflow-y-auto p-4"
                     onClick={() => setShowCreate(false)}
                 >
                     <div
                         className="my-8 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <h2 className="text-xl font-bold mb-4">Nova Reserva</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold">Nova Reserva</h2>
+                            <button
+                                onClick={() => setShowCreate(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
 
                         {createSuccess && (
                             <div className="mb-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
