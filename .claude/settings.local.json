@@ -5,7 +5,8 @@
       "Bash(find \"/Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego/app/\\(site\\)\" -name \"page.tsx\")",
       "Bash(ls -la \"/Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego/app/\\(site\\)/menu\")",
       "Bash(find \"/Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego/app/\\(info\\)\" -type f)",
-      "Bash(ls -la \"/Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego/app/\\(info\\)\")"
+      "Bash(ls -la \"/Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego/app/\\(info\\)\")",
+      "Bash(git -C \"/Users/pedrocampos/Library/Mobile Documents/com~apple~CloudDocs/Courses/Software Developer/05. Programação WEB/Next_js/OGrego\" remote -v)"
     ]
   }
 }
