@@ -176,7 +176,7 @@ export async function getReservasPendentes(): Promise<number> {
     const rows = await sql<{ count: string }[]>`
             SELECT COUNT(*)::text AS count
             FROM reservas
-            WHERE estado IN ('Pendente', 'Confirmada')
+            WHERE estado IN ('Pendente')
         `;
     return Number(rows[0]?.count ?? 0);
   } catch (error) {
