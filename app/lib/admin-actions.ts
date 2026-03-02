@@ -166,7 +166,7 @@ export async function getTotalUtilizadores(): Promise<number> {
   }
 }
 
-// ─── 3. Reservas pendentes (Pendente + Confirmada) ─────────────────────
+// ─── 3. Reservas pendentes (Pendente) ─────────────────────
 
 export async function getReservasPendentes(): Promise<number> {
   const adminCheck = await requireAdmin();

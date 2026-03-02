@@ -10,6 +10,7 @@ import {
   CalendarDaysIcon,
   ClipboardDocumentListIcon,
   TruckIcon,
+  TableCellsIcon,
 } from "@heroicons/react/24/outline";
 import {
   getVendasTotal,
@@ -297,7 +298,7 @@ export default function DashboardPage() {
 
   const [vendasTotal, setVendasTotal] = useState(0);
   const [totalUtilizadores, setTotalUtilizadores] = useState(0);
-  const [pedidosPendentes, setPedidosPendentes] = useState(0);
+  const [reservasPendentes, setReservasPendentes] = useState(0);
 
   const [vendasGrafico, setVendasGrafico] = useState<VendaPonto[]>([]);
   const [categorias, setCategorias] = useState<CategoriaTop[]>([]);
@@ -318,7 +319,7 @@ export default function DashboardPage() {
       ]);
 
       setTotalUtilizadores(users);
-      setPedidosPendentes(pendentes);
+      setReservasPendentes(pendentes);
       setRecentes(pedidos);
       setAtividade(atv);
 
@@ -365,7 +366,7 @@ export default function DashboardPage() {
         ),
       );
       const pendentes = await getReservasPendentes();
-      setPedidosPendentes(pendentes);
+      setReservasPendentes(pendentes);
     }
   };
 
@@ -440,10 +441,10 @@ export default function DashboardPage() {
               {loading ? (
                 <Skeleton className="h-8 w-12 bg-orange-400/40 mt-1" />
               ) : (
-                <p className="text-2xl font-bold">{pedidosPendentes}</p>
+                <p className="text-2xl font-bold">{reservasPendentes}</p>
               )}
             </div>
-            <ShoppingBagIcon className="h-8 w-8 opacity-80" />
+            <TableCellsIcon className="h-8 w-8 opacity-80" />
           </div>
         </div>
       </section>
