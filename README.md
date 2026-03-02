@@ -79,12 +79,6 @@ cd OGrego
 # Instalar dependências
 pnpm install
 
-# Configurar variáveis de ambiente
-cp .env.example .env.local
-# Preencher as variáveis (ver secção abaixo)
-
-# Iniciar em modo desenvolvimento
-pnpm dev
 Variáveis de Ambiente
 Criar um ficheiro .env.local na raiz do projeto com as seguintes variáveis:
 
@@ -155,5 +149,3 @@ Projeto desenvolvido em equipa como projeto académico de desenvolvimento web co
 
 Licença
 Este projeto é de carácter académico/educativo.
-
-
