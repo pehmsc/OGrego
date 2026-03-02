@@ -166,21 +166,21 @@ export async function getTotalUtilizadores(): Promise<number> {
   }
 }
 
-// ─── 3. Pedidos pendentes (pending + ready) ─────────────────────
+// ─── 3. Reservas pendentes (Pendente + Confirmada) ─────────────────────
 
-export async function getPedidosPendentes(): Promise<number> {
+export async function getReservasPendentes(): Promise<number> {
   const adminCheck = await requireAdmin();
   if (!adminCheck.ok) return 0;
 
   try {
     const rows = await sql<{ count: string }[]>`
             SELECT COUNT(*)::text AS count
-            FROM orders
-            WHERE status IN ('pending', 'ready')
+            FROM reservas
+            WHERE estado IN ('Pendente', 'Confirmada')
         `;
     return Number(rows[0]?.count ?? 0);
   } catch (error) {
-    console.error("getPedidosPendentes:", error);
+    console.error("getReservasPendentes:", error);
     return 0;
   }
 }
@@ -462,43 +462,43 @@ export async function createReservationAdmin(data: {
 // ═══════════════════════════════════════════════════════════════
 
 export type Sale = {
-    id: number;
-    numero: string;
-    cliente: string;
-    total: number;
-    itens: number;
-    data: string;
-    hora: string;
-    metodo: string;
-    status: string;
-    order_type: string;
-    notes: string | null;
+  id: number;
+  numero: string;
+  cliente: string;
+  total: number;
+  itens: number;
+  data: string;
+  hora: string;
+  metodo: string;
+  status: string;
+  order_type: string;
+  notes: string | null;
 };
 
 export type SalesStats = {
-    totalVendas: number;
-    totalItens: number;
-    mediaVenda: number;
+  totalVendas: number;
+  totalItens: number;
+  mediaVenda: number;
 };
 
 export async function getSales(): Promise<Sale[]> {
-    const adminCheck = await requireAdmin();
-    if (!adminCheck.ok) return [];
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) return [];
 
-    try {
-        const rows = await sql<
-            {
-                id: number;
-                customer_name: string;
-                total_cents: number;
-                item_count: string;
-                created_at: string;
-                payment_method: string | null;
-                status: string;
-                order_type: string;
-                notes: string | null;
-            }[]
-        >`
+  try {
+    const rows = await sql<
+      {
+        id: number;
+        customer_name: string;
+        total_cents: number;
+        item_count: string;
+        created_at: string;
+        payment_method: string | null;
+        status: string;
+        order_type: string;
+        notes: string | null;
+      }[]
+    >`
             SELECT
                 o.id,
                 o.customer_name,
@@ -515,37 +515,37 @@ export async function getSales(): Promise<Sale[]> {
             ORDER BY o.created_at DESC
         `;
 
-        return rows.map((r) => ({
-            id: r.id,
-            numero: `#VND-${String(r.id).padStart(3, "0")}`,
-            cliente: r.customer_name,
-            total: r.total_cents / 100,
-            itens: Number(r.item_count ?? 0),
-            data: r.created_at.slice(0, 10),
-            hora: r.created_at.slice(11, 16),
-            metodo: r.payment_method ?? "—",
-            status: r.status,
-            order_type: r.order_type,
-            notes: r.notes,
-        }));
-    } catch (error) {
-        console.error("getSales:", error);
-        return [];
-    }
+    return rows.map((r) => ({
+      id: r.id,
+      numero: `#VND-${String(r.id).padStart(3, "0")}`,
+      cliente: r.customer_name,
+      total: r.total_cents / 100,
+      itens: Number(r.item_count ?? 0),
+      data: r.created_at.slice(0, 10),
+      hora: r.created_at.slice(11, 16),
+      metodo: r.payment_method ?? "—",
+      status: r.status,
+      order_type: r.order_type,
+      notes: r.notes,
+    }));
+  } catch (error) {
+    console.error("getSales:", error);
+    return [];
+  }
 }
 
 export async function getSalesStats(): Promise<SalesStats> {
-    const adminCheck = await requireAdmin();
-    if (!adminCheck.ok) return { totalVendas: 0, totalItens: 0, mediaVenda: 0 };
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) return { totalVendas: 0, totalItens: 0, mediaVenda: 0 };
 
-    try {
-        const rows = await sql<
-            {
-                total_vendas: string;
-                total_itens: string;
-                num_orders: string;
-            }[]
-        >`
+  try {
+    const rows = await sql<
+      {
+        total_vendas: string;
+        total_itens: string;
+        num_orders: string;
+      }[]
+    >`
             SELECT
                 COALESCE(SUM(o.total_cents), 0)::text AS total_vendas,
                 COALESCE(SUM(oi.qty), 0)::text        AS total_itens,
@@ -559,51 +559,51 @@ export async function getSalesStats(): Promise<SalesStats> {
             WHERE o.status != 'cancelled'
         `;
 
-        const row = rows[0];
-        const totalCents = Number(row?.total_vendas ?? 0);
-        const numOrders = Number(row?.num_orders ?? 0);
+    const row = rows[0];
+    const totalCents = Number(row?.total_vendas ?? 0);
+    const numOrders = Number(row?.num_orders ?? 0);
 
-        return {
-            totalVendas: totalCents / 100,
-            totalItens: Number(row?.total_itens ?? 0),
-            mediaVenda: numOrders > 0 ? totalCents / 100 / numOrders : 0,
-        };
-    } catch (error) {
-        console.error("getSalesStats:", error);
-        return { totalVendas: 0, totalItens: 0, mediaVenda: 0 };
-    }
+    return {
+      totalVendas: totalCents / 100,
+      totalItens: Number(row?.total_itens ?? 0),
+      mediaVenda: numOrders > 0 ? totalCents / 100 / numOrders : 0,
+    };
+  } catch (error) {
+    console.error("getSalesStats:", error);
+    return { totalVendas: 0, totalItens: 0, mediaVenda: 0 };
+  }
 }
 
 export async function updateSalePaymentMethod(
-    orderId: number,
-    paymentMethod: string,
+  orderId: number,
+  paymentMethod: string,
 ): Promise<void> {
-    const adminCheck = await requireAdmin();
-    if (!adminCheck.ok) throw new Error("Not authorized");
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) throw new Error("Not authorized");
 
-    await sql`
+  await sql`
         UPDATE orders
         SET payment_method = ${paymentMethod},
             updated_at     = now()
         WHERE id = ${orderId}
     `;
 
-    revalidatePath("/admin/sales");
+  revalidatePath("/admin/sales");
 }
 
 export async function updateSaleAdmin(
-    orderId: number,
-    data: {
-        customer_name: string;
-        total_cents: number;
-        payment_method: string;
-        notes: string;
-    },
+  orderId: number,
+  data: {
+    customer_name: string;
+    total_cents: number;
+    payment_method: string;
+    notes: string;
+  },
 ): Promise<void> {
-    const adminCheck = await requireAdmin();
-    if (!adminCheck.ok) throw new Error("Not authorized");
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) throw new Error("Not authorized");
 
-    await sql`
+  await sql`
         UPDATE orders
         SET customer_name  = ${data.customer_name},
             total_cents    = ${data.total_cents},
@@ -613,20 +613,20 @@ export async function updateSaleAdmin(
         WHERE id = ${orderId}
     `;
 
-    revalidatePath("/admin/sales");
+  revalidatePath("/admin/sales");
 }
 
 export async function createSaleAdmin(data: {
-    customer_name: string;
-    customer_email: string;
-    total_cents: number;
-    payment_method: string;
-    notes: string;
+  customer_name: string;
+  customer_email: string;
+  total_cents: number;
+  payment_method: string;
+  notes: string;
 }): Promise<{ id: number }> {
-    const adminCheck = await requireAdmin();
-    if (!adminCheck.ok) throw new Error("Not authorized");
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) throw new Error("Not authorized");
 
-    const result = await sql<{ id: number }[]>`
+  const result = await sql<{ id: number }[]>`
         INSERT INTO orders (
             customer_name,
             customer_email,
@@ -653,6 +653,6 @@ export async function createSaleAdmin(data: {
         RETURNING id
     `;
 
-    revalidatePath("/admin/sales");
-    return result[0];
+  revalidatePath("/admin/sales");
+  return result[0];
 }
