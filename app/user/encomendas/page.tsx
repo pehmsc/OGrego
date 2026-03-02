@@ -89,18 +89,24 @@ export default async function EncomendasPage() {
                                                                 order.status ===
                                                                     "Cancelado"
                                                               ? "bg-red-100 text-red-700"
-                                                              : "bg-yellow-100 text-yellow-700"
+                                                              : order.status ===
+                                                                  "ready"
+                                                                ? "bg-blue-100 text-blue-700"
+                                                                : "bg-yellow-100 text-yellow-700"
                                                     }`}
                                                 >
                                                     {order.status === "pending"
-                                                        ? "Pendente"
+                                                        ? "Em preparação"
                                                         : order.status ===
-                                                            "delivered"
-                                                          ? "Entregue"
+                                                            "ready"
+                                                          ? "Pronto"
                                                           : order.status ===
-                                                              "cancelled"
-                                                            ? "Cancelado"
-                                                            : order.status}
+                                                              "delivered"
+                                                            ? "Entregue"
+                                                            : order.status ===
+                                                                "cancelled"
+                                                              ? "Cancelado"
+                                                              : order.status}
                                                 </span>
                                             </td>
                                             <td className="py-4">
@@ -113,7 +119,9 @@ export default async function EncomendasPage() {
                                                 </Link>
                                             </td>
                                             <td className="py-4">
-                                                <OrderFeedbackStars orderId={order.id} />
+                                                <OrderFeedbackStars
+                                                    orderId={order.id}
+                                                />
                                             </td>
                                         </tr>
                                     ))}
@@ -142,16 +150,21 @@ export default async function EncomendasPage() {
                                                         order.status ===
                                                             "Cancelado"
                                                       ? "bg-red-100 text-red-700"
-                                                      : "bg-yellow-100 text-yellow-700"
+                                                      : order.status === "ready"
+                                                        ? "bg-blue-100 text-blue-700"
+                                                        : "bg-yellow-100 text-yellow-700"
                                             }`}
                                         >
                                             {order.status === "pending"
-                                                ? "Pendente"
-                                                : order.status === "delivered"
-                                                  ? "Entregue"
-                                                  : order.status === "cancelled"
-                                                    ? "Cancelado"
-                                                    : order.status}
+                                                ? "Em preparação"
+                                                : order.status === "ready"
+                                                  ? "Pronto"
+                                                  : order.status === "delivered"
+                                                    ? "Entregue"
+                                                    : order.status ===
+                                                        "cancelled"
+                                                      ? "Cancelado"
+                                                      : order.status}
                                         </span>
                                     </div>
 
@@ -176,7 +189,9 @@ export default async function EncomendasPage() {
                                             Ver Recibo
                                         </Link>
                                         <div className="flex h-10 w-full items-center justify-center gap-1">
-                                            <OrderFeedbackStars orderId={order.id} />
+                                            <OrderFeedbackStars
+                                                orderId={order.id}
+                                            />
                                         </div>
                                     </div>
                                 </div>
