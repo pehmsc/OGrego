@@ -437,7 +437,7 @@ export default function DashboardPage() {
         <div className="rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase">Pedidos Pendentes</p>
+              <p className="text-xs uppercase">Reservas Pendentes</p>
               {loading ? (
                 <Skeleton className="h-8 w-12 bg-orange-400/40 mt-1" />
               ) : (
